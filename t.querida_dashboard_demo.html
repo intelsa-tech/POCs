@@ -3,33 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tierra Querida Auto-Ops - Dashboard</title>
+    <title>Tierra Querida Auto-Ops - Intelsa POC</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+    
+    <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        .lucide { vertical-align: middle; display: inline-block; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans">
     <div id="root"></div>
 
     <script type="text/babel">
+        // Extraemos de forma segura después de que todo cargó
         const { useState, useEffect, useRef } = React;
         const { 
             AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
-        } = Recharts;
+        } = window.Recharts;
 
-        // Componente de Icono corregido para evitar pantallas en blanco
-        const Icon = ({ name, size = 16, className = "" }) => {
+        // Componente de Icono Ultra-Seguro
+        const Icon = ({ name, size = 18, className = "" }) => {
             useEffect(() => {
                 if (window.lucide) window.lucide.createIcons();
             }, [name]);
-            return <i data-lucide={name.toLowerCase()} style={{ width: size, height: size }} className={className}></i>;
+            return <i data-lucide={name} className={`${className}`} style={{ width: size, height: size }}></i>;
         };
 
-        // --- DATA: SEDES REALES TIERRA QUERIDA ---
+        // --- DATOS ---
         const sedesReales = [
             "Bogotá Modelia", "El Santuario", "Cali 2 Los Mangos", "Caldas La Dorada", "12 de Octubre",
             "Campo Valdes", "Piedecuesta", "Porvenir", "La Ceja 1", "Bello 3 Niquia", "Turbo",
@@ -55,89 +65,116 @@
             "Manizales 1 La Estrella"
         ];
 
-        const locationData = sedesReales.map((name, index) => {
-            const baseVol = (index * 17) % 150; 
-            const pedidos = 40 + baseVol;
-            const tiempo = 2 + ((index * 7) % 6) + (Math.random() * 1.5); 
-            const abandono = 0.5 + ((index * 3) % 4);
-            return {
-                name, pedidos,
-                tiempo: parseFloat(tiempo.toFixed(1)),
-                abandono: parseFloat(abandono.toFixed(1)),
-                ticket: 35000 + ((index * 1000) % 15000)
-            };
-        }).sort((a, b) => b.pedidos - a.pedidos);
+        const locationData = sedesReales.map((name, index) => ({
+            name,
+            pedidos: 40 + ((index * 17) % 150),
+            tiempo: parseFloat((2 + ((index * 7) % 6)).toFixed(1)),
+            abandono: parseFloat((0.5 + ((index * 3) % 4)).toFixed(1)),
+            ticket: 35000 + ((index * 1000) % 15000)
+        })).sort((a, b) => b.pedidos - a.pedidos);
 
         const nacionalStats = {
             pedidos: locationData.reduce((acc, curr) => acc + curr.pedidos, 0),
             ingresos: locationData.reduce((acc, curr) => acc + (curr.pedidos * curr.ticket), 0),
-            tiempo: parseFloat((locationData.reduce((acc, curr) => acc + curr.tiempo, 0) / locationData.length).toFixed(1)),
-            abandono: parseFloat((locationData.reduce((acc, curr) => acc + curr.abandono, 0) / locationData.length).toFixed(1)),
-            ticket: 42500,
+            tiempo: 4.2,
+            abandono: 2.1
         };
 
         const baseHourlyData = [
-            { time: '12:00', pct: 0.05 }, { time: '13:00', pct: 0.12 }, { time: '14:00', pct: 0.08 },
-            { time: '15:00', pct: 0.04 }, { time: '16:00', pct: 0.03 }, { time: '17:00', pct: 0.06 },
-            { time: '18:00', pct: 0.10 }, { time: '19:00', pct: 0.18 }, { time: '20:00', pct: 0.22 },
-            { time: '21:00', pct: 0.08 }, { time: '22:00', pct: 0.04 }
+            { time: '12pm', pct: 40 }, { time: '2pm', pct: 25 }, { time: '4pm', pct: 15 },
+            { time: '6pm', pct: 55 }, { time: '8pm', pct: 80 }, { time: '10pm', pct: 30 }
         ];
 
-        // --- COMPONENTES ---
-        const KPI = ({ title, value, subtext, icon, colorClass = "text-orange-500", highlight = false }) => (
-            <div className={`flex flex-col ${highlight ? 'bg-orange-50 p-4 rounded-lg border border-orange-200' : ''}`}>
-                <div className="flex items-center gap-2 mb-1">
-                    <Icon name={icon} colorClass={colorClass} />
-                    <span className="text-slate-500 text-sm font-medium">{title}</span>
-                </div>
-                <div className={`text-2xl font-bold ${highlight ? 'text-orange-600' : 'text-slate-800'}`}>{value}</div>
-                {subtext && <div className="text-slate-400 text-xs mt-1">{subtext}</div>}
-            </div>
-        );
-
+        // --- APP ---
         function TierraQueridaDashboard() {
-            const [selectedSede, setSelectedSede] = useState('Nacional');
-            const isNacional = selectedSede === 'Nacional';
-            const stats = isNacional ? nacionalStats : locationData.find(l => l.name === selectedSede);
             const formatCurrency = (val) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(val);
 
             return (
-                <div className="min-h-screen p-6">
-                    <header className="mb-8 border-b pb-4">
-                        <h1 className="text-3xl font-black text-slate-900">🍔 Tierra Querida <span className="text-orange-500">Auto-Ops</span></h1>
-                        <p className="text-slate-500">Dashboard de Operaciones IA — Intelsa POC</p>
+                <div className="min-h-screen p-4 md:p-8">
+                    <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h1 className="text-4xl font-black text-slate-900 flex items-center gap-3">
+                                🍔 Tierra Querida <span className="text-orange-500">Auto-Ops</span>
+                            </h1>
+                            <p className="text-slate-500 font-medium flex items-center gap-2 mt-1">
+                                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Control de Órdenes IA — Powered by Intelsa
+                            </p>
+                        </div>
+                        <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm font-bold text-orange-600">
+                           {new Date().toLocaleDateString()} — VIVO
+                        </div>
                     </header>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
-                            <span className="text-blue-600 font-bold block mb-1">Ingresos Hoy</span>
-                            <span className="text-3xl font-black">{formatCurrency(isNacional ? stats.ingresos : stats.pedidos * stats.ticket)}</span>
+                    {/* KPI CARDS */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="flex items-center gap-2 text-blue-600 font-bold mb-2">
+                                <Icon name="dollar-sign" /> Ingresos Hoy
+                            </div>
+                            <div className="text-3xl font-black">{formatCurrency(nacionalStats.ingresos)}</div>
                         </div>
-                        <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
-                            <span className="text-emerald-600 font-bold block mb-1">Pedidos Totales</span>
-                            <span className="text-3xl font-black">{stats.pedidos}</span>
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="flex items-center gap-2 text-emerald-600 font-bold mb-2">
+                                <Icon name="shopping-bag" /> Pedidos IA
+                            </div>
+                            <div className="text-3xl font-black">{nacionalStats.pedidos}</div>
                         </div>
-                        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <span className="text-slate-500 font-bold block mb-1">ETA Promedio</span>
-                            <span className="text-3xl font-black">{stats.tiempo}m</span>
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="flex items-center gap-2 text-amber-600 font-bold mb-2">
+                                <Icon name="clock" /> ETA Promedio
+                            </div>
+                            <div className="text-3xl font-black">{nacionalStats.tiempo} min</div>
                         </div>
-                        <div className="bg-orange-50 p-6 rounded-xl border border-orange-100">
-                            <span className="text-orange-600 font-bold block mb-1">Abandono</span>
-                            <span className="text-3xl font-black">{stats.abandono}%</span>
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="flex items-center gap-2 text-red-600 font-bold mb-2">
+                                <Icon name="trending-down" /> Abandono
+                            </div>
+                            <div className="text-3xl font-black">{nacionalStats.abandono}%</div>
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-80">
-                        <h3 className="font-bold mb-4 flex items-center gap-2"><Icon name="trending-up" /> Proyección de Pedidos</h3>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={baseHourlyData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                <XAxis dataKey="time" />
-                                <YAxis />
-                                <Tooltip />
-                                <Area type="monotone" dataKey="pct" stroke="#f97316" fill="#ffedd5" />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                    {/* CHART & RANKING */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm h-[450px]">
+                            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                <Icon name="activity" className="text-orange-500" /> Curva de Demanda (IA Ops)
+                            </h3>
+                            <ResponsiveContainer width="100%" height="90%">
+                                <AreaChart data={baseHourlyData}>
+                                    <defs>
+                                        <linearGradient id="colorOrange" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                                            <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="time" axisLine={false} tickLine={false} />
+                                    <Tooltip contentStyle={{ borderRadius: '15px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                                    <Area type="monotone" dataKey="pct" stroke="#f97316" strokeWidth={4} fill="url(#colorOrange)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                <Icon name="map-pin" className="text-purple-500" /> Top Sedes
+                            </h3>
+                            <div className="space-y-4">
+                                {locationData.slice(0, 6).map((sede, i) => (
+                                    <div key={i} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors">
+                                        <div>
+                                            <div className="font-bold text-slate-800">{sede.name}</div>
+                                            <div className="text-xs text-slate-400">{sede.pedidos} pedidos hoy</div>
+                                        </div>
+                                        <div className="text-emerald-500 font-mono font-bold">{sede.tiempo}m</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="mt-8 p-4 bg-orange-50 rounded-2xl border border-orange-100 text-sm text-orange-900">
+                                <strong>Insight:</strong> La sede {locationData[0].name} lidera el volumen. Sugerimos activar refuerzo de cocina.
+                            </div>
+                        </div>
                     </div>
                 </div>
             );
