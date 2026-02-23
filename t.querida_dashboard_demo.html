@@ -1,442 +1,394 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, AreaChart, Area 
-} from 'recharts';
-import { 
-  Activity, Clock, AlertTriangle, MapPin, TrendingUp, Bot, 
-  MessageSquare, ShoppingBag, XCircle, CheckCircle, Smartphone, Filter, DollarSign, PlusCircle, ChevronDown, Search
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tierra Querida Auto-Ops - Dashboard</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+    <div id="root"></div>
 
-// --- DATA: SEDES REALES TIERRA QUERIDA ---
-const sedesReales = [
-  "Bogotá Modelia", "El Santuario", "Cali 2 Los Mangos", "Caldas La Dorada", "12 de Octubre",
-  "Campo Valdes", "Piedecuesta", "Porvenir", "La Ceja 1", "Bello 3 Niquia", "Turbo",
-  "Bogotá Castilla", "Itagüí 1 Santa Maria", "Neiva", "Santa Marta 1 Rodadero", "Buga",
-  "Medellín Castilla", "Itagüí 2 Fatima", "Buenaventura", "Dosquebradas", "Barrio Antioquia",
-  "Bucaramanga 1 Estadio", "San Antonio de Prado", "Bogotá Lucero Bajo", "Bogotá Normandía",
-  "Pedregal", "Cali 5 la Novena", "Barrio Obrero Cocina Oculta", "Zamora", "Guatapé",
-  "La Ceja 2", "Centro Comercial Bosque Plaza", "Bello 4 Goretti", "La América", "Montelíbano",
-  "Armenia 1 Nogal", "Barbosa", "Pereira 3 La Julia", "Llanogrande", "Palmira", "Copacabana",
-  "Medellin San Cristóbal", "Barranquilla 1 La bomba", "Bogotá Suba 2", "Ibagué", "Soledad",
-  "Calasanz", "Santa Rosa de Cabal", "Cali 4 La Flora", "Marinilla", "Armenia 3 Las Acacias",
-  "Manizales 3 Milán", "Bucaramanga 2 Sotomayor", "Centro Comercial SantaFe", "Bogotá Restrepo",
-  "Belén Las Mercedes", "Laureles la 70", "Envigado", "Pereira 1 Cuba", "San Antonio de Pereira",
-  "Barrancabermeja Parnaso", "Armenia 2 Granada", "Cali 3 Valle de Lili", "Sabaneta 2 Parque",
-  "Cartagena 1 Caracoles", "Bello 5 París", "San Javier 1", "Madrid", "Aranjuez", "Santa Cruz",
-  "Cartagena 2 Las Gaviotas", "Bogotá Ciudad Montes", "El Peñol", "Girardota", "Caldas",
-  "Belén Cocina Oculta", "Sabaneta 1", "Cali 1 Villa Colombia", "Bogotá Villas de Granada",
-  "Centro Comercial Premium Plaza", "El Carmen de Viboral", "Cartagena 3 Manga", "Montería",
-  "Manizales 2", "Robledo", "Yomasa Bogotá", "Chigorodó", "San Javier 2 Comuna 13", "Caucasia",
-  "Bogotá Chapinero", "Santo Domingo Savio", "Bello 1 Parque", "Milagrosa",
-  "Santa Marta 2 Sector Universidad", "Manrique", "Guarne", "Barranquilla 2 la Octava",
-  "Carepa", "Villa Hermosa", "Apartadó", "Buenos Aires", "Sincelejo", "Cartago",
-  "Manizales 1 La Estrella"
-];
+    <script type="text/babel">
+        // Extraemos componentes de las librerías globales
+        const { useState, useEffect, useRef } = React;
+        const { 
+            LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
+            Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area 
+        } = Recharts;
 
-// Generador determinístico de datos para cada sede
-const locationData = sedesReales.map((name, index) => {
-  const baseVol = (index * 17) % 150; 
-  const pedidos = 40 + baseVol;
-  const tiempo = 2 + ((index * 7) % 6) + (Math.random() * 1.5); 
-  const abandono = 0.5 + ((index * 3) % 4);
-  return {
-    name,
-    pedidos,
-    tiempo: parseFloat(tiempo.toFixed(1)),
-    abandono: parseFloat(abandono.toFixed(1)),
-    ticket: 35000 + ((index * 1000) % 15000)
-  };
-}).sort((a, b) => b.pedidos - a.pedidos);
+        // Wrapper para usar los iconos de Lucide en React sin imports
+        const Icon = ({ name, size = 16, className = "" }) => {
+            const LucideIcon = window.lucide.icons[name];
+            return LucideIcon ? <LucideIcon size={size} className={className} /> : null;
+        };
 
-const nacionalStats = {
-  pedidos: locationData.reduce((acc, curr) => acc + curr.pedidos, 0),
-  ingresos: locationData.reduce((acc, curr) => acc + (curr.pedidos * curr.ticket), 0),
-  tiempo: parseFloat((locationData.reduce((acc, curr) => acc + curr.tiempo, 0) / locationData.length).toFixed(1)),
-  abandono: parseFloat((locationData.reduce((acc, curr) => acc + curr.abandono, 0) / locationData.length).toFixed(1)),
-  ticket: 42500,
-};
+        // --- DATA: SEDES REALES TIERRA QUERIDA ---
+        const sedesReales = [
+            "Bogotá Modelia", "El Santuario", "Cali 2 Los Mangos", "Caldas La Dorada", "12 de Octubre",
+            "Campo Valdes", "Piedecuesta", "Porvenir", "La Ceja 1", "Bello 3 Niquia", "Turbo",
+            "Bogotá Castilla", "Itagüí 1 Santa Maria", "Neiva", "Santa Marta 1 Rodadero", "Buga",
+            "Medellín Castilla", "Itagüí 2 Fatima", "Buenaventura", "Dosquebradas", "Barrio Antioquia",
+            "Bucaramanga 1 Estadio", "San Antonio de Prado", "Bogotá Lucero Bajo", "Bogotá Normandía",
+            "Pedregal", "Cali 5 la Novena", "Barrio Obrero Cocina Oculta", "Zamora", "Guatapé",
+            "La Ceja 2", "Centro Comercial Bosque Plaza", "Bello 4 Goretti", "La América", "Montelíbano",
+            "Armenia 1 Nogal", "Barbosa", "Pereira 3 La Julia", "Llanogrande", "Palmira", "Copacabana",
+            "Medellin San Cristóbal", "Barranquilla 1 La bomba", "Bogotá Suba 2", "Ibagué", "Soledad",
+            "Calasanz", "Santa Rosa de Cabal", "Cali 4 La Flora", "Marinilla", "Armenia 3 Las Acacias",
+            "Manizales 3 Milán", "Bucaramanga 2 Sotomayor", "Centro Comercial SantaFe", "Bogotá Restrepo",
+            "Belén Las Mercedes", "Laureles la 70", "Envigado", "Pereira 1 Cuba", "San Antonio de Pereira",
+            "Barrancabermeja Parnaso", "Armenia 2 Granada", "Cali 3 Valle de Lili", "Sabaneta 2 Parque",
+            "Cartagena 1 Caracoles", "Bello 5 París", "San Javier 1", "Madrid", "Aranjuez", "Santa Cruz",
+            "Cartagena 2 Las Gaviotas", "Bogotá Ciudad Montes", "El Peñol", "Girardota", "Caldas",
+            "Belén Cocina Oculta", "Sabaneta 1", "Cali 1 Villa Colombia", "Bogotá Villas de Granada",
+            "Centro Comercial Premium Plaza", "El Carmen de Viboral", "Cartagena 3 Manga", "Montería",
+            "Manizales 2", "Robledo", "Yomasa Bogotá", "Chigorodó", "San Javier 2 Comuna 13", "Caucasia",
+            "Bogotá Chapinero", "Santo Domingo Savio", "Bello 1 Parque", "Milagrosa",
+            "Santa Marta 2 Sector Universidad", "Manrique", "Guarne", "Barranquilla 2 la Octava",
+            "Carepa", "Villa Hermosa", "Apartadó", "Buenos Aires", "Sincelejo", "Cartago",
+            "Manizales 1 La Estrella"
+        ];
 
-const baseHourlyData = [
-  { time: '12:00', pct: 0.05 }, { time: '13:00', pct: 0.12 }, { time: '14:00', pct: 0.08 },
-  { time: '15:00', pct: 0.04 }, { time: '16:00', pct: 0.03 }, { time: '17:00', pct: 0.06 },
-  { time: '18:00', pct: 0.10 }, { time: '19:00', pct: 0.18 }, { time: '20:00', pct: 0.22 },
-  { time: '21:00', pct: 0.08 }, { time: '22:00', pct: 0.04 }
-];
+        const locationData = sedesReales.map((name, index) => {
+            const baseVol = (index * 17) % 150; 
+            const pedidos = 40 + baseVol;
+            const tiempo = 2 + ((index * 7) % 6) + (Math.random() * 1.5); 
+            const abandono = 0.5 + ((index * 3) % 4);
+            return {
+                name,
+                pedidos,
+                tiempo: parseFloat(tiempo.toFixed(1)),
+                abandono: parseFloat(abandono.toFixed(1)),
+                ticket: 35000 + ((index * 1000) % 15000)
+            };
+        }).sort((a, b) => b.pedidos - a.pedidos);
 
-const upsellItems = [
-  { item: 'Tocineta Adicional', basePct: 0.15 },
-  { item: 'Papas Francesas', basePct: 0.11 },
-  { item: 'Gaseosa 400ml', basePct: 0.08 },
-  { item: 'Doble Carne', basePct: 0.05 },
-];
+        const nacionalStats = {
+            pedidos: locationData.reduce((acc, curr) => acc + curr.pedidos, 0),
+            ingresos: locationData.reduce((acc, curr) => acc + (curr.pedidos * curr.ticket), 0),
+            tiempo: parseFloat((locationData.reduce((acc, curr) => acc + curr.tiempo, 0) / locationData.length).toFixed(1)),
+            abandono: parseFloat((locationData.reduce((acc, curr) => acc + curr.abandono, 0) / locationData.length).toFixed(1)),
+            ticket: 42500,
+        };
 
-// --- COMPONENTES AUXILIARES ---
-const Card = ({ children, className = '' }) => (
-  <div className={`bg-white rounded-xl border border-slate-200 p-5 shadow-sm ${className}`}>
-    {children}
-  </div>
-);
+        const baseHourlyData = [
+            { time: '12:00', pct: 0.05 }, { time: '13:00', pct: 0.12 }, { time: '14:00', pct: 0.08 },
+            { time: '15:00', pct: 0.04 }, { time: '16:00', pct: 0.03 }, { time: '17:00', pct: 0.06 },
+            { time: '18:00', pct: 0.10 }, { time: '19:00', pct: 0.18 }, { time: '20:00', pct: 0.22 },
+            { time: '21:00', pct: 0.08 }, { time: '22:00', pct: 0.04 }
+        ];
 
-const KPI = ({ title, value, subtext, icon: Icon, colorClass = "text-orange-500", highlight = false }) => (
-  <div className={`flex flex-col ${highlight ? 'bg-orange-50 p-4 rounded-lg border border-orange-200' : ''}`}>
-    <div className="flex items-center gap-2 mb-1">
-      <Icon size={16} className={colorClass} />
-      <span className="text-slate-500 text-sm font-medium">{title}</span>
-    </div>
-    <div className={`text-2xl font-bold ${highlight ? 'text-orange-600' : 'text-slate-800'}`}>{value}</div>
-    {subtext && <div className="text-slate-400 text-xs mt-1">{subtext}</div>}
-  </div>
-);
+        const upsellItems = [
+            { item: 'Tocineta Adicional', basePct: 0.15 },
+            { item: 'Papas Francesas', basePct: 0.11 },
+            { item: 'Gaseosa 400ml', basePct: 0.08 },
+            { item: 'Doble Carne', basePct: 0.05 },
+        ];
 
-// --- APP PRINCIPAL ---
-export default function TierraQueridaDashboard() {
-  const [currentTime, setCurrentTime] = useState('');
-  const [selectedSede, setSelectedSede] = useState('Nacional');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const dropdownRef = useRef(null);
+        // --- COMPONENTES AUXILIARES ---
+        const Card = ({ children, className = '' }) => (
+            <div className={`bg-white rounded-xl border border-slate-200 p-5 shadow-sm ${className}`}>
+                {children}
+            </div>
+        );
 
-  useEffect(() => {
-    setCurrentTime(new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-    const timer = setInterval(() => {
-      setCurrentTime(new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Cerrar el filtro al hacer clic afuera
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsFilterOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Cálculos dinámicos basados en el filtro
-  const isNacional = selectedSede === 'Nacional';
-  const currentStats = isNacional ? nacionalStats : locationData.find(l => l.name === selectedSede);
-  
-  const displayPedidos = isNacional ? nacionalStats.pedidos : currentStats.pedidos;
-  const displayIngresos = isNacional ? nacionalStats.ingresos : (currentStats.pedidos * currentStats.ticket);
-  
-  const formatCurrency = (val) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(val);
-
-  const hourlyData = baseHourlyData.map(h => ({
-    time: h.time,
-    pedidos: Math.round(displayPedidos * h.pct)
-  }));
-
-  const activeOrders = Math.max(1, Math.ceil(displayPedidos * 0.05));
-  const recentOrders = Math.max(1, Math.ceil(displayPedidos * 0.08));
-
-  const currentUpsellData = upsellItems.map(u => ({
-    item: u.item,
-    count: Math.max(1, Math.round(displayPedidos * u.basePct))
-  }));
-  const maxUpsell = Math.max(...currentUpsellData.map(u => u.count), 1);
-
-  const tableData = isNacional ? locationData.slice(0, 8) : [currentStats];
-
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 p-4 md:p-6 font-sans">
-      
-      {/* HEADER & FILTROS */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-slate-200 pb-4">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
-            🍔 Tierra Querida <span className="text-orange-500">Auto-Ops</span>
-          </h1>
-          <p className="text-slate-500 mt-1 flex items-center gap-2">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-            </span>
-            Control de Órdenes IA en Vivo — Powered by Intelsa
-          </p>
-        </div>
-        
-        <div className="flex gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-          
-          {/* BOTÓN DE FILTRO FUNCIONAL */}
-          <div className="relative" ref={dropdownRef}>
-            <button 
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="px-4 py-2 bg-slate-100 rounded text-sm font-medium text-slate-700 hover:bg-slate-200 flex items-center gap-2 transition min-w-[140px] justify-between"
-            >
-              <div className="flex items-center gap-2">
-                <Filter size={14} /> 
-                <span className="truncate max-w-[150px]">
-                  {selectedSede}
-                </span>
-              </div>
-              <ChevronDown size={14} className={`transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {isFilterOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50 flex flex-col max-h-[400px] overflow-hidden">
-                <div className="p-3 border-b border-slate-100 flex items-center gap-2 bg-slate-50">
-                  <Search size={16} className="text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Buscar entre 95 sedes..."
-                    className="w-full text-sm outline-none bg-transparent"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    autoFocus
-                  />
+        const KPI = ({ title, value, subtext, iconName, colorClass = "text-orange-500", highlight = false }) => (
+            <div className={`flex flex-col ${highlight ? 'bg-orange-50 p-4 rounded-lg border border-orange-200' : ''}`}>
+                <div className="flex items-center gap-2 mb-1">
+                    <Icon name={iconName} size={16} className={colorClass} />
+                    <span className="text-slate-500 text-sm font-medium">{title}</span>
                 </div>
-                <div className="overflow-y-auto p-2 space-y-1">
-                  <button
-                    onClick={() => { setSelectedSede('Nacional'); setIsFilterOpen(false); setSearchTerm(''); }}
-                    className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${isNacional ? 'bg-orange-50 text-orange-600 font-bold' : 'hover:bg-slate-100 text-slate-700'}`}
-                  >
-                    Nacional (Consolidado)
-                  </button>
-                  <div className="h-px bg-slate-100 my-1"></div>
-                  {sedesReales
-                    .filter(s => s.toLowerCase().includes(searchTerm.toLowerCase()))
-                    .map((sede, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => { setSelectedSede(sede); setIsFilterOpen(false); setSearchTerm(''); }}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${selectedSede === sede ? 'bg-orange-50 text-orange-600 font-bold' : 'hover:bg-slate-100 text-slate-700'}`}
-                    >
-                      {sede}
-                    </button>
-                  ))}
-                  {sedesReales.filter(s => s.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
-                    <div className="px-3 py-4 text-sm text-slate-400 text-center">No se encontraron sedes</div>
-                  )}
+                <div className={`text-2xl font-bold ${highlight ? 'text-orange-600' : 'text-slate-800'}`}>{value}</div>
+                {subtext && <div className="text-slate-400 text-xs mt-1">{subtext}</div>}
+            </div>
+        );
+
+        // --- APP PRINCIPAL ---
+        function TierraQueridaDashboard() {
+            const [currentTime, setCurrentTime] = useState('');
+            const [selectedSede, setSelectedSede] = useState('Nacional');
+            const [isFilterOpen, setIsFilterOpen] = useState(false);
+            const [searchTerm, setSearchTerm] = useState('');
+            const dropdownRef = useRef(null);
+
+            useEffect(() => {
+                const updateClock = () => {
+                    setCurrentTime(new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+                };
+                updateClock();
+                const timer = setInterval(updateClock, 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            useEffect(() => {
+                function handleClickOutside(event) {
+                    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                        setIsFilterOpen(false);
+                    }
+                }
+                document.addEventListener("mousedown", handleClickOutside);
+                return () => document.removeEventListener("mousedown", handleClickOutside);
+            }, []);
+
+            const isNacional = selectedSede === 'Nacional';
+            const currentStats = isNacional ? nacionalStats : locationData.find(l => l.name === selectedSede);
+            const displayPedidos = isNacional ? nacionalStats.pedidos : currentStats.pedidos;
+            const displayIngresos = isNacional ? nacionalStats.ingresos : (currentStats.pedidos * currentStats.ticket);
+            
+            const formatCurrency = (val) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(val);
+
+            const hourlyData = baseHourlyData.map(h => ({
+                time: h.time,
+                pedidos: Math.round(displayPedidos * h.pct)
+            }));
+
+            const activeOrders = Math.max(1, Math.ceil(displayPedidos * 0.05));
+            const recentOrders = Math.max(1, Math.ceil(displayPedidos * 0.08));
+
+            const currentUpsellData = upsellItems.map(u => ({
+                item: u.item,
+                count: Math.max(1, Math.round(displayPedidos * u.basePct))
+            }));
+            const maxUpsell = Math.max(...currentUpsellData.map(u => u.count), 1);
+
+            const tableData = isNacional ? locationData.slice(0, 8) : [currentStats];
+
+            return (
+                <div className="min-h-screen p-4 md:p-6">
+                    {/* HEADER */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-slate-200 pb-4">
+                        <div>
+                            <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
+                                🍔 Tierra Querida <span className="text-orange-500">Auto-Ops</span>
+                            </h1>
+                            <p className="text-slate-500 mt-1 flex items-center gap-2">
+                                <span className="relative flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                                </span>
+                                Control de Órdenes IA en Vivo — Powered by Intelsa
+                            </p>
+                        </div>
+                        
+                        <div className="flex gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+                            <div className="relative" ref={dropdownRef}>
+                                <button 
+                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                    className="px-4 py-2 bg-slate-100 rounded text-sm font-medium text-slate-700 hover:bg-slate-200 flex items-center gap-2 transition min-w-[140px] justify-between"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <Icon name="Filter" size={14} /> 
+                                        <span className="truncate max-w-[150px]">{selectedSede}</span>
+                                    </div>
+                                    <Icon name="ChevronDown" size={14} className={`transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {isFilterOpen && (
+                                    <div className="absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50 flex flex-col max-h-[400px] overflow-hidden">
+                                        <div className="p-3 border-b border-slate-100 flex items-center gap-2 bg-slate-50">
+                                            <Icon name="Search" size={16} className="text-slate-400" />
+                                            <input
+                                                type="text"
+                                                placeholder="Buscar entre 95 sedes..."
+                                                className="w-full text-sm outline-none bg-transparent"
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                autoFocus
+                                            />
+                                        </div>
+                                        <div className="overflow-y-auto p-2 space-y-1">
+                                            <button
+                                                onClick={() => { setSelectedSede('Nacional'); setIsFilterOpen(false); setSearchTerm(''); }}
+                                                className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${isNacional ? 'bg-orange-50 text-orange-600 font-bold' : 'hover:bg-slate-100 text-slate-700'}`}
+                                            >
+                                                Nacional (Consolidado)
+                                            </button>
+                                            <div className="h-px bg-slate-100 my-1"></div>
+                                            {sedesReales
+                                                .filter(s => s.toLowerCase().includes(searchTerm.toLowerCase()))
+                                                .map((sede, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => { setSelectedSede(sede); setIsFilterOpen(false); setSearchTerm(''); }}
+                                                    className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${selectedSede === sede ? 'bg-orange-50 text-orange-600 font-bold' : 'hover:bg-slate-100 text-slate-700'}`}
+                                                >
+                                                    {sede}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="px-4 py-2 bg-slate-50 rounded text-orange-600 text-sm font-bold font-mono border border-slate-200 flex items-center">
+                                {currentTime}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* PULSO EN VIVO */}
+                    <div className="mb-6">
+                        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <Icon name="Activity" size={16} className="text-emerald-500" /> Pulso en vivo ({isNacional ? 'Global' : selectedSede})
+                        </h2>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col justify-center">
+                                <span className="text-blue-600 text-sm font-bold">Ingresos Hoy (IA)</span>
+                                <span className="text-2xl lg:text-3xl font-black text-blue-700">{formatCurrency(displayIngresos)}</span>
+                            </div>
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex flex-col justify-center">
+                                <span className="text-emerald-600 text-sm font-bold">Conf. últ. 15 min</span>
+                                <span className="text-3xl font-black text-emerald-700">{recentOrders}</span>
+                            </div>
+                            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4 flex flex-col justify-center">
+                                <span className="text-slate-500 text-sm font-bold">Pedidos en Curso</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-3xl font-black text-slate-800">{activeOrders}</span>
+                                    <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">100% IA</span>
+                                </div>
+                            </div>
+                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col justify-center">
+                                <span className="text-amber-600 text-sm font-bold">ETA Promedio</span>
+                                <span className="text-3xl font-black text-amber-700">{currentStats.tiempo}<span className="text-lg">m</span></span>
+                            </div>
+                            <div className={`border rounded-xl p-4 flex flex-col justify-center ${isNacional ? 'bg-red-50 border-red-200 animate-pulse' : 'bg-emerald-50 border-emerald-200'}`}>
+                                {isNacional ? (
+                                    <>
+                                        <span className="text-red-600 text-sm font-bold flex items-center gap-1"><Icon name="AlertTriangle" size={14}/> Sede con Demoras</span>
+                                        <span className="text-xl font-black text-red-700 mt-1">Rionegro</span>
+                                        <span className="text-xs text-red-500">ETA actual: 8.5 min</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="text-emerald-600 text-sm font-bold flex items-center gap-1"><Icon name="CheckCircle" size={14}/> Estado de Sede</span>
+                                        <span className="text-xl font-black text-emerald-700 mt-1">Óptimo</span>
+                                        <span className="text-xs text-emerald-600">Operando con normalidad</span>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* DASHBOARD GRID */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Card>
+                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
+                                <Icon name="ShoppingBag" className="text-orange-500" /> Volumen y Ventas
+                            </h2>
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <KPI title="Total Pedidos (Hoy)" value={displayPedidos} iconName="Smartphone" subtext="▲ 12% vs ayer" colorClass="text-emerald-500" />
+                                <KPI title="Ticket Promedio" value={formatCurrency(currentStats.ticket)} iconName="TrendingUp" subtext={`Meta: ${formatCurrency(45000)}`} colorClass="text-blue-500" />
+                                <KPI title="% del Canal Digital" value="68%" iconName="PieChart" subtext="WhatsApp vs Web" colorClass="text-purple-500" />
+                                <div className="flex flex-col">
+                                    <span className="text-slate-500 text-sm font-medium mb-1">Top Productos</span>
+                                    <span className="text-slate-800 text-sm font-bold truncate">1. Burger Tierra Querida</span>
+                                </div>
+                            </div>
+                            <div className="h-40 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={hourlyData}>
+                                        <defs>
+                                            <linearGradient id="colorPedidos" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#f97316" stopOpacity={0.2}/>
+                                                <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                                        <XAxis dataKey="time" stroke="#64748b" fontSize={12} />
+                                        <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                        <Area type="monotone" dataKey="pedidos" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorPedidos)" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </Card>
+
+                        <Card>
+                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
+                                <Icon name="Clock" className="text-blue-500" /> Experiencia del Cliente
+                            </h2>
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <KPI title="T. Respuesta" value="1.2s" iconName="Clock" subtext="Bot inmediato" colorClass="text-blue-500" />
+                                <KPI title="T. a Confirmación" value={`${currentStats.tiempo}m`} iconName="CheckCircle" subtext="Cierre de orden" colorClass="text-emerald-500" />
+                                <KPI title="Conversión Chat" value="72%" iconName="TrendingUp" subtext="Eficiencia flujo" colorClass="text-purple-500" />
+                                <KPI title="Mensajes x Pedido" value="6.2" iconName="MessageSquare" subtext="Promedio orden" colorClass="text-slate-500" />
+                            </div>
+                            <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-5 flex items-center justify-between">
+                                <div>
+                                    <div className="flex items-center gap-2 text-orange-600 font-bold mb-1 text-lg">
+                                        <Icon name="Bot" size={24} /> Pedidos Exitosos (IA)
+                                    </div>
+                                    <p className="text-slate-600 text-sm">Órdenes confirmadas de principio a fin.</p>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-5xl font-black text-orange-600">{displayPedidos}</span>
+                                </div>
+                            </div>
+                        </Card>
+
+                        <Card>
+                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
+                                <Icon name="DollarSign" className="text-emerald-500" /> Upselling
+                            </h2>
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <KPI title="Abandono" value={`${currentStats.abandono}%`} iconName="XCircle" colorClass="text-red-500" />
+                                <KPI title="Upselling" value="34%" iconName="PlusCircle" highlight={true} colorClass="text-emerald-600" />
+                            </div>
+                            <div className="space-y-3">
+                                {currentUpsellData.map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-3">
+                                        <span className="w-32 text-sm text-slate-700 truncate">{item.item}</span>
+                                        <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div className="h-full bg-emerald-400" style={{ width: `${(item.count / maxUpsell) * 100}%` }}></div>
+                                        </div>
+                                        <span className="text-sm font-bold">{item.count}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+
+                        <Card>
+                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
+                                <Icon name="MapPin" className="text-purple-500" /> Ranking Sedes
+                            </h2>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm">
+                                    <thead>
+                                        <tr className="border-b border-slate-200 text-slate-500 uppercase">
+                                            <th className="pb-3">Sede</th>
+                                            <th className="pb-3 text-right">Pedidos</th>
+                                            <th className="pb-3 text-right">ETA</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {tableData.map((sede, idx) => (
+                                            <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                                                <td className="py-3 font-bold flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full ${sede.tiempo > 6 ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
+                                                    {sede.name}
+                                                </td>
+                                                <td className="py-3 text-right">{sede.pedidos}</td>
+                                                <td className="py-3 text-right font-mono">{sede.tiempo}m</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Card>
+                    </div>
                 </div>
-              </div>
-            )}
-          </div>
+            );
+        }
 
-          <button className="px-4 py-2 bg-slate-100 rounded text-sm font-medium text-slate-700 hover:bg-slate-200 transition">
-            Hoy
-          </button>
-          <div className="px-4 py-2 bg-slate-50 rounded text-orange-600 text-sm font-bold font-mono border border-slate-200 flex items-center">
-            {currentTime}
-          </div>
-        </div>
-      </div>
-
-      {/* PANEL EN TIEMPO REAL */}
-      <div className="mb-6">
-        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-          <Activity size={16} className="text-emerald-500" /> Pulso en vivo ({isNacional ? 'Global' : selectedSede})
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col justify-center">
-            <span className="text-blue-600 text-sm font-bold">Ingresos Hoy (IA)</span>
-            <span className="text-2xl lg:text-3xl font-black text-blue-700">{formatCurrency(displayIngresos)}</span>
-          </div>
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex flex-col justify-center">
-            <span className="text-emerald-600 text-sm font-bold">Conf. últ. 15 min</span>
-            <span className="text-3xl font-black text-emerald-700">{recentOrders}</span>
-          </div>
-          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4 flex flex-col justify-center">
-            <span className="text-slate-500 text-sm font-bold">Pedidos en Curso</span>
-            <div className="flex items-center gap-2">
-              <span className="text-3xl font-black text-slate-800">{activeOrders}</span>
-              <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">100% IA</span>
-            </div>
-          </div>
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col justify-center">
-            <span className="text-amber-600 text-sm font-bold">ETA Promedio</span>
-            <span className="text-3xl font-black text-amber-700">{currentStats.tiempo}<span className="text-lg">m</span></span>
-          </div>
-          <div className={`border rounded-xl p-4 flex flex-col justify-center ${isNacional ? 'bg-red-50 border-red-200 animate-pulse' : 'bg-emerald-50 border-emerald-200'}`}>
-            {isNacional ? (
-              <>
-                <span className="text-red-600 text-sm font-bold flex items-center gap-1"><AlertTriangle size={14}/> Sede con Demoras</span>
-                <span className="text-xl font-black text-red-700 mt-1">Rionegro</span>
-                <span className="text-xs text-red-500">ETA actual: 8.5 min</span>
-              </>
-            ) : (
-              <>
-                <span className="text-emerald-600 text-sm font-bold flex items-center gap-1"><CheckCircle size={14}/> Estado de Sede</span>
-                <span className="text-xl font-black text-emerald-700 mt-1">Óptimo</span>
-                <span className="text-xs text-emerald-600">Operando con normalidad</span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* GRID DE 4 BLOQUES */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {/* BLOQUE 1: VOLUMEN Y VENTAS */}
-        <Card>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <ShoppingBag className="text-orange-500" /> Volumen y Ventas
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <KPI title="Total Pedidos (Hoy)" value={displayPedidos} icon={Smartphone} subtext="▲ 12% vs ayer" colorClass="text-emerald-500" />
-            <KPI title="Ticket Promedio" value={formatCurrency(currentStats.ticket)} icon={TrendingUp} subtext={`Meta: ${formatCurrency(45000)}`} colorClass="text-blue-500" />
-            <KPI title="% del Canal Digital" value="68%" icon={PieChart} subtext="WhatsApp vs Web" colorClass="text-purple-500" />
-            <div className="flex flex-col">
-              <span className="text-slate-500 text-sm font-medium mb-1">Top Productos</span>
-              <span className="text-slate-800 text-sm font-bold truncate">1. Burger Tierra Querida</span>
-              <span className="text-slate-600 text-sm truncate">2. Hamburguesa Doble</span>
-            </div>
-          </div>
-
-          <div className="h-40 w-full mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={hourlyData}>
-                <defs>
-                  <linearGradient id="colorPedidos" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="time" stroke="#64748b" fontSize={12} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#fff', borderColor: '#e2e8f0', color: '#0f172a' }}
-                  itemStyle={{ color: '#f97316', fontWeight: 'bold' }}
-                />
-                <Area type="monotone" dataKey="pedidos" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorPedidos)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* BLOQUE 2: EXPERIENCIA Y VELOCIDAD */}
-        <Card>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <Clock className="text-blue-500" /> Experiencia del Cliente
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <KPI title="T. Primera Respuesta" value="1.2s" icon={Clock} subtext="Respuesta inmediata del Bot" colorClass="text-blue-500" />
-            <KPI title="T. a Confirmación" value={`${currentStats.tiempo}m`} icon={CheckCircle} subtext="Desde saludo hasta cierre" colorClass="text-emerald-500" />
-            <KPI title="Conversión Chat → Pedido" value="72%" icon={TrendingUp} subtext="Eficiencia del flujo de venta" colorClass="text-purple-500" />
-            <KPI title="Mensajes x Pedido" value="6.2" icon={MessageSquare} subtext="Promedio para ordenar" colorClass="text-slate-500" />
-          </div>
-
-          {/* KPI ESTRELLA: EL MODELO DE COBRO DE INTELSA */}
-          <div className="mt-6 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-5 flex items-center justify-between shadow-sm">
-            <div>
-              <div className="flex items-center gap-2 text-orange-600 font-bold mb-1 text-lg">
-                <Bot size={24} /> Pedidos Exitosos (Male IA)
-              </div>
-              <p className="text-slate-600 text-sm max-w-[200px]">Órdenes confirmadas, enviadas a cocina de principio a fin.</p>
-            </div>
-            <div className="text-right">
-              <span className="text-5xl font-black text-orange-600 drop-shadow-sm">{displayPedidos}</span>
-              <p className="text-emerald-600 text-sm font-bold mt-1">Facturación validada</p>
-            </div>
-          </div>
-        </Card>
-
-        {/* BLOQUE 3: UPSELLING Y CONVERSIÓN */}
-        <Card>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <DollarSign className="text-emerald-500" /> Upselling y Retención
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <KPI title="Tasa de Abandono" value={`${currentStats.abandono}%`} icon={XCircle} subtext="Chats que no finalizan" colorClass="text-red-500" />
-            <KPI title="Recuperación de Carrito" value="18%" icon={Activity} subtext="Retargeting automático" colorClass="text-blue-500" />
-            <KPI 
-              title="Ventas con Upselling" 
-              value="34%" 
-              icon={PlusCircle} 
-              subtext="El bot ofreció y vendió extras" 
-              colorClass="text-emerald-600" 
-              highlight={true} 
-            />
-            <KPI title="Ticket Incrementado" value="+$4.200" icon={TrendingUp} subtext="Promedio por upselling" colorClass="text-emerald-500" />
-          </div>
-
-          <div className="mt-4">
-            <span className="text-slate-600 text-sm font-medium mb-3 block">Top Adiciones Vendidas Automáticamente</span>
-            <div className="space-y-3">
-              {currentUpsellData.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3">
-                  <span className="w-36 text-sm text-slate-700 font-medium truncate">{item.item}</span>
-                  <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-emerald-400 rounded-full" 
-                      style={{ width: `${(item.count / maxUpsell) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-sm font-bold text-slate-800 w-10 text-right">{item.count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Card>
-
-        {/* BLOQUE 4: PERFORMANCE POR SEDE */}
-        <Card>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <MapPin className="text-purple-500" /> Rendimiento por Sede
-            </h2>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
-                  <th className="pb-3 font-medium">Sede</th>
-                  <th className="pb-3 font-medium text-right">Pedidos IA</th>
-                  <th className="pb-3 font-medium text-right">T. Conf (m)</th>
-                  <th className="pb-3 font-medium text-right">Abandono %</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableData.map((sede, idx) => (
-                  <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
-                    <td className="py-3 text-sm font-bold text-slate-800 flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${sede.tiempo > 6 ? 'bg-red-500' : sede.tiempo < 4 ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
-                      <span className="truncate max-w-[150px]">{sede.name}</span>
-                    </td>
-                    <td className="py-3 text-sm text-right text-slate-600">{sede.pedidos}</td>
-                    <td className="py-3 text-sm text-right font-mono">
-                      <span className={`${sede.tiempo > 6 ? 'text-red-500 font-bold' : 'text-slate-600'}`}>
-                        {sede.tiempo}
-                      </span>
-                    </td>
-                    <td className="py-3 text-sm text-right">
-                      <span className={`px-2 py-1 rounded-md text-xs font-medium ${sede.abandono > 3 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                        {sede.abandono}%
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          <div className="mt-4 bg-amber-50 p-3 rounded-lg flex items-start gap-3 border border-amber-200">
-             <AlertTriangle size={18} className="text-amber-600 shrink-0 mt-0.5" />
-             <p className="text-xs text-amber-900 leading-relaxed">
-               {isNacional ? (
-                 <><strong className="font-bold">Insight Operativo:</strong> Se identifican cuellos de botella en sedes con volumen alto. Recomendamos auditar tiempos de despacho en la regional Antioquia.</>
-               ) : (
-                 <><strong className="font-bold">Insight Sede:</strong> {selectedSede} está confirmando en un promedio de {currentStats.tiempo}m con una tasa de abandono del {currentStats.abandono}%. El bot está funcionando correctamente.</>
-               )}
-             </p>
-          </div>
-        </Card>
-
-      </div>
-    </div>
-  );
-}
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<TierraQueridaDashboard />);
+    </script>
+</body>
+</html>
