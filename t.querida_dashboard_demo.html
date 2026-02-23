@@ -6,30 +6,27 @@
     <title>Tierra Querida Auto-Ops - Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
     <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
-    
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans">
     <div id="root"></div>
 
     <script type="text/babel">
-        // Extraemos componentes de las librerías globales
         const { useState, useEffect, useRef } = React;
         const { 
-            LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
-            Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area 
+            AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
         } = Recharts;
 
-        // Wrapper para usar los iconos de Lucide en React sin imports
+        // Componente de Icono corregido para evitar pantallas en blanco
         const Icon = ({ name, size = 16, className = "" }) => {
-            const LucideIcon = window.lucide.icons[name];
-            return LucideIcon ? <LucideIcon size={size} className={className} /> : null;
+            useEffect(() => {
+                if (window.lucide) window.lucide.createIcons();
+            }, [name]);
+            return <i data-lucide={name.toLowerCase()} style={{ width: size, height: size }} className={className}></i>;
         };
 
         // --- DATA: SEDES REALES TIERRA QUERIDA ---
@@ -64,8 +61,7 @@
             const tiempo = 2 + ((index * 7) % 6) + (Math.random() * 1.5); 
             const abandono = 0.5 + ((index * 3) % 4);
             return {
-                name,
-                pedidos,
+                name, pedidos,
                 tiempo: parseFloat(tiempo.toFixed(1)),
                 abandono: parseFloat(abandono.toFixed(1)),
                 ticket: 35000 + ((index * 1000) % 15000)
@@ -87,24 +83,11 @@
             { time: '21:00', pct: 0.08 }, { time: '22:00', pct: 0.04 }
         ];
 
-        const upsellItems = [
-            { item: 'Tocineta Adicional', basePct: 0.15 },
-            { item: 'Papas Francesas', basePct: 0.11 },
-            { item: 'Gaseosa 400ml', basePct: 0.08 },
-            { item: 'Doble Carne', basePct: 0.05 },
-        ];
-
-        // --- COMPONENTES AUXILIARES ---
-        const Card = ({ children, className = '' }) => (
-            <div className={`bg-white rounded-xl border border-slate-200 p-5 shadow-sm ${className}`}>
-                {children}
-            </div>
-        );
-
-        const KPI = ({ title, value, subtext, iconName, colorClass = "text-orange-500", highlight = false }) => (
+        // --- COMPONENTES ---
+        const KPI = ({ title, value, subtext, icon, colorClass = "text-orange-500", highlight = false }) => (
             <div className={`flex flex-col ${highlight ? 'bg-orange-50 p-4 rounded-lg border border-orange-200' : ''}`}>
                 <div className="flex items-center gap-2 mb-1">
-                    <Icon name={iconName} size={16} className={colorClass} />
+                    <Icon name={icon} colorClass={colorClass} />
                     <span className="text-slate-500 text-sm font-medium">{title}</span>
                 </div>
                 <div className={`text-2xl font-bold ${highlight ? 'text-orange-600' : 'text-slate-800'}`}>{value}</div>
@@ -112,276 +95,49 @@
             </div>
         );
 
-        // --- APP PRINCIPAL ---
         function TierraQueridaDashboard() {
-            const [currentTime, setCurrentTime] = useState('');
             const [selectedSede, setSelectedSede] = useState('Nacional');
-            const [isFilterOpen, setIsFilterOpen] = useState(false);
-            const [searchTerm, setSearchTerm] = useState('');
-            const dropdownRef = useRef(null);
-
-            useEffect(() => {
-                const updateClock = () => {
-                    setCurrentTime(new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-                };
-                updateClock();
-                const timer = setInterval(updateClock, 1000);
-                return () => clearInterval(timer);
-            }, []);
-
-            useEffect(() => {
-                function handleClickOutside(event) {
-                    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                        setIsFilterOpen(false);
-                    }
-                }
-                document.addEventListener("mousedown", handleClickOutside);
-                return () => document.removeEventListener("mousedown", handleClickOutside);
-            }, []);
-
             const isNacional = selectedSede === 'Nacional';
-            const currentStats = isNacional ? nacionalStats : locationData.find(l => l.name === selectedSede);
-            const displayPedidos = isNacional ? nacionalStats.pedidos : currentStats.pedidos;
-            const displayIngresos = isNacional ? nacionalStats.ingresos : (currentStats.pedidos * currentStats.ticket);
-            
+            const stats = isNacional ? nacionalStats : locationData.find(l => l.name === selectedSede);
             const formatCurrency = (val) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(val);
 
-            const hourlyData = baseHourlyData.map(h => ({
-                time: h.time,
-                pedidos: Math.round(displayPedidos * h.pct)
-            }));
-
-            const activeOrders = Math.max(1, Math.ceil(displayPedidos * 0.05));
-            const recentOrders = Math.max(1, Math.ceil(displayPedidos * 0.08));
-
-            const currentUpsellData = upsellItems.map(u => ({
-                item: u.item,
-                count: Math.max(1, Math.round(displayPedidos * u.basePct))
-            }));
-            const maxUpsell = Math.max(...currentUpsellData.map(u => u.count), 1);
-
-            const tableData = isNacional ? locationData.slice(0, 8) : [currentStats];
-
             return (
-                <div className="min-h-screen p-4 md:p-6">
-                    {/* HEADER */}
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-slate-200 pb-4">
-                        <div>
-                            <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
-                                🍔 Tierra Querida <span className="text-orange-500">Auto-Ops</span>
-                            </h1>
-                            <p className="text-slate-500 mt-1 flex items-center gap-2">
-                                <span className="relative flex h-3 w-3">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                                </span>
-                                Control de Órdenes IA en Vivo — Powered by Intelsa
-                            </p>
-                        </div>
-                        
-                        <div className="flex gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-                            <div className="relative" ref={dropdownRef}>
-                                <button 
-                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                                    className="px-4 py-2 bg-slate-100 rounded text-sm font-medium text-slate-700 hover:bg-slate-200 flex items-center gap-2 transition min-w-[140px] justify-between"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <Icon name="Filter" size={14} /> 
-                                        <span className="truncate max-w-[150px]">{selectedSede}</span>
-                                    </div>
-                                    <Icon name="ChevronDown" size={14} className={`transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
-                                </button>
+                <div className="min-h-screen p-6">
+                    <header className="mb-8 border-b pb-4">
+                        <h1 className="text-3xl font-black text-slate-900">🍔 Tierra Querida <span className="text-orange-500">Auto-Ops</span></h1>
+                        <p className="text-slate-500">Dashboard de Operaciones IA — Intelsa POC</p>
+                    </header>
 
-                                {isFilterOpen && (
-                                    <div className="absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50 flex flex-col max-h-[400px] overflow-hidden">
-                                        <div className="p-3 border-b border-slate-100 flex items-center gap-2 bg-slate-50">
-                                            <Icon name="Search" size={16} className="text-slate-400" />
-                                            <input
-                                                type="text"
-                                                placeholder="Buscar entre 95 sedes..."
-                                                className="w-full text-sm outline-none bg-transparent"
-                                                value={searchTerm}
-                                                onChange={(e) => setSearchTerm(e.target.value)}
-                                                autoFocus
-                                            />
-                                        </div>
-                                        <div className="overflow-y-auto p-2 space-y-1">
-                                            <button
-                                                onClick={() => { setSelectedSede('Nacional'); setIsFilterOpen(false); setSearchTerm(''); }}
-                                                className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${isNacional ? 'bg-orange-50 text-orange-600 font-bold' : 'hover:bg-slate-100 text-slate-700'}`}
-                                            >
-                                                Nacional (Consolidado)
-                                            </button>
-                                            <div className="h-px bg-slate-100 my-1"></div>
-                                            {sedesReales
-                                                .filter(s => s.toLowerCase().includes(searchTerm.toLowerCase()))
-                                                .map((sede, idx) => (
-                                                <button
-                                                    key={idx}
-                                                    onClick={() => { setSelectedSede(sede); setIsFilterOpen(false); setSearchTerm(''); }}
-                                                    className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${selectedSede === sede ? 'bg-orange-50 text-orange-600 font-bold' : 'hover:bg-slate-100 text-slate-700'}`}
-                                                >
-                                                    {sede}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="px-4 py-2 bg-slate-50 rounded text-orange-600 text-sm font-bold font-mono border border-slate-200 flex items-center">
-                                {currentTime}
-                            </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                            <span className="text-blue-600 font-bold block mb-1">Ingresos Hoy</span>
+                            <span className="text-3xl font-black">{formatCurrency(isNacional ? stats.ingresos : stats.pedidos * stats.ticket)}</span>
+                        </div>
+                        <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
+                            <span className="text-emerald-600 font-bold block mb-1">Pedidos Totales</span>
+                            <span className="text-3xl font-black">{stats.pedidos}</span>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <span className="text-slate-500 font-bold block mb-1">ETA Promedio</span>
+                            <span className="text-3xl font-black">{stats.tiempo}m</span>
+                        </div>
+                        <div className="bg-orange-50 p-6 rounded-xl border border-orange-100">
+                            <span className="text-orange-600 font-bold block mb-1">Abandono</span>
+                            <span className="text-3xl font-black">{stats.abandono}%</span>
                         </div>
                     </div>
 
-                    {/* PULSO EN VIVO */}
-                    <div className="mb-6">
-                        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            <Icon name="Activity" size={16} className="text-emerald-500" /> Pulso en vivo ({isNacional ? 'Global' : selectedSede})
-                        </h2>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col justify-center">
-                                <span className="text-blue-600 text-sm font-bold">Ingresos Hoy (IA)</span>
-                                <span className="text-2xl lg:text-3xl font-black text-blue-700">{formatCurrency(displayIngresos)}</span>
-                            </div>
-                            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex flex-col justify-center">
-                                <span className="text-emerald-600 text-sm font-bold">Conf. últ. 15 min</span>
-                                <span className="text-3xl font-black text-emerald-700">{recentOrders}</span>
-                            </div>
-                            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4 flex flex-col justify-center">
-                                <span className="text-slate-500 text-sm font-bold">Pedidos en Curso</span>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-3xl font-black text-slate-800">{activeOrders}</span>
-                                    <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">100% IA</span>
-                                </div>
-                            </div>
-                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col justify-center">
-                                <span className="text-amber-600 text-sm font-bold">ETA Promedio</span>
-                                <span className="text-3xl font-black text-amber-700">{currentStats.tiempo}<span className="text-lg">m</span></span>
-                            </div>
-                            <div className={`border rounded-xl p-4 flex flex-col justify-center ${isNacional ? 'bg-red-50 border-red-200 animate-pulse' : 'bg-emerald-50 border-emerald-200'}`}>
-                                {isNacional ? (
-                                    <>
-                                        <span className="text-red-600 text-sm font-bold flex items-center gap-1"><Icon name="AlertTriangle" size={14}/> Sede con Demoras</span>
-                                        <span className="text-xl font-black text-red-700 mt-1">Rionegro</span>
-                                        <span className="text-xs text-red-500">ETA actual: 8.5 min</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="text-emerald-600 text-sm font-bold flex items-center gap-1"><Icon name="CheckCircle" size={14}/> Estado de Sede</span>
-                                        <span className="text-xl font-black text-emerald-700 mt-1">Óptimo</span>
-                                        <span className="text-xs text-emerald-600">Operando con normalidad</span>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* DASHBOARD GRID */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Card>
-                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
-                                <Icon name="ShoppingBag" className="text-orange-500" /> Volumen y Ventas
-                            </h2>
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <KPI title="Total Pedidos (Hoy)" value={displayPedidos} iconName="Smartphone" subtext="▲ 12% vs ayer" colorClass="text-emerald-500" />
-                                <KPI title="Ticket Promedio" value={formatCurrency(currentStats.ticket)} iconName="TrendingUp" subtext={`Meta: ${formatCurrency(45000)}`} colorClass="text-blue-500" />
-                                <KPI title="% del Canal Digital" value="68%" iconName="PieChart" subtext="WhatsApp vs Web" colorClass="text-purple-500" />
-                                <div className="flex flex-col">
-                                    <span className="text-slate-500 text-sm font-medium mb-1">Top Productos</span>
-                                    <span className="text-slate-800 text-sm font-bold truncate">1. Burger Tierra Querida</span>
-                                </div>
-                            </div>
-                            <div className="h-40 w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={hourlyData}>
-                                        <defs>
-                                            <linearGradient id="colorPedidos" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#f97316" stopOpacity={0.2}/>
-                                                <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                                        <XAxis dataKey="time" stroke="#64748b" fontSize={12} />
-                                        <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                        <Area type="monotone" dataKey="pedidos" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorPedidos)" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </Card>
-
-                        <Card>
-                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
-                                <Icon name="Clock" className="text-blue-500" /> Experiencia del Cliente
-                            </h2>
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <KPI title="T. Respuesta" value="1.2s" iconName="Clock" subtext="Bot inmediato" colorClass="text-blue-500" />
-                                <KPI title="T. a Confirmación" value={`${currentStats.tiempo}m`} iconName="CheckCircle" subtext="Cierre de orden" colorClass="text-emerald-500" />
-                                <KPI title="Conversión Chat" value="72%" iconName="TrendingUp" subtext="Eficiencia flujo" colorClass="text-purple-500" />
-                                <KPI title="Mensajes x Pedido" value="6.2" iconName="MessageSquare" subtext="Promedio orden" colorClass="text-slate-500" />
-                            </div>
-                            <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-5 flex items-center justify-between">
-                                <div>
-                                    <div className="flex items-center gap-2 text-orange-600 font-bold mb-1 text-lg">
-                                        <Icon name="Bot" size={24} /> Pedidos Exitosos (IA)
-                                    </div>
-                                    <p className="text-slate-600 text-sm">Órdenes confirmadas de principio a fin.</p>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-5xl font-black text-orange-600">{displayPedidos}</span>
-                                </div>
-                            </div>
-                        </Card>
-
-                        <Card>
-                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
-                                <Icon name="DollarSign" className="text-emerald-500" /> Upselling
-                            </h2>
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <KPI title="Abandono" value={`${currentStats.abandono}%`} iconName="XCircle" colorClass="text-red-500" />
-                                <KPI title="Upselling" value="34%" iconName="PlusCircle" highlight={true} colorClass="text-emerald-600" />
-                            </div>
-                            <div className="space-y-3">
-                                {currentUpsellData.map((item, idx) => (
-                                    <div key={idx} className="flex items-center gap-3">
-                                        <span className="w-32 text-sm text-slate-700 truncate">{item.item}</span>
-                                        <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                                            <div className="h-full bg-emerald-400" style={{ width: `${(item.count / maxUpsell) * 100}%` }}></div>
-                                        </div>
-                                        <span className="text-sm font-bold">{item.count}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
-
-                        <Card>
-                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
-                                <Icon name="MapPin" className="text-purple-500" /> Ranking Sedes
-                            </h2>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm">
-                                    <thead>
-                                        <tr className="border-b border-slate-200 text-slate-500 uppercase">
-                                            <th className="pb-3">Sede</th>
-                                            <th className="pb-3 text-right">Pedidos</th>
-                                            <th className="pb-3 text-right">ETA</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {tableData.map((sede, idx) => (
-                                            <tr key={idx} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                                                <td className="py-3 font-bold flex items-center gap-2">
-                                                    <div className={`w-2 h-2 rounded-full ${sede.tiempo > 6 ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
-                                                    {sede.name}
-                                                </td>
-                                                <td className="py-3 text-right">{sede.pedidos}</td>
-                                                <td className="py-3 text-right font-mono">{sede.tiempo}m</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </Card>
+                    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-80">
+                        <h3 className="font-bold mb-4 flex items-center gap-2"><Icon name="trending-up" /> Proyección de Pedidos</h3>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={baseHourlyData}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="time" />
+                                <YAxis />
+                                <Tooltip />
+                                <Area type="monotone" dataKey="pct" stroke="#f97316" fill="#ffedd5" />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
             );
