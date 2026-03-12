@@ -2,13 +2,14 @@
 Orquestador principal: Pipeline de 3 agentes para crear páginas B2B en Webflow.
 
 Pipeline:
-  [Agente 1: Keyword Research] → [Agente 2: Copywriting] → [Agente 3: Webflow Upload]
+  [Agente 1: Keyword Research] → [Agente 2: Copywriting] → [Revisión Humana] → [Agente 3: Webflow Upload]
 
 Uso:
   python main.py
   python main.py --topic "ABM Marketing B2B" --market "SaaS empresas medianas"
   python main.py --topic "Inbound Marketing B2B" --site-id "abc123" --collection-id "def456"
   python main.py --topic "Demand Generation" --publish  # auto-publicar
+  python main.py --topic "Demand Generation" --skip-review  # omitir revisión humana
 """
 
 import argparse
@@ -22,6 +23,90 @@ from dotenv import load_dotenv
 from agents.keyword_research import run_keyword_research
 from agents.copywriting import run_copywriting
 from agents.webflow_uploader import run_webflow_upload
+
+
+def human_review_copy(copy_result: dict) -> bool:
+    """
+    Pausa el pipeline para que un humano revise el copy generado.
+
+    Muestra un resumen del contenido y solicita aprobación antes de subir a Webflow.
+
+    Returns:
+        True si el usuario aprueba, False si rechaza (aborta el pipeline).
+    """
+    copy_data = copy_result.get("copy_data", {})
+
+    print(f"\n{'='*60}")
+    print("  REVISIÓN HUMANA — Aprueba el copy antes de subir a Webflow")
+    print(f"{'='*60}\n")
+
+    if isinstance(copy_data, dict) and "raw_copy" not in copy_data:
+        # Mostrar los campos clave del copy estructurado
+        fields = [
+            ("meta_title",          "Meta Title"),
+            ("meta_description",    "Meta Description"),
+            ("hero_headline",       "Hero Headline"),
+            ("hero_subheadline",    "Hero Subheadline"),
+            ("hero_cta_primary",    "CTA Principal"),
+            ("hero_cta_secondary",  "CTA Secundario"),
+            ("pain_section_title",  "Pain Points (título)"),
+            ("value_prop_title",    "Propuesta de Valor (título)"),
+            ("services_title",      "Servicios (título)"),
+            ("cta_section_title",   "CTA Final (título)"),
+        ]
+        for key, label in fields:
+            value = copy_data.get(key)
+            if value:
+                print(f"  {label}:")
+                print(f"    {value}\n")
+
+        # Métricas de impacto
+        metrics = copy_data.get("value_metrics", [])
+        if metrics:
+            print("  Métricas de impacto:")
+            for m in metrics:
+                print(f"    • {m}")
+            print()
+
+        # Servicios
+        services = copy_data.get("services", [])
+        if services:
+            print("  Servicios incluidos:")
+            for s in services:
+                if isinstance(s, dict):
+                    print(f"    • {s.get('name', '')}: {s.get('description', '')}")
+                else:
+                    print(f"    • {s}")
+            print()
+
+        # FAQs
+        faqs = copy_data.get("faqs", [])
+        if faqs:
+            print(f"  FAQs generadas: {len(faqs)} preguntas")
+            for faq in faqs[:2]:  # Solo las 2 primeras como muestra
+                if isinstance(faq, dict):
+                    print(f"    Q: {faq.get('question', '')}")
+            print()
+    else:
+        # Fallback: mostrar raw si el JSON no se parseó
+        raw = copy_data.get("raw_copy", copy_result.get("raw_response", ""))
+        preview = raw[:1000] + "...\n[truncado — ver outputs/ para el texto completo]" if len(raw) > 1000 else raw
+        print(preview)
+
+    print(f"\n  El copy completo está guardado en outputs/")
+    print(f"\n{'─'*60}")
+
+    while True:
+        answer = input("  ¿Apruebas este copy para subir a Webflow? [s/n]: ").strip().lower()
+        if answer in ("s", "si", "sí", "y", "yes"):
+            print("\n  ✅ Copy aprobado. Continuando con el upload...\n")
+            return True
+        elif answer in ("n", "no"):
+            print("\n  ❌ Copy rechazado. Pipeline detenido.")
+            print("  Puedes editar el archivo JSON en outputs/ y hacer el upload manual.")
+            return False
+        else:
+            print("  Responde 's' para aprobar o 'n' para rechazar.")
 
 
 def print_step(step: int, title: str):
@@ -56,6 +141,7 @@ def run_pipeline(
     collection_id: str | None = None,
     auto_publish: bool = False,
     skip_upload: bool = False,
+    skip_review: bool = False,
 ) -> dict:
     """
     Ejecuta el pipeline completo de 3 agentes.
@@ -68,6 +154,7 @@ def run_pipeline(
         collection_id: ID de la Collection Webflow (opcional)
         auto_publish: Si True, publica automáticamente en Webflow
         skip_upload: Si True, omite el paso de upload a Webflow
+        skip_review: Si True, omite la revisión humana y sube directamente
 
     Returns:
         dict con todos los outputs del pipeline
@@ -112,6 +199,17 @@ def run_pipeline(
     if isinstance(copy_result["copy_data"], dict) and "hero_headline" in copy_result["copy_data"]:
         print(f"\n  Hero Headline: {copy_result['copy_data'].get('hero_headline', 'N/A')}")
         print(f"  Meta Title: {copy_result['copy_data'].get('meta_title', 'N/A')}")
+
+    # ─── REVISIÓN HUMANA ────────────────────────────────────────────────────────
+    if not skip_upload and not skip_review:
+        approved = human_review_copy(copy_result)
+        if not approved:
+            return {
+                "keyword_research": keyword_result,
+                "copywriting": copy_result,
+                "webflow": None,
+                "review_status": "rejected",
+            }
 
     # ─── AGENTE 3: WEBFLOW UPLOAD ───────────────────────────────────────────────
     if skip_upload:
@@ -208,6 +306,11 @@ def main():
         action="store_true",
         help="Omitir el upload a Webflow (solo ejecutar keyword research + copywriting)",
     )
+    parser.add_argument(
+        "--skip-review",
+        action="store_true",
+        help="Omitir la revisión humana y subir directamente a Webflow (modo automático)",
+    )
 
     args = parser.parse_args()
 
@@ -225,6 +328,7 @@ def main():
         collection_id=args.collection_id,
         auto_publish=args.publish,
         skip_upload=args.skip_upload,
+        skip_review=args.skip_review,
     )
 
 
