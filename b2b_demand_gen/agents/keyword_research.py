@@ -1,11 +1,13 @@
 """
 Agente 1: Keyword Research para B2B Demand Generation.
 
-Usa Claude Opus 4.6 con web_search para investigar:
+Usa Claude Opus 4.6 con web_search (server-side) para investigar:
 - Keywords primarias y secundarias de alta intención B2B
 - Volumen de búsqueda estimado y competencia
 - Pain points del buyer persona
 - Preguntas frecuentes (FAQ seeds)
+
+Compatible con todos los agentes de copy: service, industry, blog.
 """
 
 import anthropic
@@ -25,36 +27,72 @@ Cuando investigues keywords para un servicio B2B:
 
 Siempre entrega resultados estructurados y accionables."""
 
+# Prompts específicos por tipo de página
+_PAGE_TYPE_INSTRUCTIONS = {
+    "service": """
+Enfoca la investigación en:
+- Keywords de intención transaccional ("contratar", "agencia", "consultoría", "precio")
+- Competidores que aparecen en búsquedas similares
+- Diferenciadores que buscan los compradores B2B
+- Keywords de pain point + solución""",
 
-def run_keyword_research(service_topic: str, target_market: str = "B2B") -> dict:
+    "industry": """
+Enfoca la investigación en:
+- Keywords específicas del vertical/industria (terminología propia del sector)
+- Retos y regulaciones específicas de la industria
+- Benchmarks y métricas que importan en ese sector
+- Casos de uso y aplicaciones concretas
+- Preguntas que hacen los líderes de esa industria""",
+
+    "blog": """
+Enfoca la investigación en:
+- Keywords informacionales con alto volumen de búsqueda
+- Preguntas de "cómo hacer", "qué es", "mejores prácticas"
+- Temas de thought leadership que busca el C-suite
+- Keywords de intención educativa que alimentan el top-of-funnel
+- Oportunidades de featured snippets y PAA (People Also Ask)""",
+}
+
+
+def run_keyword_research(
+    topic: str,
+    target_market: str = "B2B",
+    page_type: str = "service",
+) -> dict:
     """
-    Ejecuta investigación de keywords para el servicio dado.
+    Ejecuta investigación de keywords para el tema dado.
 
     Args:
-        service_topic: Tema/servicio a investigar (ej: "generación de demanda B2B")
+        topic: Tema/servicio/industria a investigar
         target_market: Mercado objetivo (default: "B2B")
+        page_type: Tipo de página destino — "service" | "industry" | "blog"
 
     Returns:
-        dict con la investigación completa de keywords
+        dict con la investigación completa de keywords y page_type incluido
     """
     client = anthropic.Anthropic()
 
+    # web_search_20260209 es un tool server-side: Anthropic lo ejecuta
+    # automáticamente. No requiere loop manual de tool_use.
     tools = [
         {"type": "web_search_20260209", "name": "web_search"},
     ]
 
+    page_instructions = _PAGE_TYPE_INSTRUCTIONS.get(page_type, _PAGE_TYPE_INSTRUCTIONS["service"])
+
     messages = [
         {
             "role": "user",
-            "content": f"""Realiza una investigación exhaustiva de keywords para una página de servicios sobre:
-**Servicio:** {service_topic}
+            "content": f"""Realiza una investigación exhaustiva de keywords para una página de tipo **{page_type}** sobre:
+**Tema:** {topic}
 **Mercado:** {target_market}
+{page_instructions}
 
 Investiga y entrega:
 
-1. **Keywords Primarias** (3-5): Las más relevantes con alta intención de compra
+1. **Keywords Primarias** (3-5): Las más relevantes con alta intención
 2. **Keywords Secundarias / LSI** (8-10): Variaciones y sinónimos importantes
-3. **Long-tail Keywords** (5-8): Frases específicas de 4+ palabras que usan compradores B2B
+3. **Long-tail Keywords** (5-8): Frases específicas de 4+ palabras
 4. **Preguntas del Buyer** (5-7): Qué preguntas hacen los decision makers en Google
 5. **Pain Points Detectados**: Problemas principales que buscan resolver
 6. **Ángulos de Contenido**: 3 enfoques diferenciadores para la página
@@ -63,51 +101,27 @@ Usa búsquedas web para validar tendencias actuales y competencia.""",
         }
     ]
 
+    # web_search es server-side: el stream termina con end_turn tras las búsquedas
     with client.messages.stream(
         model=MODEL,
         max_tokens=4096,
         thinking={"type": "adaptive"},
+        output_config={"effort": "high"},
         system=SYSTEM_PROMPT,
         tools=tools,
         messages=messages,
     ) as stream:
         response = stream.get_final_message()
 
-    # Manejar loop de tool use si es necesario
-    while response.stop_reason == "tool_use":
-        tool_results = []
-        for block in response.content:
-            if block.type == "tool_use":
-                # El servidor maneja web_search automáticamente,
-                # pero si retorna tool_use explícito, procesamos
-                tool_results.append({
-                    "type": "tool_result",
-                    "tool_use_id": block.id,
-                    "content": f"Búsqueda completada para: {block.input}",
-                })
-
-        messages.append({"role": "assistant", "content": response.content})
-        if tool_results:
-            messages.append({"role": "user", "content": tool_results})
-
-        with client.messages.stream(
-            model=MODEL,
-            max_tokens=4096,
-            thinking={"type": "adaptive"},
-            system=SYSTEM_PROMPT,
-            tools=tools,
-            messages=messages,
-        ) as stream:
-            response = stream.get_final_message()
-
-    # Extraer texto final
+    # Extraer texto final (ignorar bloques thinking)
     research_text = ""
     for block in response.content:
         if hasattr(block, "text"):
             research_text += block.text
 
     return {
-        "service_topic": service_topic,
+        "topic": topic,
+        "page_type": page_type,
         "target_market": target_market,
         "research": research_text,
         "usage": {

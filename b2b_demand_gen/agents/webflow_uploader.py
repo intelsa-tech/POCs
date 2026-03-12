@@ -3,10 +3,12 @@ Agente 3: Webflow Uploader para B2B Demand Generation.
 
 Usa Claude Opus 4.6 con tool use para:
 1. Descubrir sitios y Collections disponibles en Webflow
-2. Identificar el template/Collection correcto para páginas de servicios
+2. Identificar el template/Collection correcto según el tipo de página
 3. Mapear el copy generado a los campos de Webflow
 4. Crear el item en la Collection (como draft para revisión)
 5. Opcionalmente publicar el item
+
+Compatible con todos los agentes de copy: service, industry, blog.
 """
 
 import json
@@ -27,7 +29,7 @@ Tu tarea es subir contenido de marketing B2B a Webflow de forma precisa.
 
 Al trabajar con Webflow:
 1. Primero explora los sitios y collections disponibles
-2. Identifica el collection más apropiado para una página de servicios
+2. Identifica el collection más apropiado según el tipo de página (servicio, industria o blog)
 3. Analiza el schema del collection (campos disponibles)
 4. Mapea el copy generado a los campos correctos del collection
 5. Crea el item como DRAFT para que el equipo pueda revisarlo antes de publicar
@@ -185,6 +187,17 @@ def run_webflow_upload(
     """
     client = anthropic.Anthropic()
 
+    # Soporte para la interfaz antigua (service_topic) y la nueva (topic + page_type)
+    topic = copywriting_output.get("topic") or copywriting_output.get("service_topic", "")
+    page_type = copywriting_output.get("page_type", "service")
+
+    page_type_labels = {
+        "service": "página de servicios",
+        "industry": "página de industria",
+        "blog": "artículo de blog",
+    }
+    page_label = page_type_labels.get(page_type, "página")
+
     copy_summary = json.dumps(copywriting_output["copy_data"], ensure_ascii=False, indent=2)
     if len(copy_summary) > 3000:
         copy_summary = copy_summary[:3000] + "\n... [truncado para el contexto]"
@@ -202,9 +215,10 @@ def run_webflow_upload(
     messages = [
         {
             "role": "user",
-            "content": f"""Sube esta página de servicios B2B a Webflow.
+            "content": f"""Sube esta {page_label} B2B a Webflow.
 
-**Servicio:** {copywriting_output['service_topic']}
+**Tema:** {topic}
+**Tipo de página:** {page_type} ({page_label})
 
 **Contexto previo:**
 {context_str}
@@ -215,7 +229,7 @@ def run_webflow_upload(
 ```
 
 Pasos a seguir:
-1. {'Usa el collection_id conocido directamente' if collection_id else 'Lista los sitios disponibles y encuentra el correcto'}
+1. {'Usa el collection_id conocido directamente' if collection_id else f'Lista los sitios disponibles y encuentra la Collection apropiada para una {page_label}'}
 2. {'Explora el schema del collection' if not collection_id else 'Verifica el schema del collection para mapear campos'}
 3. Mapea el copy a los campos del collection (adapta los nombres de campo al schema real)
 4. Crea el item como DRAFT con toda la información
@@ -234,6 +248,8 @@ Pasos a seguir:
         response = client.messages.create(
             model=MODEL,
             max_tokens=4096,
+            thinking={"type": "adaptive"},
+            output_config={"effort": "high"},
             system=SYSTEM_PROMPT,
             tools=WEBFLOW_TOOLS,
             messages=messages,
@@ -270,7 +286,8 @@ Pasos a seguir:
             final_text += block.text
 
     return {
-        "service_topic": copywriting_output["service_topic"],
+        "topic": topic,
+        "page_type": page_type,
         "result": final_text,
         "iterations": iteration,
         "usage": {
