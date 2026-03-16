@@ -656,11 +656,19 @@ async function loadHistory() {
             ${cached}
           </div>
         </div>
-        ${gen.complete_file ? `
-        <button onclick="loadOutputFile('${escHtml(gen.complete_file)}')"
-          class="ml-4 text-xs text-indigo-600 hover:text-indigo-800 font-medium flex-shrink-0">
-          Ver →
-        </button>` : ''}
+        <div class="ml-4 flex items-center gap-2 flex-shrink-0">
+          ${gen.complete_file ? `
+          <button onclick="loadOutputFile('${escHtml(gen.complete_file)}')"
+            class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+            Ver →
+          </button>` : ''}
+          ${(gen.status !== 'published' && gen.complete_file) ? `
+          <button id="wf-btn-${gen.id}"
+            onclick="uploadToWebflow(${gen.id}, '${escHtml(gen.topic)}')"
+            class="text-xs bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 px-2 py-1 rounded-lg font-medium transition">
+            📤 Webflow
+          </button>` : ''}
+        </div>
       `;
       listEl.appendChild(card);
     });
@@ -708,6 +716,28 @@ async function loadOutputFile(filename) {
     doneSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch(e) {
     alert('Error cargando el archivo: ' + e.message);
+  }
+}
+
+async function uploadToWebflow(genId, topic) {
+  const btn = document.getElementById(`wf-btn-${genId}`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Subiendo…'; }
+
+  try {
+    const resp = await fetch(`/api/history/${genId}/webflow-upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ auto_publish: false }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || 'Error en el upload');
+
+    if (btn) { btn.textContent = '✅ Subido'; btn.classList.replace('bg-violet-50', 'bg-emerald-50'); btn.classList.replace('text-violet-700', 'text-emerald-700'); }
+    alert(`✅ "${topic}" subido a Webflow exitosamente.\n\nRespuesta del agente:\n${(data.webflow_result || '').slice(0, 300)}`);
+    setTimeout(() => loadHistory(), 1500);
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = '📤 Webflow'; }
+    alert(`Error al subir a Webflow: ${e.message}`);
   }
 }
 

@@ -7,6 +7,7 @@ Corre con:
 """
 
 import asyncio
+import functools
 import json
 import os
 import queue
@@ -360,6 +361,65 @@ async def update_gen_status(gen_id: int, request: Request):
         webflow_url=body.get("webflow_url"),
     )
     return {"status": "ok"}
+
+
+# ─── Webflow Upload retroactivo ───────────────────────────────────────────────
+
+@app.post("/api/history/{gen_id}/webflow-upload")
+async def upload_history_to_webflow(gen_id: int, request: Request):
+    """
+    Sube a Webflow un ítem del historial que no fue subido anteriormente
+    (ej. generaciones con skip_upload=True o que fallaron en el paso 3).
+    """
+    gen = database.get_generation(gen_id)
+    if not gen:
+        raise HTTPException(status_code=404, detail="Generación no encontrada.")
+    if not gen.get("complete_file"):
+        raise HTTPException(status_code=400, detail="No hay archivo de output para esta generación.")
+
+    filepath = OUTPUTS_DIR / gen["complete_file"]
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail=f"Archivo de output no encontrado: {gen['complete_file']}")
+
+    body = await request.json()
+    site_id = body.get("site_id") or os.environ.get("WEBFLOW_SITE_ID")
+    collection_id = body.get("collection_id") or os.environ.get("WEBFLOW_COLLECTION_ID")
+    auto_publish = body.get("auto_publish", False)
+
+    # Cargar datos del archivo de output
+    with open(filepath, "r", encoding="utf-8") as f:
+        file_data = json.load(f)
+
+    # El archivo puede ser _COMPLETE.json (tiene key "copywriting") o _copy.json (directo)
+    copy_result = file_data.get("copywriting", file_data)
+
+    # Ejecutar en un thread para no bloquear el event loop
+    webflow_result = await asyncio.get_event_loop().run_in_executor(
+        None,
+        functools.partial(
+            run_webflow_upload,
+            copy_result,
+            site_id=site_id,
+            collection_id=collection_id,
+            auto_publish=auto_publish,
+        ),
+    )
+
+    # Guardar el resultado del upload
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    slug = gen["topic"].lower().replace(" ", "_")[:30]
+    _save_output(webflow_result, f"{timestamp}_{slug}_webflow.json")
+
+    # Actualizar status en DB
+    new_status = "published" if auto_publish else "draft"
+    database.update_status(gen_id, status=new_status)
+
+    return {
+        "status": "ok",
+        "webflow_result": webflow_result.get("result", ""),
+        "iterations": webflow_result.get("iterations", 0),
+        "usage": webflow_result.get("usage", {}),
+    }
 
 
 # ─── Outputs (archivos JSON) ──────────────────────────────────────────────────
