@@ -36,6 +36,8 @@ from tools.webflow_api import (
     get_collection,
     list_collection_items,
     get_item,
+    list_pages,
+    get_page_dom,
 )
 
 # ── Colores ANSI ──────────────────────────────────────────────────────────────
@@ -92,10 +94,68 @@ def find_template_item(collections: list, slug: str, label: str) -> dict | None:
     return None
 
 
+def find_static_page(pages: list, folder_slug: str, page_slug: str) -> dict | None:
+    """Busca una página estática dentro de una carpeta por sus slugs."""
+    print(f"\n  Buscando página estática: '{folder_slug}/{page_slug}'…")
+
+    # Construir mapa id→page para resolver parentId
+    pages_by_id = {p["id"]: p for p in pages}
+
+    # Primero encontrar la carpeta
+    folder = next((p for p in pages if p.get("slug") == folder_slug), None)
+    if not folder:
+        print(f"  {Y}⚠  Carpeta '{folder_slug}' no encontrada. Carpetas disponibles:{E}")
+        folders = [p for p in pages if p.get("isFolder")]
+        for f in folders:
+            print(f"    • {Y}{f.get('slug')}{E}  →  {f.get('title', '?')}  (id: {C}{f['id']}{E})")
+        return None
+
+    folder_id = folder["id"]
+    print(f"  {G}✓ Carpeta encontrada:{E} '{folder.get('title')}' (id: {C}{folder_id}{E})")
+
+    # Buscar la página hija con ese slug
+    page = next(
+        (p for p in pages if p.get("slug") == page_slug and p.get("parentId") == folder_id),
+        None,
+    )
+    if not page:
+        print(f"  {Y}⚠  Página '{page_slug}' no encontrada en la carpeta. Páginas en '{folder_slug}':{E}")
+        children = [p for p in pages if p.get("parentId") == folder_id]
+        for c in children:
+            print(f"    • {Y}{c.get('slug')}{E}  →  {c.get('title', '?')}  (id: {C}{c['id']}{E})")
+        return None
+
+    page_id = page["id"]
+    print(f"  {G}✓ Página encontrada:{E} '{page.get('title')}' (id: {C}{page_id}{E})")
+    print(f"  {B}Campos del objeto page:{E}")
+    for k, v in page.items():
+        print(f"    {Y}{k:<25}{E} {str(v)[:100]}")
+
+    # Obtener el DOM de la página
+    print(f"\n  Obteniendo DOM de la página…")
+    dom = get_page_dom(page_id)
+    if "error" in dom:
+        print(f"  {R}✗ Error al obtener DOM: {dom['error']}{E}")
+        dom = {}
+    else:
+        nodes = dom.get("nodes", [])
+        print(f"  {G}✓ DOM obtenido:{E} {len(nodes)} nodos")
+
+    return {
+        "page_id": page_id,
+        "folder_id": folder_id,
+        "folder_slug": folder_slug,
+        "page_slug": page_slug,
+        "title": page.get("title", ""),
+        "dom": dom,
+    }
+
+
 def discover(
     service_slug: str | None = None,
     industry_slug: str | None = None,
     blog_slug: str | None = None,
+    page_path: str | None = None,
     save: bool = False,
 ):
     print(f"\n{B}{'═'*60}{E}")
@@ -198,6 +258,25 @@ def discover(
             "fields": field_list,
         }
 
+    # ── Páginas estáticas ─────────────────────────────────────────────────────
+    static_page_result = None
+    if page_path:
+        print_section("PASO 4b — Página estática (folder/page)")
+        pages_resp = list_pages(site_id)
+        if "error" in pages_resp:
+            print(f"  {R}✗ {pages_resp['error']}{E}")
+        else:
+            all_pages = pages_resp.get("pages", [])
+            print(f"  {G}✓{E} {len(all_pages)} páginas encontradas en el sitio")
+            parts = page_path.strip("/").split("/", 1)
+            if len(parts) == 2:
+                static_page_result = find_static_page(all_pages, parts[0], parts[1])
+                if static_page_result:
+                    env_lines.append(f"WEBFLOW_STATIC_PAGE_ID={static_page_result['page_id']}")
+                    env_lines.append(f"WEBFLOW_STATIC_FOLDER_ID={static_page_result['folder_id']}")
+            else:
+                print(f"  {R}✗ Formato inválido. Usa: carpeta/pagina  (ej: servicios/servicio-atencion-cliente){E}")
+
     # ── Resumen .env ──────────────────────────────────────────────────────────
     if env_lines:
         print_section("RESULTADO — Agrega estas líneas a tu .env")
@@ -206,6 +285,8 @@ def discover(
 
     # ── Guardar ───────────────────────────────────────────────────────────────
     output = {"collections": schema_data, "templates": templates}
+    if static_page_result:
+        output["static_page"] = {k: v for k, v in static_page_result.items() if k != "dom"}
     if save:
         out_path = Path(__file__).parent / "webflow_schema.json"
         with open(out_path, "w", encoding="utf-8") as f:
@@ -221,18 +302,22 @@ if __name__ == "__main__":
         description="Descubre la estructura CMS de Webflow — Intelsa",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--service",  metavar="SLUG", help="Slug del item template para Servicios")
-    parser.add_argument("--industry", metavar="SLUG", help="Slug del item template para Industrias")
-    parser.add_argument("--blog",     metavar="SLUG", help="Slug del item template para Blog")
+    parser.add_argument("--service",  metavar="SLUG", help="Slug del item template para Servicios (CMS)")
+    parser.add_argument("--industry", metavar="SLUG", help="Slug del item template para Industrias (CMS)")
+    parser.add_argument("--blog",     metavar="SLUG", help="Slug del item template para Blog (CMS)")
+    parser.add_argument("--page",     metavar="FOLDER/PAGE", help="Ruta de página estática, ej: servicios/servicio-atencion-cliente")
     parser.add_argument("--save", action="store_true", help="Guarda el schema en webflow_schema.json")
     args = parser.parse_args()
 
-    # Si no se pasan slugs, usa el de servicios por defecto
-    service_slug = args.service or ("servicio-atencion-cliente" if not any([args.industry, args.blog]) else None)
+    # Si no se pasan slugs de CMS, omitir búsqueda CMS
+    service_slug = args.service if args.service else None
+    if not any([args.service, args.industry, args.blog, args.page]):
+        service_slug = "servicio-atencion-cliente"  # default legacy
 
     discover(
         service_slug=service_slug,
         industry_slug=args.industry,
         blog_slug=args.blog,
+        page_path=args.page,
         save=args.save,
     )

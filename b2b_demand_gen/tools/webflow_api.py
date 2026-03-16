@@ -106,6 +106,26 @@ def create_collection_item(collection_id: str, field_data: dict[str, Any]) -> di
         return _handle_response(response)
 
 
+def list_pages(site_id: str) -> dict:
+    """Lista todas las páginas estáticas de un sitio (incluyendo las de carpetas)."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{WEBFLOW_BASE_URL}/sites/{site_id}/pages",
+            headers=_get_headers(),
+        )
+        return _handle_response(response)
+
+
+def get_page_dom(page_id: str) -> dict:
+    """Obtiene el DOM/estructura de una página estática de Webflow."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{WEBFLOW_BASE_URL}/pages/{page_id}/dom",
+            headers=_get_headers(),
+        )
+        return _handle_response(response)
+
+
 def publish_item(collection_id: str, item_id: str) -> dict:
     """Publica un item draft en Webflow (lo hace visible en el sitio)."""
     with httpx.Client() as client:
