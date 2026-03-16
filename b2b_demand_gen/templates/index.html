@@ -15,6 +15,10 @@
     .step-pulse { animation: pulse 1.5s ease-in-out infinite; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
     pre { white-space: pre-wrap; word-break: break-word; }
+    .expandable { max-height: 300px; overflow-y: auto; position: relative; }
+    .expandable.expanded { max-height: none; }
+    .expand-btn { cursor: pointer; text-align: center; padding: 6px; border-top: 1px solid #e2e8f0; margin-top: 8px; }
+    .tab-active { border-color: rgb(99 102 241); color: rgb(99 102 241); background: rgb(238 242 255); }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -195,8 +199,11 @@
 
     <!-- Preview del último paso -->
     <div id="step-preview" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-4 fade-in">
-      <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3" id="preview-label">Preview</h4>
-      <pre id="preview-content" class="text-xs text-slate-700 log-box max-h-40 overflow-y-auto"></pre>
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide" id="preview-label">Preview</h4>
+        <button onclick="toggleExpand('preview-content')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Expandir / Contraer</button>
+      </div>
+      <pre id="preview-content" class="text-xs text-slate-700 log-box expandable"></pre>
     </div>
 
   </section>
@@ -250,12 +257,50 @@
         </div>
       </div>
 
-      <div id="webflow-preview" class="hidden mb-4">
-        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Resultado Webflow</h4>
-        <pre id="webflow-content" class="text-xs bg-slate-50 rounded-lg p-3 log-box max-h-36 overflow-y-auto text-slate-700"></pre>
+      <!-- Tabs de contenido -->
+      <div id="result-tabs" class="hidden mb-4">
+        <div class="flex border-b border-slate-200 gap-1 mb-4">
+          <button onclick="switchTab('tab-article')" id="btn-tab-article"
+            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 rounded-t-lg transition tab-active">
+            📝 Artículo / Copy
+          </button>
+          <button onclick="switchTab('tab-keywords')" id="btn-tab-keywords"
+            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 rounded-t-lg transition">
+            🔍 Keywords
+          </button>
+          <button onclick="switchTab('tab-webflow')" id="btn-tab-webflow"
+            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 rounded-t-lg transition">
+            🌐 Webflow
+          </button>
+        </div>
+
+        <!-- Tab: Artículo -->
+        <div id="tab-article" class="tab-content">
+          <div id="article-preview-content" class="space-y-4"></div>
+          <div class="mt-4 flex gap-2">
+            <button onclick="downloadJSON('copy')" class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-medium transition">
+              ⬇ Descargar Copy (JSON)
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab: Keywords -->
+        <div id="tab-keywords" class="tab-content hidden">
+          <pre id="keywords-full-content" class="text-xs text-slate-700 bg-slate-50 rounded-lg p-4 log-box max-h-[600px] overflow-y-auto"></pre>
+          <div class="mt-4">
+            <button onclick="downloadJSON('keywords')" class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-medium transition">
+              ⬇ Descargar Keywords (JSON)
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab: Webflow -->
+        <div id="tab-webflow" class="tab-content hidden">
+          <pre id="webflow-full-content" class="text-xs text-slate-700 bg-slate-50 rounded-lg p-4 log-box max-h-[600px] overflow-y-auto"></pre>
+        </div>
       </div>
 
-      <div id="outputs-list" class="hidden">
+      <div id="outputs-list" class="hidden mt-4">
         <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Archivos generados (en outputs/)</h4>
         <ul id="outputs-items" class="space-y-1"></ul>
       </div>
@@ -478,6 +523,61 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+// ─── Tabs y expansión ─────────────────────────────────────────────────────
+function toggleExpand(elementId) {
+  const el = document.getElementById(elementId);
+  if (el) el.classList.toggle('expanded');
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('[id^="btn-tab-"]').forEach(btn => btn.classList.remove('tab-active'));
+  const tab = document.getElementById(tabId);
+  const btn = document.getElementById('btn-' + tabId);
+  if (tab) tab.classList.remove('hidden');
+  if (btn) btn.classList.add('tab-active');
+}
+
+// Almacena los datos del último pipeline para descargas
+let lastPipelineData = {};
+
+function downloadJSON(type) {
+  let data, filename;
+  if (type === 'copy' && lastPipelineData.copy_data) {
+    data = lastPipelineData.copy_data;
+    filename = 'copy_generated.json';
+  } else if (type === 'keywords' && lastPipelineData.keyword_research) {
+    data = { research: lastPipelineData.keyword_research };
+    filename = 'keyword_research.json';
+  } else {
+    alert('No hay datos para descargar.');
+    return;
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function renderFullArticle(copyData, pageType) {
+  const container = document.getElementById('article-preview-content');
+  container.innerHTML = '';
+  renderCopyPreview(copyData, pageType);
+  // Clone the review preview into the article tab
+  const reviewContent = document.getElementById('copy-preview-content');
+  container.innerHTML = reviewContent.innerHTML;
+
+  // Also add the full raw copy_data as expandable JSON
+  const jsonSection = document.createElement('details');
+  jsonSection.className = 'mt-4';
+  jsonSection.innerHTML = `
+    <summary class="cursor-pointer text-xs font-semibold text-slate-500 uppercase tracking-wide">Ver datos completos (JSON)</summary>
+    <pre class="text-xs text-slate-600 bg-slate-50 rounded-lg p-3 mt-2 log-box max-h-[500px] overflow-y-auto">${escHtml(JSON.stringify(copyData, null, 2))}</pre>
+  `;
+  container.appendChild(jsonSection);
+}
+
 // ─── Submit del formulario ───────────────────────────────────────────────────
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -619,7 +719,7 @@ async function sendReview(approved) {
 document.getElementById('approve-btn').addEventListener('click', () => sendReview(true));
 document.getElementById('reject-btn').addEventListener('click', () => sendReview(false));
 
-function onPipelineComplete({ status, message, outputs, webflow_preview }) {
+function onPipelineComplete({ status, message, outputs, webflow_preview, keyword_research, copy_data, page_type }) {
   const isOk = status === 'completed' || status === 'completed_no_upload';
   const isRejected = status === 'rejected';
 
@@ -631,10 +731,33 @@ function onPipelineComplete({ status, message, outputs, webflow_preview }) {
   title.textContent = isRejected ? 'Pipeline detenido' : isOk ? 'Pipeline completado' : 'Completado con advertencias';
   msg.textContent   = message || '';
 
-  if (webflow_preview) {
-    document.getElementById('webflow-content').textContent = webflow_preview;
-    show(document.getElementById('webflow-preview'));
+  // Guardar datos para descargas
+  lastPipelineData = { copy_data, keyword_research, webflow_preview };
+
+  // Mostrar tabs con contenido completo
+  const resultTabs = document.getElementById('result-tabs');
+  show(resultTabs);
+
+  // Tab: Artículo / Copy
+  if (copy_data && Object.keys(copy_data).length > 0) {
+    renderCopyPreview(copy_data, page_type || 'service');
+    renderFullArticle(copy_data, page_type || 'service');
   }
+
+  // Tab: Keywords
+  if (keyword_research) {
+    document.getElementById('keywords-full-content').textContent = keyword_research;
+  }
+
+  // Tab: Webflow
+  if (webflow_preview) {
+    document.getElementById('webflow-full-content').textContent = webflow_preview;
+  } else {
+    document.getElementById('webflow-full-content').textContent = 'No se ejecutó el upload a Webflow.';
+  }
+
+  // Default to article tab
+  switchTab('tab-article');
 
   if (Array.isArray(outputs) && outputs.length > 0) {
     const ul = document.getElementById('outputs-items');
@@ -667,6 +790,10 @@ document.getElementById('new-btn').addEventListener('click', () => {
   hide(doneSection);
   hide(progressSection);
   hide(reviewSection);
+  hide(document.getElementById('result-tabs'));
+  hide(document.getElementById('outputs-list'));
+  hide(document.getElementById('step-preview'));
+  lastPipelineData = {};
   document.getElementById('topic').focus();
   resetSubmitBtn();
 });

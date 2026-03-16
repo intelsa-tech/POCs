@@ -21,12 +21,25 @@ def _get_headers() -> dict:
     }
 
 
+def _handle_response(response: httpx.Response) -> dict:
+    """Maneja la respuesta de Webflow con errores descriptivos."""
+    if response.status_code == 401:
+        return {"error": "401 Unauthorized - El WEBFLOW_API_TOKEN es inválido o expiró. Genera uno nuevo en Webflow > Site Settings > Apps & Integrations > API Access."}
+    if response.status_code == 403:
+        return {"error": "403 Forbidden - El token no tiene permisos suficientes. Necesita scopes: sites:read, cms:read, cms:write. Regenera el token con estos permisos."}
+    if response.status_code == 404:
+        return {"error": f"404 Not Found - El recurso no existe. Verifica los IDs de site/collection."}
+    if response.status_code >= 400:
+        detail = response.text[:300] if response.text else "Sin detalle"
+        return {"error": f"Error {response.status_code}: {detail}"}
+    return response.json()
+
+
 def list_sites() -> dict:
     """Lista todos los sitios Webflow asociados al token."""
     with httpx.Client() as client:
         response = client.get(f"{WEBFLOW_BASE_URL}/sites", headers=_get_headers())
-        response.raise_for_status()
-        return response.json()
+        return _handle_response(response)
 
 
 def list_collections(site_id: str) -> dict:
@@ -36,8 +49,7 @@ def list_collections(site_id: str) -> dict:
             f"{WEBFLOW_BASE_URL}/sites/{site_id}/collections",
             headers=_get_headers(),
         )
-        response.raise_for_status()
-        return response.json()
+        return _handle_response(response)
 
 
 def get_collection(collection_id: str) -> dict:
@@ -47,8 +59,7 @@ def get_collection(collection_id: str) -> dict:
             f"{WEBFLOW_BASE_URL}/collections/{collection_id}",
             headers=_get_headers(),
         )
-        response.raise_for_status()
-        return response.json()
+        return _handle_response(response)
 
 
 def list_collection_items(collection_id: str, limit: int = 10) -> dict:
@@ -59,8 +70,7 @@ def list_collection_items(collection_id: str, limit: int = 10) -> dict:
             headers=_get_headers(),
             params={"limit": limit},
         )
-        response.raise_for_status()
-        return response.json()
+        return _handle_response(response)
 
 
 def create_collection_item(collection_id: str, field_data: dict[str, Any]) -> dict:
@@ -71,17 +81,10 @@ def create_collection_item(collection_id: str, field_data: dict[str, Any]) -> di
         collection_id: ID de la Collection destino.
         field_data: Diccionario con los campos del item.
                     Debe incluir al menos 'name' y 'slug'.
-                    Ejemplo: {
-                        "name": "Generación de Demanda B2B",
-                        "slug": "generacion-demanda-b2b",
-                        "hero-title": "...",
-                        "body-copy": "...",
-                        ...
-                    }
     """
     payload = {
         "isArchived": False,
-        "isDraft": True,  # Empieza como draft para revisión
+        "isDraft": True,
         "fieldData": field_data,
     }
     with httpx.Client() as client:
@@ -90,8 +93,7 @@ def create_collection_item(collection_id: str, field_data: dict[str, Any]) -> di
             headers=_get_headers(),
             json=payload,
         )
-        response.raise_for_status()
-        return response.json()
+        return _handle_response(response)
 
 
 def publish_item(collection_id: str, item_id: str) -> dict:
@@ -102,5 +104,4 @@ def publish_item(collection_id: str, item_id: str) -> dict:
             headers=_get_headers(),
             json={"itemIds": [item_id]},
         )
-        response.raise_for_status()
-        return response.json()
+        return _handle_response(response)

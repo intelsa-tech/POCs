@@ -21,7 +21,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 # Asegurar que los imports del proyecto funcionen correctamente
 _BASE_DIR = Path(__file__).parent
@@ -89,7 +89,7 @@ def _run_pipeline(job_id: str, params: dict):
 
         emit("step_complete", {
             "step": 1,
-            "preview": keyword_result["research"][:700],
+            "preview": keyword_result["research"],
             "usage": keyword_result["usage"],
         })
 
@@ -120,6 +120,9 @@ def _run_pipeline(job_id: str, params: dict):
                 emit("pipeline_complete", {
                     "status": "rejected",
                     "message": "Copy rechazado. Pipeline detenido.",
+                    "keyword_research": keyword_result.get("research", ""),
+                    "copy_data": copy_result.get("copy_data", {}),
+                    "page_type": page_type,
                     "outputs": [f"{timestamp}_{slug}_keywords.json", f"{timestamp}_{slug}_copy.json"],
                 })
                 return
@@ -131,6 +134,9 @@ def _run_pipeline(job_id: str, params: dict):
             emit("pipeline_complete", {
                 "status": "completed_no_upload",
                 "message": "Pipeline completado. Upload a Webflow omitido (skip-upload).",
+                "keyword_research": keyword_result.get("research", ""),
+                "copy_data": copy_result.get("copy_data", {}),
+                "page_type": page_type,
                 "outputs": [f"{timestamp}_{slug}_keywords.json", f"{timestamp}_{slug}_copy.json"],
             })
             return
@@ -147,7 +153,7 @@ def _run_pipeline(job_id: str, params: dict):
 
         emit("step_complete", {
             "step": 3,
-            "result_preview": webflow_result["result"][:500],
+            "result_preview": webflow_result["result"],
             "usage": webflow_result["usage"],
         })
 
@@ -161,7 +167,10 @@ def _run_pipeline(job_id: str, params: dict):
         emit("pipeline_complete", {
             "status": "completed",
             "message": "✅ Pipeline completado exitosamente.",
-            "webflow_preview": webflow_result["result"][:600],
+            "webflow_preview": webflow_result["result"],
+            "keyword_research": keyword_result.get("research", ""),
+            "copy_data": copy_result.get("copy_data", {}),
+            "page_type": page_type,
             "outputs": [
                 f"{timestamp}_{slug}_keywords.json",
                 f"{timestamp}_{slug}_copy.json",
@@ -256,6 +265,25 @@ async def submit_review(job_id: str, request: Request):
     _jobs[job_id]["review_event"].set()
 
     return {"status": "ok", "approved": approved}
+
+
+@app.get("/api/outputs")
+async def list_outputs():
+    """Lista todos los archivos de output generados."""
+    OUTPUTS_DIR.mkdir(exist_ok=True)
+    files = sorted(OUTPUTS_DIR.glob("*.json"), reverse=True)
+    return [{"name": f.name, "size": f.stat().st_size} for f in files]
+
+
+@app.get("/api/outputs/{filename}")
+async def get_output(filename: str):
+    """Retorna el contenido de un archivo de output."""
+    filepath = OUTPUTS_DIR / filename
+    if not filepath.exists() or not filepath.suffix == ".json":
+        raise HTTPException(status_code=404, detail="Archivo no encontrado.")
+    with open(filepath, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return JSONResponse(content=data)
 
 
 if __name__ == "__main__":
