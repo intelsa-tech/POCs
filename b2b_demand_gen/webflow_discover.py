@@ -62,7 +62,9 @@ def find_template_item(collections: list, slug: str, label: str) -> dict | None:
         items_resp = list_collection_items(cid, limit=100)
         if "error" in items_resp:
             continue
-        for item in items_resp.get("items", []):
+        all_items = items_resp.get("items", [])
+        print(f"    → {len(all_items)} items en '{cname}': {[i.get('fieldData', {}).get('slug', i.get('slug', i['id'])) for i in all_items]}")
+        for item in all_items:
             fd = item.get("fieldData", {})
             item_slug = fd.get("slug", item.get("slug", ""))
             if item_slug == slug or item.get("id") == slug:
