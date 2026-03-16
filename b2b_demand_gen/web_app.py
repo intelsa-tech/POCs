@@ -83,8 +83,18 @@ def _run_pipeline(job_id: str, params: dict):
         target_market = params.get("target_market", "empresas B2B medianas y grandes")
         company_context = params.get("company_context", "")
         output_language = params.get("output_language", "es")
+        pt_upper = page_type.upper()
         site_id = params.get("site_id") or os.environ.get("WEBFLOW_SITE_ID")
-        collection_id = params.get("collection_id") or os.environ.get("WEBFLOW_COLLECTION_ID")
+        collection_id = (
+            params.get("collection_id")
+            or os.environ.get(f"WEBFLOW_COLLECTION_ID_{pt_upper}")
+            or os.environ.get("WEBFLOW_COLLECTION_ID")
+        ) or None
+        template_item_id = (
+            params.get("template_item_id")
+            or os.environ.get(f"WEBFLOW_TEMPLATE_ITEM_ID_{pt_upper}")
+            or os.environ.get("WEBFLOW_TEMPLATE_ITEM_ID")
+        ) or None
         auto_publish = params.get("auto_publish", False)
         skip_upload = params.get("skip_upload", False)
         skip_review = params.get("skip_review", False)
@@ -186,6 +196,7 @@ def _run_pipeline(job_id: str, params: dict):
             copy_result,
             site_id=site_id,
             collection_id=collection_id,
+            template_item_id=template_item_id,
             auto_publish=auto_publish,
         )
         _save_output(webflow_result, f"{timestamp}_{slug}_webflow.json")
@@ -382,8 +393,19 @@ async def upload_history_to_webflow(gen_id: int, request: Request):
         raise HTTPException(status_code=404, detail=f"Archivo de output no encontrado: {gen['complete_file']}")
 
     body = await request.json()
+    page_type = gen.get("page_type", "service")
+    pt_upper = page_type.upper()
     site_id = body.get("site_id") or os.environ.get("WEBFLOW_SITE_ID")
-    collection_id = body.get("collection_id") or os.environ.get("WEBFLOW_COLLECTION_ID")
+    collection_id = (
+        body.get("collection_id")
+        or os.environ.get(f"WEBFLOW_COLLECTION_ID_{pt_upper}")
+        or os.environ.get("WEBFLOW_COLLECTION_ID")
+    ) or None
+    template_item_id = (
+        body.get("template_item_id")
+        or os.environ.get(f"WEBFLOW_TEMPLATE_ITEM_ID_{pt_upper}")
+        or os.environ.get("WEBFLOW_TEMPLATE_ITEM_ID")
+    ) or None
     auto_publish = body.get("auto_publish", False)
 
     # Cargar datos del archivo de output
@@ -401,6 +423,7 @@ async def upload_history_to_webflow(gen_id: int, request: Request):
             copy_result,
             site_id=site_id,
             collection_id=collection_id,
+            template_item_id=template_item_id,
             auto_publish=auto_publish,
         ),
     )

@@ -220,15 +220,17 @@ def run_webflow_upload(
     copywriting_output: dict,
     site_id: str | None = None,
     collection_id: str | None = None,
+    template_item_id: str | None = None,
     auto_publish: bool = False,
 ) -> dict:
     """
-    Sube el contenido generado a Webflow.
+    Sube el contenido generado a Webflow usando el item template como referencia de diseño.
 
     Args:
         copywriting_output: Output del agente de copywriting
-        site_id: ID del sitio Webflow (opcional, el agente lo descubrirá si no se provee)
-        collection_id: ID de la Collection destino (opcional)
+        site_id: ID del sitio Webflow (opcional, se lee de WEBFLOW_SITE_ID si no se provee)
+        collection_id: ID de la Collection destino (opcional, se lee de WEBFLOW_COLLECTION_ID_{TYPE})
+        template_item_id: ID del item template cuyo schema se usará como referencia (opcional)
         auto_publish: Si True, publica el item automáticamente (default: False)
 
     Returns:
@@ -261,11 +263,24 @@ def run_webflow_upload(
 
     context_str = "\n".join(context_parts) if context_parts else "- Ninguno (debes descubrir la estructura)"
 
-    template_item_id = os.environ.get("WEBFLOW_TEMPLATE_ITEM_ID", "")
+    # Resolver template_item_id: parámetro > env var por tipo > env var genérica
+    page_type = copywriting_output.get("page_type", "service")
+    pt_upper = page_type.upper()
+    if not template_item_id:
+        template_item_id = (
+            os.environ.get(f"WEBFLOW_TEMPLATE_ITEM_ID_{pt_upper}")
+            or os.environ.get("WEBFLOW_TEMPLATE_ITEM_ID", "")
+        )
+    if not collection_id:
+        collection_id = (
+            os.environ.get(f"WEBFLOW_COLLECTION_ID_{pt_upper}")
+            or os.environ.get("WEBFLOW_COLLECTION_ID", "")
+        ) or None
+
     template_hint = (
-        f"- **Template Item ID conocido:** {template_item_id}"
+        f"- **Template Item ID conocido:** {template_item_id} — usa get_item para leer sus campos exactos"
         if template_item_id else
-        f'- Busca el item template con slug "{_TEMPLATE_ITEM_SLUG}" listando items de la collection de Servicios'
+        f'- Busca el item template con slug "{_TEMPLATE_ITEM_SLUG}" listando items de la collection'
     )
 
     messages = [

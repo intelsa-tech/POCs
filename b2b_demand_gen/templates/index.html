@@ -172,14 +172,22 @@
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Webflow Site ID</label>
-              <input id="site_id" type="text" placeholder="Dejar vacío para auto-detectar"
+              <input id="site_id" type="text" placeholder="Dejar vacío → usa .env"
                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">Webflow Collection ID</label>
-              <input id="collection_id" type="text" placeholder="Dejar vacío para auto-detectar"
+              <label class="block text-xs font-medium text-slate-600 mb-1">Collection ID</label>
+              <input id="collection_id" type="text" placeholder="Dejar vacío → usa .env por tipo"
                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
             </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">
+              Template Item ID
+              <span class="font-normal text-slate-400 ml-1">— ID del item de Webflow cuyo diseño se replicará</span>
+            </label>
+            <input id="template_item_id" type="text" placeholder="Dejar vacío → usa .env por tipo (WEBFLOW_TEMPLATE_ITEM_ID_SERVICE / _INDUSTRY / _BLOG)"
+              class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
           <div class="flex flex-wrap gap-5">
             <label class="flex items-center gap-2 cursor-pointer select-none">
@@ -814,8 +822,9 @@ form.addEventListener('submit', async (e) => {
     target_market:   document.getElementById('target_market').value.trim(),
     company_context: document.getElementById('company_context').value.trim(),
     output_language: document.querySelector('input[name="output_language"]:checked')?.value || 'es',
-    site_id:         document.getElementById('site_id').value.trim() || null,
-    collection_id:   document.getElementById('collection_id').value.trim() || null,
+    site_id:          document.getElementById('site_id').value.trim() || null,
+    collection_id:    document.getElementById('collection_id').value.trim() || null,
+    template_item_id: document.getElementById('template_item_id').value.trim() || null,
     skip_upload:     document.getElementById('skip_upload').checked,
     skip_review:     document.getElementById('skip_review').checked,
     auto_publish:    document.getElementById('auto_publish').checked,
