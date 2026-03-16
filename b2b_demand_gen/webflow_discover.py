@@ -104,10 +104,10 @@ def find_static_page(pages: list, folder_slug: str, page_slug: str) -> dict | No
     # Primero encontrar la carpeta
     folder = next((p for p in pages if p.get("slug") == folder_slug), None)
     if not folder:
-        print(f"  {Y}⚠  Carpeta '{folder_slug}' no encontrada. Carpetas disponibles:{E}")
-        folders = [p for p in pages if p.get("isFolder")]
-        for f in folders:
-            print(f"    • {Y}{f.get('slug')}{E}  →  {f.get('title', '?')}  (id: {C}{f['id']}{E})")
+        print(f"  {Y}⚠  Carpeta '{folder_slug}' no encontrada. Todas las páginas/carpetas:{E}")
+        for p in pages:
+            keys = {k: v for k, v in p.items() if k in ("slug", "title", "id", "parentId", "type", "isFolder", "collectionId")}
+            print(f"    • {Y}{p.get('slug', '—'):<35}{E} {str(keys)[:120]}")
         return None
 
     folder_id = folder["id"]
