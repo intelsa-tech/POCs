@@ -73,6 +73,16 @@ def list_collection_items(collection_id: str, limit: int = 10) -> dict:
         return _handle_response(response)
 
 
+def get_item(collection_id: str, item_id: str) -> dict:
+    """Obtiene un item específico de una Collection (útil para usar como template)."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{WEBFLOW_BASE_URL}/collections/{collection_id}/items/{item_id}",
+            headers=_get_headers(),
+        )
+        return _handle_response(response)
+
+
 def create_collection_item(collection_id: str, field_data: dict[str, Any]) -> dict:
     """
     Crea un nuevo item (página) en una Collection de Webflow.

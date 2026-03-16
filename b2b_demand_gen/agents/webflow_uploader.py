@@ -12,12 +12,14 @@ Compatible con todos los agentes de copy: service, industry, blog.
 """
 
 import json
+import os
 import anthropic
 from .intelsa_context import INTELSA_PROFILE
 from tools.webflow_api import (
     list_sites,
     list_collections,
     get_collection,
+    get_item,
     list_collection_items,
     create_collection_item,
     publish_item,
@@ -25,18 +27,41 @@ from tools.webflow_api import (
 
 MODEL = "claude-opus-4-6"
 
-_SYSTEM_PROMPT = f"""Eres un experto en Webflow CMS y automatización de contenido para Intelsa.co.
-Tu tarea es subir contenido de marketing B2B a Webflow de forma precisa.
+# ID del item template cuyo diseño queremos replicar (puede sobrescribirse con env var)
+_TEMPLATE_ITEM_SLUG = "servicio-atencion-cliente"
 
-Al trabajar con Webflow:
-1. Primero explora los sitios y collections disponibles
-2. Identifica el collection más apropiado según el tipo de página (servicio, industria o blog)
-3. Analiza el schema del collection (campos disponibles)
-4. Mapea el copy generado a los campos correctos del collection
-   - El nuevo schema usa: h1, meta_description, hero_subtitle, cta_primary, sections, faq, cta_final
-   - Mapea estos campos a los campos del CMS de Webflow de forma inteligente
-5. Crea el item como DRAFT para que el equipo pueda revisarlo antes de publicar
-6. Confirma la creación exitosa con el ID del item
+_SYSTEM_PROMPT = f"""Eres un experto en Webflow CMS y automatización de contenido para Intelsa.co.
+Tu tarea es crear una página nueva en Webflow que use EXACTAMENTE el mismo diseño que la página
+template existente de Intelsa (slug: {_TEMPLATE_ITEM_SLUG}).
+
+ESTRATEGIA OBLIGATORIA:
+1. Lista los sitios y obtén el site_id
+2. Lista las collections del sitio
+3. Busca el item template con slug "{_TEMPLATE_ITEM_SLUG}" en la collection de Servicios:
+   - Llama list_collection_items en la collection que parezca ser "Servicios"
+   - Identifica cuál item tiene slug == "{_TEMPLATE_ITEM_SLUG}"
+   - Llama get_item con ese collection_id e item_id para obtener sus campos EXACTOS
+4. Usa los nombres de campo EXACTOS del template (fieldData) para crear el nuevo item
+   - NO inventes nombres de campo ni uses nombres genéricos
+   - Usa SOLO los campos que existen en el template
+   - Si un campo es Rich Text, usa HTML válido
+   - Si un campo acepta listas/arrays, usa el mismo formato que el template
+5. Genera un slug limpio para el nuevo item basado en el topic (solo minúsculas, sin tildes, guiones)
+6. Crea el item en la MISMA collection que el template — así heredará el mismo diseño/template
+7. Si auto_publish=True, publica el item inmediatamente
+
+MAPEO DE CAMPOS (copy_data → campos del template):
+- h1 → campo de título/heading principal del template
+- hero_subtitle → campo de subtítulo/descripción corta
+- meta_description → campo de meta description o description
+- cta_primary → campo de CTA o botón principal
+- sections[0].h2 + sections[0].body → primer bloque de contenido
+- sections completo → campo de contenido rico (Rich Text) o secciones individuales
+- faq → campo de preguntas frecuentes (si existe) o parte del Rich Text
+- cta_final → campo de CTA final o parte del contenido
+
+Para campos Rich Text, convierte el contenido a HTML estructurado:
+<h2>título</h2><p>párrafo</p><h3>subtítulo</h3><p>párrafo</p>
 
 IMPORTANTE: Siempre crea el item como draft (isDraft: true) a menos que se indique explícitamente publicar.
 {INTELSA_PROFILE}"""
@@ -81,8 +106,26 @@ WEBFLOW_TOOLS = [
         },
     },
     {
+        "name": "get_item",
+        "description": "Obtiene un item específico de una Collection por su ID. Úsalo para leer el item template y ver sus campos exactos.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "collection_id": {
+                    "type": "string",
+                    "description": "ID de la Collection",
+                },
+                "item_id": {
+                    "type": "string",
+                    "description": "ID del item a obtener",
+                },
+            },
+            "required": ["collection_id", "item_id"],
+        },
+    },
+    {
         "name": "list_collection_items",
-        "description": "Lista items existentes en una Collection para entender el formato de datos esperado.",
+        "description": "Lista items existentes en una Collection para encontrar el item template por slug.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -147,6 +190,8 @@ def _execute_tool(tool_name: str, tool_input: dict) -> str:
             result = list_collections(tool_input["site_id"])
         elif tool_name == "get_collection_schema":
             result = get_collection(tool_input["collection_id"])
+        elif tool_name == "get_item":
+            result = get_item(tool_input["collection_id"], tool_input["item_id"])
         elif tool_name == "list_collection_items":
             result = list_collection_items(
                 tool_input["collection_id"],
@@ -216,34 +261,47 @@ def run_webflow_upload(
 
     context_str = "\n".join(context_parts) if context_parts else "- Ninguno (debes descubrir la estructura)"
 
+    template_item_id = os.environ.get("WEBFLOW_TEMPLATE_ITEM_ID", "")
+    template_hint = (
+        f"- **Template Item ID conocido:** {template_item_id}"
+        if template_item_id else
+        f'- Busca el item template con slug "{_TEMPLATE_ITEM_SLUG}" listando items de la collection de Servicios'
+    )
+
     messages = [
         {
             "role": "user",
-            "content": f"""Sube esta {page_label} B2B a Webflow.
+            "content": f"""Crea una nueva {page_label} en Webflow usando el mismo diseño que la página template existente.
 
-**Tema:** {topic}
+**Tema del nuevo servicio:** {topic}
 **Tipo de página:** {page_type} ({page_label})
 
-**Contexto previo:**
+**IDs conocidos:**
 {context_str}
+{template_hint}
 
-**Copy generado (a subir):**
+**PASOS OBLIGATORIOS:**
+1. Lista los sitios → obtén site_id
+2. Lista las collections del sitio
+3. {"Usa collection_id: " + collection_id + " directamente" if collection_id else 'Identifica la collection de Servicios (busca "Servicio", "Services" o similar en el nombre/slug)'}
+4. Llama list_collection_items en esa collection para encontrar el item con slug "{_TEMPLATE_ITEM_SLUG}"
+5. {"Llama get_item(collection_id='" + collection_id + "', item_id='" + template_item_id + "') para ver los campos exactos del template" if template_item_id else f'Llama get_item con el collection_id y el item_id del template "{_TEMPLATE_ITEM_SLUG}"'}
+6. Usa los nombres de campo EXACTOS del template para mapear el nuevo copy
+7. Crea el nuevo item en la MISMA collection con esos campos exactos
+8. {'Publica el item inmediatamente con publish_page' if auto_publish else 'Deja el item como isDraft: true'}
+9. Reporta: item_id, collection_id, URL (si disponible) y resumen del mapeo de campos
+
+**Copy generado para el nuevo servicio:**
 ```json
 {copy_summary}
 ```
 
-Pasos a seguir:
-1. {'Usa el collection_id conocido directamente' if collection_id else f'Lista los sitios disponibles y encuentra la Collection apropiada para una {page_label}'}
-2. {'Explora el schema del collection' if not collection_id else 'Verifica el schema del collection para mapear campos'}
-3. Mapea el copy a los campos del collection (adapta los nombres de campo al schema real)
-4. Crea el item como DRAFT con toda la información
-5. {'Publica el item después de crearlo' if auto_publish else 'Deja el item como DRAFT para revisión'}
-6. Reporta el ID del item creado y próximos pasos""",
+RECUERDA: El objetivo es que la nueva página use el mismo template de diseño que "{_TEMPLATE_ITEM_SLUG}". Esto se logra creando el item en la misma Collection con los mismos nombres de campo.""",
         }
     ]
 
     # Agentic loop con tool use
-    max_iterations = 10
+    max_iterations = 15
     iteration = 0
 
     while iteration < max_iterations:
