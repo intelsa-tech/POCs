@@ -1,12 +1,9 @@
 """
-Web UI para el pipeline B2B Demand Generation.
+Web UI para el pipeline B2B Demand Generation — Intelsa.co
 
 Corre con:
     cd b2b_demand_gen
     uvicorn web_app:app --reload --port 8000
-
-O desde la raíz del proyecto:
-    uvicorn b2b_demand_gen.web_app:app --reload --port 8000
 """
 
 import asyncio
@@ -33,6 +30,8 @@ from agents.copy_industries import run_copy_industries
 from agents.copy_services import run_copy_services
 from agents.keyword_research import run_keyword_research
 from agents.webflow_uploader import run_webflow_upload
+from agents.intelsa_context import LANGUAGE_LABELS
+import db as database
 
 OUTPUTS_DIR = _BASE_DIR / "outputs"
 TEMPLATES_DIR = _BASE_DIR / "templates"
@@ -44,10 +43,12 @@ COPY_AGENTS = {
 }
 
 # ─── Estado en memoria de los jobs ───────────────────────────────────────────
-# job_id → { queue, review_event, review_approved, status }
 _jobs: dict[str, dict] = {}
 
-app = FastAPI(title="B2B Content Generator")
+app = FastAPI(title="B2B Content Generator — Intelsa")
+
+# Inicializar la DB al arrancar
+database.init_db()
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -58,6 +59,14 @@ def _save_output(data: dict, filename: str) -> str:
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     return str(filepath)
+
+
+def _sum_cache(usage: dict) -> tuple[int, int]:
+    """Extrae (cache_read, cache_creation) de un dict de usage."""
+    return (
+        usage.get("cache_read_input_tokens", 0) or 0,
+        usage.get("cache_creation_input_tokens", 0) or 0,
+    )
 
 
 def _run_pipeline(job_id: str, params: dict):
@@ -72,6 +81,7 @@ def _run_pipeline(job_id: str, params: dict):
         page_type = params.get("page_type", "service")
         target_market = params.get("target_market", "empresas B2B medianas y grandes")
         company_context = params.get("company_context", "")
+        output_language = params.get("output_language", "es")
         site_id = params.get("site_id") or os.environ.get("WEBFLOW_SITE_ID")
         collection_id = params.get("collection_id") or os.environ.get("WEBFLOW_COLLECTION_ID")
         auto_publish = params.get("auto_publish", False)
@@ -84,7 +94,9 @@ def _run_pipeline(job_id: str, params: dict):
         # ── PASO 1: Keyword Research ──────────────────────────────────────────
         emit("step_start", {"step": 1, "name": "Keyword Research"})
 
-        keyword_result = run_keyword_research(topic, target_market, page_type=page_type)
+        keyword_result = run_keyword_research(
+            topic, target_market, page_type=page_type, output_language=output_language
+        )
         _save_output(keyword_result, f"{timestamp}_{slug}_keywords.json")
 
         emit("step_complete", {
@@ -97,7 +109,7 @@ def _run_pipeline(job_id: str, params: dict):
         emit("step_start", {"step": 2, "name": f"Copywriting — {page_type}"})
 
         copy_fn = COPY_AGENTS[page_type]
-        copy_result = copy_fn(keyword_result, company_context)
+        copy_result = copy_fn(keyword_result, company_context, output_language)
         _save_output(copy_result, f"{timestamp}_{slug}_copy.json")
 
         emit("step_complete", {
@@ -112,11 +124,24 @@ def _run_pipeline(job_id: str, params: dict):
                 "page_type": copy_result.get("page_type", "service"),
                 "topic": copy_result.get("topic", topic),
             })
-            # Bloquear el thread hasta que el usuario decida en el navegador
             _jobs[job_id]["review_event"].wait()
             approved = _jobs[job_id]["review_approved"]
 
             if not approved:
+                # Guardar en DB aunque sea rechazado (para tracking de créditos)
+                k_read, k_cre = _sum_cache(keyword_result["usage"])
+                c_read, c_cre = _sum_cache(copy_result["usage"])
+                database.save_generation(
+                    topic=topic, page_type=page_type, target_market=target_market,
+                    output_language=output_language, company_context=company_context,
+                    complete_file=f"{timestamp}_{slug}_copy.json",
+                    keyword_tokens=keyword_result["usage"]["input_tokens"] + keyword_result["usage"]["output_tokens"],
+                    copy_tokens=copy_result["usage"]["input_tokens"] + copy_result["usage"]["output_tokens"],
+                    webflow_tokens=0,
+                    cache_read_tokens=k_read + c_read,
+                    cache_creation_tokens=k_cre + c_cre,
+                    status="rejected",
+                )
                 emit("pipeline_complete", {
                     "status": "rejected",
                     "message": "Copy rechazado. Pipeline detenido.",
@@ -131,6 +156,19 @@ def _run_pipeline(job_id: str, params: dict):
 
         # ── PASO 3: Webflow Upload ────────────────────────────────────────────
         if skip_upload:
+            k_read, k_cre = _sum_cache(keyword_result["usage"])
+            c_read, c_cre = _sum_cache(copy_result["usage"])
+            database.save_generation(
+                topic=topic, page_type=page_type, target_market=target_market,
+                output_language=output_language, company_context=company_context,
+                complete_file=f"{timestamp}_{slug}_copy.json",
+                keyword_tokens=keyword_result["usage"]["input_tokens"] + keyword_result["usage"]["output_tokens"],
+                copy_tokens=copy_result["usage"]["input_tokens"] + copy_result["usage"]["output_tokens"],
+                webflow_tokens=0,
+                cache_read_tokens=k_read + c_read,
+                cache_creation_tokens=k_cre + c_cre,
+                status="draft",
+            )
             emit("pipeline_complete", {
                 "status": "completed_no_upload",
                 "message": "Pipeline completado. Upload a Webflow omitido (skip-upload).",
@@ -162,7 +200,24 @@ def _run_pipeline(job_id: str, params: dict):
             "copywriting": copy_result,
             "webflow": webflow_result,
         }
-        _save_output(total, f"{timestamp}_{slug}_COMPLETE.json")
+        complete_file = f"{timestamp}_{slug}_COMPLETE.json"
+        _save_output(total, complete_file)
+
+        # ── Guardar en DB ─────────────────────────────────────────────────────
+        k_read, k_cre = _sum_cache(keyword_result["usage"])
+        c_read, c_cre = _sum_cache(copy_result["usage"])
+        w_read, w_cre = _sum_cache(webflow_result["usage"])
+        database.save_generation(
+            topic=topic, page_type=page_type, target_market=target_market,
+            output_language=output_language, company_context=company_context,
+            complete_file=complete_file,
+            keyword_tokens=keyword_result["usage"]["input_tokens"] + keyword_result["usage"]["output_tokens"],
+            copy_tokens=copy_result["usage"]["input_tokens"] + copy_result["usage"]["output_tokens"],
+            webflow_tokens=webflow_result["usage"]["input_tokens"] + webflow_result["usage"]["output_tokens"],
+            cache_read_tokens=k_read + c_read + w_read,
+            cache_creation_tokens=k_cre + c_cre + w_cre,
+            status="published" if auto_publish else "draft",
+        )
 
         emit("pipeline_complete", {
             "status": "completed",
@@ -171,18 +226,19 @@ def _run_pipeline(job_id: str, params: dict):
             "keyword_research": keyword_result.get("research", ""),
             "copy_data": copy_result.get("copy_data", {}),
             "page_type": page_type,
+            "output_language": output_language,
             "outputs": [
                 f"{timestamp}_{slug}_keywords.json",
                 f"{timestamp}_{slug}_copy.json",
                 f"{timestamp}_{slug}_webflow.json",
-                f"{timestamp}_{slug}_COMPLETE.json",
+                complete_file,
             ],
         })
 
     except Exception as exc:
         emit("pipeline_error", {"message": str(exc)})
     finally:
-        q.put(None)  # Sentinel: cierra el stream SSE
+        q.put(None)
 
 
 # ─── Rutas ────────────────────────────────────────────────────────────────────
@@ -203,6 +259,9 @@ async def create_job(request: Request):
 
     if params.get("page_type", "service") not in COPY_AGENTS:
         raise HTTPException(status_code=400, detail="page_type inválido.")
+
+    if params.get("output_language", "es") not in LANGUAGE_LABELS:
+        raise HTTPException(status_code=400, detail="output_language inválido.")
 
     job_id = str(uuid.uuid4())
     _jobs[job_id] = {
@@ -230,7 +289,6 @@ async def stream_job(job_id: str):
                 event = _jobs[job_id]["queue"].get_nowait()
             except queue.Empty:
                 await asyncio.sleep(0.15)
-                # Heartbeat para mantener la conexión
                 yield ": heartbeat\n\n"
                 continue
 
@@ -254,7 +312,7 @@ async def stream_job(job_id: str):
 
 @app.post("/api/jobs/{job_id}/review")
 async def submit_review(job_id: str, request: Request):
-    """Recibe la decisión de revisión humana (approve/reject)."""
+    """Recibe la decisión de revisión humana."""
     if job_id not in _jobs:
         raise HTTPException(status_code=404, detail="Job no encontrado.")
 
@@ -266,6 +324,45 @@ async def submit_review(job_id: str, request: Request):
 
     return {"status": "ok", "approved": approved}
 
+
+# ─── Historial (DB) ───────────────────────────────────────────────────────────
+
+@app.get("/api/history")
+async def get_history(
+    limit: int = 50,
+    page_type: str | None = None,
+    status: str | None = None,
+    language: str | None = None,
+):
+    """Lista el historial de generaciones con filtros opcionales."""
+    return database.list_generations(
+        limit=limit, page_type=page_type, status=status, language=language
+    )
+
+
+@app.get("/api/history/stats")
+async def get_stats():
+    """Estadísticas de uso: tokens, cache, generaciones por tipo."""
+    return database.get_stats()
+
+
+@app.patch("/api/history/{gen_id}/status")
+async def update_gen_status(gen_id: int, request: Request):
+    """Actualiza el status de una generación (draft → approved → published)."""
+    body = await request.json()
+    new_status = body.get("status")
+    if new_status not in ("draft", "approved", "published", "rejected"):
+        raise HTTPException(status_code=400, detail="Status inválido.")
+    database.update_status(
+        gen_id,
+        status=new_status,
+        webflow_item_id=body.get("webflow_item_id"),
+        webflow_url=body.get("webflow_url"),
+    )
+    return {"status": "ok"}
+
+
+# ─── Outputs (archivos JSON) ──────────────────────────────────────────────────
 
 @app.get("/api/outputs")
 async def list_outputs():
@@ -279,7 +376,7 @@ async def list_outputs():
 async def get_output(filename: str):
     """Retorna el contenido de un archivo de output."""
     filepath = OUTPUTS_DIR / filename
-    if not filepath.exists() or not filepath.suffix == ".json":
+    if not filepath.exists() or filepath.suffix != ".json":
         raise HTTPException(status_code=404, detail="Archivo no encontrado.")
     with open(filepath, "r", encoding="utf-8") as f:
         data = json.load(f)

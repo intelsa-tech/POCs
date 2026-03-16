@@ -19,27 +19,44 @@
     .expandable.expanded { max-height: none; }
     .expand-btn { cursor: pointer; text-align: center; padding: 6px; border-top: 1px solid #e2e8f0; margin-top: 8px; }
     .tab-active { border-color: rgb(99 102 241); color: rgb(99 102 241); background: rgb(238 242 255); }
+    .nav-active { background: rgb(238 242 255); color: rgb(99 102 241); font-weight: 600; }
+    .cache-badge { background: #dcfce7; color: #166534; font-size: 10px; padding: 1px 6px; border-radius: 9999px; }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
 
 <!-- ── Header ──────────────────────────────────────────────────────────────── -->
 <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
-  <div class="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
-    <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-      <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
+  <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-slate-900 leading-tight">B2B Content Generator</h1>
+        <p class="text-xs text-slate-500">Intelsa · Keyword Research → Copy → Webflow</p>
+      </div>
     </div>
-    <div>
-      <h1 class="text-lg font-bold text-slate-900 leading-tight">B2B Content Generator</h1>
-      <p class="text-xs text-slate-500">Pipeline IA · Keyword Research → Copy → Webflow</p>
+    <div class="flex gap-2">
+      <button onclick="showView('generator')" id="nav-generator"
+        class="px-3 py-1.5 text-xs font-medium rounded-lg transition nav-active">
+        Generar
+      </button>
+      <button onclick="showView('history')" id="nav-history"
+        class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 rounded-lg transition">
+        Historial
+      </button>
     </div>
   </div>
 </header>
 
 <main class="max-w-4xl mx-auto px-6 py-8 space-y-6">
+
+<!-- ── Vista: Generador ──────────────────────────────────────────────────── -->
+<div id="view-generator">
 
   <!-- ── Formulario ────────────────────────────────────────────────────────── -->
   <section id="form-section" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
@@ -93,15 +110,54 @@
           class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
       </div>
 
+      <!-- Idioma de salida -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Idioma del output</label>
+        <div class="flex gap-2 flex-wrap">
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="es" checked class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇨🇴 Español
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="en" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇺🇸 English
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="pt" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇧🇷 Português
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="fr" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇫🇷 Français
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="de" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇩🇪 Deutsch
+            </div>
+          </label>
+        </div>
+        <p class="text-xs text-slate-400 mt-1.5">El copy completo (títulos, CTAs, FAQs) se genera en el idioma seleccionado</p>
+      </div>
+
       <!-- Contexto empresa -->
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">
-          Contexto de la empresa
+          Datos reales disponibles
           <span class="text-slate-400 font-normal">(opcional)</span>
         </label>
         <textarea id="company_context" rows="3"
-          placeholder="Nombre de la agencia, servicios actuales, tono de voz, diferenciadores…"
+          placeholder="Métricas reales, casos de éxito, testimoniales, diferenciadores específicos del servicio…"
           class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+        <p class="text-xs text-slate-400 mt-1">Estos datos reales se usan en el copy — el modelo nunca inventará estadísticas</p>
       </div>
 
       <!-- Opciones avanzadas -->
@@ -313,12 +369,67 @@
     </div>
   </section>
 
+</div> <!-- end view-generator -->
+
+<!-- ── Vista: Historial ──────────────────────────────────────────────────── -->
+<div id="view-history" class="hidden">
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-base font-semibold text-slate-800">Historial de generaciones</h2>
+      <div class="flex items-center gap-2">
+        <div id="stats-badge" class="text-xs text-slate-500"></div>
+        <button onclick="loadHistory()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">↻ Actualizar</button>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex gap-2 mb-4 flex-wrap">
+      <select id="filter-page-type" onchange="loadHistory()" class="text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        <option value="">Todos los tipos</option>
+        <option value="service">Servicios</option>
+        <option value="industry">Industrias</option>
+        <option value="blog">Blog</option>
+      </select>
+      <select id="filter-status" onchange="loadHistory()" class="text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        <option value="">Todos los status</option>
+        <option value="draft">Draft</option>
+        <option value="approved">Aprobado</option>
+        <option value="published">Publicado</option>
+        <option value="rejected">Rechazado</option>
+      </select>
+      <select id="filter-language" onchange="loadHistory()" class="text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        <option value="">Todos los idiomas</option>
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="pt">Português</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+      </select>
+    </div>
+
+    <div id="history-loading" class="text-sm text-slate-400 py-8 text-center">Cargando historial…</div>
+    <div id="history-list" class="hidden space-y-2"></div>
+    <div id="history-empty" class="hidden text-sm text-slate-400 py-8 text-center">No hay generaciones aún.</div>
+  </div>
+</div>
+
 </main>
 
 <script>
 // ─── Estado global ─────────────────────────────────────────────────────────
 let currentJobId = null;
 let currentEventSource = null;
+
+// ─── Navegación entre vistas ─────────────────────────────────────────────────
+function showView(view) {
+  document.getElementById('view-generator').classList.toggle('hidden', view !== 'generator');
+  document.getElementById('view-history').classList.toggle('hidden', view !== 'history');
+  document.getElementById('nav-generator').classList.toggle('nav-active', view === 'generator');
+  document.getElementById('nav-generator').classList.toggle('text-slate-500', view !== 'generator');
+  document.getElementById('nav-history').classList.toggle('nav-active', view === 'history');
+  document.getElementById('nav-history').classList.toggle('text-slate-500', view !== 'history');
+  if (view === 'history') loadHistory();
+}
 
 // ─── Elementos DOM ──────────────────────────────────────────────────────────
 const formSection    = document.getElementById('form-section');
@@ -355,84 +466,92 @@ function renderCopyPreview(copyData, pageType) {
   const container = document.getElementById('copy-preview-content');
   container.innerHTML = '';
 
-  // Campos importantes por tipo
-  const fieldGroups = {
-    service: [
-      { label: 'Meta Title', key: 'meta_title' },
-      { label: 'Meta Description', key: 'meta_description' },
-      { label: 'Hero Headline', key: 'hero_headline', big: true },
-      { label: 'Hero Subheadline', key: 'hero_subheadline' },
-      { label: 'CTA Principal', key: 'hero_cta_primary', badge: true },
-      { label: 'CTA Secundario', key: 'hero_cta_secondary', badge: true },
-      { label: 'Pain Points (título)', key: 'pain_section_title' },
-      { label: 'Propuesta de Valor (título)', key: 'value_prop_title' },
-      { label: 'Servicios (título)', key: 'services_title' },
-      { label: 'CTA Final', key: 'cta_section_title' },
-    ],
-    industry: [
-      { label: 'Meta Title', key: 'meta_title' },
-      { label: 'Meta Description', key: 'meta_description' },
-      { label: 'Hero Headline', key: 'hero_headline', big: true },
-      { label: 'Hero Subheadline', key: 'hero_subheadline' },
-      { label: 'CTA Principal', key: 'hero_cta_primary', badge: true },
-      { label: 'Retos (título)', key: 'challenges_title' },
-      { label: 'Nuestro Enfoque (título)', key: 'approach_title' },
-      { label: 'Casos de Uso (título)', key: 'use_cases_title' },
-      { label: 'Métricas (título)', key: 'metrics_title' },
-    ],
-    blog: [
-      { label: 'Meta Title', key: 'meta_title' },
-      { label: 'Meta Description', key: 'meta_description' },
-      { label: 'Título del Post', key: 'post_title', big: true },
-      { label: 'Subtítulo', key: 'post_subtitle' },
-      { label: 'Keyword Principal', key: 'focus_keyword', badge: true },
-      { label: 'Tiempo de Lectura', key: 'reading_time', badge: true },
-      { label: 'Categoría', key: 'category', badge: true },
-      { label: 'CTA Interno', key: 'internal_cta_title' },
-    ],
-  };
+  // ── Campos del schema unificado ──────────────────────────────────────────
+  // Soporta el nuevo schema (h1, hero_subtitle, cta_primary, sections, faq)
+  // y el schema legacy por compatibilidad con archivos anteriores
 
-  const fields = fieldGroups[pageType] || fieldGroups.service;
+  // Meta title (nuevo: meta_title, legacy: meta_title)
+  const metaTitle = copyData.meta_title;
+  if (metaTitle) _appendField(container, 'Meta Title', metaTitle);
 
-  for (const field of fields) {
-    const val = copyData[field.key];
-    if (!val) continue;
+  // Meta description
+  const metaDesc = copyData.meta_description;
+  if (metaDesc) _appendField(container, 'Meta Description', metaDesc);
 
+  // H1 / Título principal (nuevo: h1, legacy: hero_headline / post_title)
+  const h1 = copyData.h1 || copyData.hero_headline || copyData.post_title;
+  if (h1) {
     const div = document.createElement('div');
-    if (field.big) {
-      div.innerHTML = `
-        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">${field.label}</div>
-        <div class="text-lg font-bold text-slate-900">${escHtml(val)}</div>
-      `;
-    } else if (field.badge) {
-      div.innerHTML = `
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-medium text-slate-500">${field.label}:</span>
-          <span class="bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-0.5 rounded-full">${escHtml(val)}</span>
-        </div>
-      `;
-    } else {
-      div.innerHTML = `
-        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">${field.label}</div>
-        <div class="text-sm text-slate-700">${escHtml(val)}</div>
-      `;
-    }
+    div.innerHTML = `
+      <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">H1 / Título principal</div>
+      <div class="text-xl font-bold text-slate-900 leading-tight">${escHtml(h1)}</div>
+    `;
     container.appendChild(div);
   }
 
-  // Listas especiales
-  if (pageType === 'service') {
-    _renderList(container, copyData.value_metrics, '📊 Métricas de impacto', 'emerald');
-    _renderServices(container, copyData.services);
-    _renderFaqs(container, copyData.faqs, 2);
-  } else if (pageType === 'industry') {
-    _renderList(container, copyData.industry_metrics, '📊 Métricas del sector', 'emerald');
-    _renderUseCases(container, copyData.use_cases, 2);
-    _renderFaqs(container, copyData.faqs, 2);
-  } else if (pageType === 'blog') {
-    _renderToc(container, copyData.toc_items);
-    _renderFaqs(container, copyData.faqs, 2);
+  // Hero subtitle
+  const subtitle = copyData.hero_subtitle || copyData.hero_subheadline || copyData.post_subtitle;
+  if (subtitle) _appendField(container, 'Hero / Subtítulo', subtitle);
+
+  // CTAs
+  const ctaPrimary = copyData.cta_primary || copyData.hero_cta_primary;
+  if (ctaPrimary) _appendBadge(container, 'CTA Principal', ctaPrimary, 'indigo');
+
+  const ctaFinal = copyData.cta_final || copyData.cta_section_title;
+  if (ctaFinal) _appendBadge(container, 'CTA Final', ctaFinal, 'emerald');
+
+  // Blog-specific
+  if (copyData.focus_keyword) _appendBadge(container, 'Keyword Principal', copyData.focus_keyword, 'violet');
+  if (copyData.reading_time) _appendBadge(container, 'Tiempo de lectura', copyData.reading_time, 'slate');
+  if (copyData.category) _appendBadge(container, 'Categoría', copyData.category, 'amber');
+
+  // Intro paragraph (blog)
+  if (copyData.intro_paragraph) _appendField(container, 'Introducción (hook)', copyData.intro_paragraph);
+
+  // Sections preview (nuevo schema)
+  if (Array.isArray(copyData.sections) && copyData.sections.length > 0) {
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">📑 Secciones (${copyData.sections.length})</div>`;
+    const ol = document.createElement('ol');
+    ol.className = 'space-y-1 list-decimal list-inside';
+    copyData.sections.forEach(s => {
+      const li = document.createElement('li');
+      li.className = 'text-sm text-slate-700';
+      li.textContent = s.h2 || s.title || 'Sin título';
+      ol.appendChild(li);
+    });
+    div.appendChild(ol);
+    container.appendChild(div);
   }
+
+  // FAQs preview
+  const faqArray = copyData.faq || copyData.faqs;
+  _renderFaqs(container, faqArray, 3);
+
+  // Takeaways (blog)
+  if (Array.isArray(copyData.takeaways) && copyData.takeaways.length > 0) {
+    _renderList(container, copyData.takeaways, '💡 Takeaways', 'emerald');
+  }
+}
+
+function _appendField(container, label, value) {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">${label}</div>
+    <div class="text-sm text-slate-700">${escHtml(value)}</div>
+  `;
+  container.appendChild(div);
+}
+
+function _appendBadge(container, label, value, color = 'indigo') {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-medium text-slate-500">${label}:</span>
+      <span class="bg-${color}-100 text-${color}-700 text-xs font-semibold px-2 py-0.5 rounded-full">${escHtml(value)}</span>
+    </div>
+  `;
+  container.appendChild(div);
 }
 
 function _renderList(container, items, label, color = 'indigo') {
@@ -451,68 +570,145 @@ function _renderList(container, items, label, color = 'indigo') {
   container.appendChild(div);
 }
 
-function _renderServices(container, services) {
-  if (!Array.isArray(services) || services.length === 0) return;
-  const div = document.createElement('div');
-  div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">🔧 Servicios incluidos (${services.length})</div>`;
-  const grid = document.createElement('div');
-  grid.className = 'grid grid-cols-2 gap-2';
-  services.slice(0, 4).forEach(s => {
-    const card = document.createElement('div');
-    card.className = 'bg-slate-50 rounded-lg px-3 py-2 text-xs';
-    const name = typeof s === 'object' ? s.name || s.title : s;
-    const desc = typeof s === 'object' ? s.description || '' : '';
-    card.innerHTML = `<div class="font-medium text-slate-700">${escHtml(name)}</div>${desc ? `<div class="text-slate-500 mt-0.5">${escHtml(desc)}</div>` : ''}`;
-    grid.appendChild(card);
-  });
-  div.appendChild(grid);
-  container.appendChild(div);
-}
-
-function _renderUseCases(container, useCases, limit = 2) {
-  if (!Array.isArray(useCases) || useCases.length === 0) return;
-  const div = document.createElement('div');
-  div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">💡 Casos de uso</div>`;
-  useCases.slice(0, limit).forEach(uc => {
-    const card = document.createElement('div');
-    card.className = 'bg-slate-50 rounded-lg px-3 py-2 text-xs mb-2';
-    const name = typeof uc === 'object' ? uc.name || uc.title : uc;
-    const result = typeof uc === 'object' ? uc.result || uc.outcome || '' : '';
-    card.innerHTML = `<div class="font-medium text-slate-700">${escHtml(name)}</div>${result ? `<div class="text-emerald-600 mt-0.5">→ ${escHtml(result)}</div>` : ''}`;
-    div.appendChild(card);
-  });
-  container.appendChild(div);
-}
-
-function _renderToc(container, items) {
-  if (!Array.isArray(items) || items.length === 0) return;
-  const div = document.createElement('div');
-  div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">📋 Tabla de contenidos</div>`;
-  const ol = document.createElement('ol');
-  ol.className = 'space-y-1 list-decimal list-inside';
-  items.forEach(item => {
-    const li = document.createElement('li');
-    li.className = 'text-sm text-slate-700';
-    li.textContent = item;
-    ol.appendChild(li);
-  });
-  div.appendChild(ol);
-  container.appendChild(div);
-}
-
-function _renderFaqs(container, faqs, limit = 2) {
+function _renderFaqs(container, faqs, limit = 3) {
   if (!Array.isArray(faqs) || faqs.length === 0) return;
   const div = document.createElement('div');
-  div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">❓ FAQs generadas (${faqs.length} en total, mostrando ${Math.min(limit, faqs.length)})</div>`;
+  div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">❓ FAQs (${faqs.length} generadas, mostrando ${Math.min(limit, faqs.length)})</div>`;
   faqs.slice(0, limit).forEach(faq => {
     const card = document.createElement('div');
     card.className = 'bg-slate-50 rounded-lg px-3 py-2 text-xs mb-2';
     const q = typeof faq === 'object' ? faq.question || faq.q : faq;
     const a = typeof faq === 'object' ? faq.answer || faq.a || '' : '';
-    card.innerHTML = `<div class="font-medium text-slate-700">Q: ${escHtml(q)}</div>${a ? `<div class="text-slate-500 mt-1">A: ${escHtml(a.substring(0, 120))}${a.length > 120 ? '…' : ''}</div>` : ''}`;
+    card.innerHTML = `<div class="font-medium text-slate-700">Q: ${escHtml(q)}</div>${a ? `<div class="text-slate-500 mt-1">A: ${escHtml(a.substring(0, 150))}${a.length > 150 ? '…' : ''}</div>` : ''}`;
     div.appendChild(card);
   });
   container.appendChild(div);
+}
+
+// ─── Historial ────────────────────────────────────────────────────────────────
+const PAGE_TYPE_LABELS = { service: '🏢 Servicio', industry: '🏭 Industria', blog: '✍️ Blog' };
+const STATUS_COLORS = {
+  draft: 'bg-slate-100 text-slate-600',
+  approved: 'bg-blue-100 text-blue-700',
+  published: 'bg-emerald-100 text-emerald-700',
+  rejected: 'bg-red-100 text-red-600',
+};
+const LANG_FLAGS = { es: '🇨🇴', en: '🇺🇸', pt: '🇧🇷', fr: '🇫🇷', de: '🇩🇪' };
+
+async function loadHistory() {
+  const ptFilter = document.getElementById('filter-page-type')?.value || '';
+  const stFilter = document.getElementById('filter-status')?.value || '';
+  const lgFilter = document.getElementById('filter-language')?.value || '';
+
+  const qs = new URLSearchParams();
+  if (ptFilter) qs.set('page_type', ptFilter);
+  if (stFilter) qs.set('status', stFilter);
+  if (lgFilter) qs.set('language', lgFilter);
+
+  const listEl = document.getElementById('history-list');
+  const loadEl = document.getElementById('history-loading');
+  const emptyEl = document.getElementById('history-empty');
+  show(loadEl); hide(listEl); hide(emptyEl);
+
+  try {
+    const [histResp, statsResp] = await Promise.all([
+      fetch(`/api/history?${qs}`),
+      fetch('/api/history/stats'),
+    ]);
+    const history = await histResp.json();
+    const stats = await statsResp.json();
+
+    // Stats badge
+    const statsEl = document.getElementById('stats-badge');
+    if (statsEl && stats.total_generations > 0) {
+      const cacheRate = stats.total_tokens > 0
+        ? Math.round((stats.total_cache_read / stats.total_tokens) * 100)
+        : 0;
+      statsEl.innerHTML = `${stats.total_generations} generaciones · ${(stats.total_tokens||0).toLocaleString()} tokens`
+        + (cacheRate > 0 ? ` · <span class="cache-badge">💰 ${cacheRate}% cached</span>` : '');
+    }
+
+    hide(loadEl);
+    if (!history.length) { show(emptyEl); return; }
+
+    listEl.innerHTML = '';
+    history.forEach(gen => {
+      const date = new Date(gen.created_at).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' });
+      const statusClass = STATUS_COLORS[gen.status] || STATUS_COLORS.draft;
+      const flag = LANG_FLAGS[gen.output_language] || '';
+      const cached = gen.cache_read_tokens > 0
+        ? `<span class="cache-badge">💰 ${gen.cache_read_tokens.toLocaleString()} cached</span>`
+        : '';
+
+      const card = document.createElement('div');
+      card.className = 'flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3 hover:bg-slate-100 transition';
+      card.innerHTML = `
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm font-semibold text-slate-800 truncate">${escHtml(gen.topic)}</span>
+            <span class="text-xs text-slate-400">${PAGE_TYPE_LABELS[gen.page_type] || gen.page_type}</span>
+            <span class="text-xs">${flag}</span>
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium ${statusClass}">${gen.status}</span>
+          </div>
+          <div class="flex items-center gap-3 mt-1 text-xs text-slate-400">
+            <span>${date}</span>
+            <span>${(gen.total_tokens||0).toLocaleString()} tokens</span>
+            ${cached}
+          </div>
+        </div>
+        ${gen.complete_file ? `
+        <button onclick="loadOutputFile('${escHtml(gen.complete_file)}')"
+          class="ml-4 text-xs text-indigo-600 hover:text-indigo-800 font-medium flex-shrink-0">
+          Ver →
+        </button>` : ''}
+      `;
+      listEl.appendChild(card);
+    });
+    show(listEl);
+  } catch (e) {
+    hide(loadEl);
+    document.getElementById('history-list').innerHTML = `<p class="text-sm text-red-500">Error cargando historial: ${e.message}</p>`;
+    show(listEl);
+  }
+}
+
+async function loadOutputFile(filename) {
+  try {
+    const resp = await fetch(`/api/outputs/${filename}`);
+    if (!resp.ok) throw new Error('Archivo no encontrado');
+    const data = await resp.json();
+
+    // Switch to generator view and show the data
+    showView('generator');
+    lastPipelineData = {
+      copy_data: data.copywriting?.copy_data || {},
+      keyword_research: data.keyword_research?.research || '',
+      webflow_preview: data.webflow?.result || '',
+    };
+    const pageType = data.copywriting?.page_type || 'service';
+
+    const icon = document.getElementById('done-icon');
+    const title = document.getElementById('done-title');
+    const msg = document.getElementById('done-message');
+    icon.textContent = '📂';
+    title.textContent = 'Generación cargada del historial';
+    msg.textContent = data.keyword_research?.topic || '';
+
+    show(document.getElementById('result-tabs'));
+    renderCopyPreview(lastPipelineData.copy_data, pageType);
+    renderFullArticle(lastPipelineData.copy_data, pageType);
+    if (lastPipelineData.keyword_research) {
+      document.getElementById('keywords-full-content').textContent = lastPipelineData.keyword_research;
+    }
+    if (lastPipelineData.webflow_preview) {
+      document.getElementById('webflow-full-content').textContent = lastPipelineData.webflow_preview;
+    }
+    switchTab('tab-article');
+    show(doneSection);
+    doneSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch(e) {
+    alert('Error cargando el archivo: ' + e.message);
+  }
 }
 
 function escHtml(str) {
@@ -583,15 +779,16 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const params = {
-    topic:          document.getElementById('topic').value.trim(),
-    page_type:      document.querySelector('input[name="page_type"]:checked').value,
-    target_market:  document.getElementById('target_market').value.trim(),
+    topic:           document.getElementById('topic').value.trim(),
+    page_type:       document.querySelector('input[name="page_type"]:checked').value,
+    target_market:   document.getElementById('target_market').value.trim(),
     company_context: document.getElementById('company_context').value.trim(),
-    site_id:        document.getElementById('site_id').value.trim() || null,
-    collection_id:  document.getElementById('collection_id').value.trim() || null,
-    skip_upload:    document.getElementById('skip_upload').checked,
-    skip_review:    document.getElementById('skip_review').checked,
-    auto_publish:   document.getElementById('auto_publish').checked,
+    output_language: document.querySelector('input[name="output_language"]:checked')?.value || 'es',
+    site_id:         document.getElementById('site_id').value.trim() || null,
+    collection_id:   document.getElementById('collection_id').value.trim() || null,
+    skip_upload:     document.getElementById('skip_upload').checked,
+    skip_review:     document.getElementById('skip_review').checked,
+    auto_publish:    document.getElementById('auto_publish').checked,
   };
 
   // Reset UI
@@ -678,7 +875,12 @@ function onStepComplete({ step, preview, usage, result_preview }) {
 
   if (usage) {
     const tokenEl = document.getElementById(`${id}-tokens`);
-    if (tokenEl) tokenEl.textContent = `${(usage.input_tokens||0)+(usage.output_tokens||0)} tokens`;
+    if (tokenEl) {
+      const total = (usage.input_tokens||0) + (usage.output_tokens||0);
+      const cached = usage.cache_read_input_tokens || 0;
+      const cacheInfo = cached > 0 ? ` <span class="cache-badge">💰 ${cached.toLocaleString()} cached</span>` : '';
+      tokenEl.innerHTML = `${total.toLocaleString()} tokens${cacheInfo}`;
+    }
   }
 
   const previewText = preview || result_preview;

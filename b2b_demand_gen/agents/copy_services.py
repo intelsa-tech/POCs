@@ -1,113 +1,138 @@
 """
-Agente Copy: Páginas de Servicios B2B.
+Agente Copy: Páginas de Servicios BPO — Intelsa.co
 
-Usa Claude Opus 4.6 con adaptive thinking para generar:
-- Hero section (headline + subheadline + CTA)
-- Sección de pain points
-- Propuesta de valor y diferenciadores
-- Detalle de servicios incluidos
-- Proceso de trabajo (pasos)
-- FAQ basado en keywords
-- CTA final
-- Meta title y meta description SEO
+Genera copy de página de servicios orientado a compradores enterprise (COO, VP Ops, Head of CX)
+usando el framework PAS (Problem-Agitate-Solution) o Before-After-Bridge según aplique.
 
-Interfaz unificada: acepta output de keyword_research y retorna
-copy_data con page_type="service".
+OPTIMIZACIONES DE CRÉDITOS:
+- System prompt con INTELSA_PROFILE cacheado (cache_control=ephemeral)
+- Schema JSON estático cacheado — no se repagan en cada request
+- Solo el bloque dinámico (topic, keywords, idioma) consume tokens nuevos
 """
 
 import json
 import re
 import anthropic
+from .intelsa_context import INTELSA_PROFILE, get_language_instruction
 
 MODEL = "claude-opus-4-6"
 
-SYSTEM_PROMPT = """Eres un copywriter B2B de élite especializado en páginas de servicios
-que convierten. Tienes expertise en:
+# ─── System prompt (CACHEADO) ─────────────────────────────────────────────────
+_SYSTEM = f"""Eres un copywriter B2B de élite especializado en páginas de servicios BPO
+y outsourcing que convierten en los mercados US y LATAM.
 
-- Frameworks de copywriting: AIDA, PAS (Problem-Agitate-Solution), Before-After-Bridge
-- Escritura para C-suite y decision makers empresariales
+Frameworks que aplicas:
+- Páginas de servicio: PAS (Problem-Agitate-Solution) o Before-After-Bridge
+- Enfoque en el comprador que evalúa outsourcing por primera vez o cambia de proveedor
 - SEO on-page semántico sin sacrificar conversión
-- Estructuras de páginas de servicio que generan leads calificados
+- Estructura optimizada para LLM citation y featured snippets
+{INTELSA_PROFILE}"""
 
-Tu estilo es: directo, basado en valor de negocio, sin jerga innecesaria,
-orientado a resultados medibles (ROI, pipeline, revenue).
+# ─── Schema de salida (CACHEADO) ─────────────────────────────────────────────
+# Este bloque es idéntico en todos los requests de páginas de servicios.
+_SERVICE_SCHEMA = """Genera el copy completo para una PÁGINA DE SERVICIOS de Intelsa.co.
 
-Al escribir copy para B2B:
-- Habla el idioma del negocio (ROI, pipeline, MQL, SQLs, CAC, LTV)
-- Usa datos y estadísticas cuando sea posible
-- El CTA principal debe crear urgencia sin ser agresivo
-- El copy debe responder: "¿Por qué nosotros?" y "¿Por qué ahora?"
-"""
+Usa el framework PAS (Problem → Agitate → Solution) o Before-After-Bridge según el tema.
+El copy debe responder las 3 preguntas del comprador: ¿por qué Intelsa?, ¿por qué Colombia?, ¿por qué ahora?
+
+OUTPUT FORMAT — entrega un JSON válido con EXACTAMENTE estas claves:
+
+{
+  "meta_title": "60-70 chars, keyword primaria al inicio, primera letra mayúscula solo",
+  "meta_description": "max 155 chars, incluye keyword y beneficio concreto, sin exclamaciones",
+  "h1": "Título principal — específico y orientado al comprador, primera letra mayúscula, resto minúsculas salvo nombres propios",
+  "hero_subtitle": "1-2 oraciones — propuesta de valor clara, responde ¿por qué Intelsa?",
+  "cta_primary": "Texto del CTA — bajo riesgo, específico, sin exclamaciones",
+  "sections": [
+    {
+      "h2": "Sección 1 — primera letra mayúscula, resto minúsculas (rule: no title case)",
+      "body": "Cuerpo de la sección (150-300 palabras). Primera definición en las primeras 2 oraciones. Framework PAS aplicado.",
+      "h3_items": [
+        {
+          "h3": "Subsección si aplica",
+          "body": "Detalle de la subsección"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Pregunta literal del comprador",
+      "answer": "Respuesta directa primero (max 50 palabras). Respuesta directa, luego detalle si es necesario."
+    }
+  ],
+  "cta_final": "CTA de cierre — responde una pregunta específica del comprador"
+}
+
+SECCIONES REQUERIDAS (en este orden):
+1. El problema / pain actual (PAS: Problem)
+2. Por qué el status quo duele más de lo que parece (PAS: Agitate)
+3. La solución de Intelsa — qué hacemos y cómo (PAS: Solution)
+4. Qué incluye el servicio (lista de capacidades)
+5. Cómo es el proceso de onboarding / qué esperar
+6. Por qué Colombia / por qué nearshore (responde la objeción implícita)
+7. FAQ (mínimo 6 preguntas del comprador enterprise)
+
+REGLAS OBLIGATORIAS:
+- NUNCA inventar estadísticas — usar "nuestros clientes reportan..." si no hay dato real
+- NUNCA usar title case en títulos (cada palabra con mayúscula) — solo primera letra
+- NUNCA usar exclamaciones en CTAs ni en ningún texto
+- Responder "¿por qué Intelsa?" y "¿por qué Colombia?" en el copy, no solo en FAQ
+- Los h3_items son opcionales — usar solo cuando haya sub-elementos reales que listar"""
 
 
-def run_copy_services(keyword_research: dict, company_context: str = "") -> dict:
+def run_copy_services(
+    keyword_research: dict,
+    company_context: str = "",
+    output_language: str = "es",
+) -> dict:
     """
-    Genera el copy completo para una página de servicios B2B.
+    Genera el copy completo para una página de servicios de Intelsa.co.
 
     Args:
         keyword_research: Output de run_keyword_research()
-        company_context: Información adicional sobre la empresa/servicio (opcional)
+        company_context: Contexto adicional / datos reales disponibles (opcional)
+        output_language: Código ISO 639-1 ("es", "en", "pt", "fr", "de")
 
     Returns:
-        dict con page_type="service" y copy_data estructurado para Webflow
+        dict con page_type="service" y copy_data en el nuevo schema unificado
     """
     client = anthropic.Anthropic()
 
     topic = keyword_research.get("topic") or keyword_research.get("service_topic", "")
-    context_section = f"\n**Contexto de la empresa:**\n{company_context}" if company_context else ""
+    lang = output_language or keyword_research.get("output_language", "es")
+    language_instruction = get_language_instruction(lang)
+
+    context_block = (
+        f"\n**Datos reales disponibles (métricas, casos de éxito, testimoniales):**\n{company_context}"
+        if company_context
+        else ""
+    )
+
+    # Bloque DINÁMICO — cambia por request
+    dynamic_block = (
+        f"Crea el copy de página de servicios para: **{topic}**\n\n"
+        f"**Investigación de Keywords:**\n{keyword_research['research']}"
+        f"{context_block}"
+        f"{language_instruction}"
+    )
 
     messages = [
         {
             "role": "user",
-            "content": f"""Con base en esta investigación de keywords, crea el copy completo para una
-página de servicios de {topic}.
-
-**Investigación de Keywords:**
-{keyword_research['research']}
-{context_section}
-
-Genera el copy estructurado para Webflow con estas secciones:
-
----
-
-## 1. SEO META
-- **meta_title**: (60-70 chars, incluye keyword primaria)
-- **meta_description**: (150-160 chars, incluye CTA implícito)
-
-## 2. HERO SECTION
-- **hero_headline**: Headline principal (max 10 palabras, high-impact)
-- **hero_subheadline**: Subheadline explicativo (1-2 oraciones, propuesta de valor clara)
-- **hero_cta_primary**: Texto del botón CTA principal
-- **hero_cta_secondary**: Texto del botón CTA secundario (más suave)
-
-## 3. PAIN POINTS SECTION
-- **pain_section_title**: Título de la sección
-- **pain_points**: Lista de 3-4 pain points con descripción corta cada uno
-
-## 4. PROPUESTA DE VALOR
-- **value_prop_title**: Título de la sección
-- **value_prop_body**: 2-3 párrafos que explican el servicio y diferenciadores
-- **value_metrics**: 3 métricas de impacto (ej: "300% más MQLs", "60 días para ver resultados")
-
-## 5. SERVICIOS / QUÉ INCLUYE
-- **services_title**: Título de la sección
-- **services**: Lista de 4-6 servicios con nombre + descripción corta (1 oración)
-
-## 6. PROCESO / CÓMO TRABAJAMOS
-- **process_title**: Título de la sección
-- **process_steps**: 4 pasos del proceso con nombre + descripción
-
-## 7. FAQ
-- **faq_title**: Título de la sección
-- **faqs**: 5 preguntas y respuestas basadas en las keywords de pregunta identificadas
-
-## 8. CTA FINAL
-- **cta_section_title**: Headline de la sección final
-- **cta_section_body**: 1-2 oraciones de cierre
-- **cta_final_button**: Texto del botón CTA final
-
----
-Entrega todo en formato JSON válido con estas claves exactas.""",
+            "content": [
+                # Schema ESTÁTICO — se cachea (igual en todos los requests de servicio)
+                {
+                    "type": "text",
+                    "text": _SERVICE_SCHEMA,
+                    "cache_control": {"type": "ephemeral"},
+                },
+                # Datos DINÁMICOS — no se cachean
+                {
+                    "type": "text",
+                    "text": dynamic_block,
+                },
+            ],
         }
     ]
 
@@ -116,7 +141,7 @@ Entrega todo en formato JSON válido con estas claves exactas.""",
         max_tokens=8192,
         thinking={"type": "adaptive"},
         output_config={"effort": "high"},
-        system=SYSTEM_PROMPT,
+        system=[{"type": "text", "text": _SYSTEM, "cache_control": {"type": "ephemeral"}}],
         messages=messages,
     ) as stream:
         response = stream.get_final_message()
@@ -126,16 +151,18 @@ Entrega todo en formato JSON válido con estas claves exactas.""",
         if hasattr(block, "text") and block.text is not None:
             copy_text += block.text
 
-    copy_data = _parse_json_response(copy_text)
-
+    usage = response.usage
     return {
         "topic": topic,
         "page_type": "service",
-        "copy_data": copy_data,
+        "output_language": lang,
+        "copy_data": _parse_json_response(copy_text),
         "raw_response": copy_text,
         "usage": {
-            "input_tokens": response.usage.input_tokens,
-            "output_tokens": response.usage.output_tokens,
+            "input_tokens": usage.input_tokens,
+            "output_tokens": usage.output_tokens,
+            "cache_read_input_tokens": getattr(usage, "cache_read_input_tokens", 0) or 0,
+            "cache_creation_input_tokens": getattr(usage, "cache_creation_input_tokens", 0) or 0,
         },
     }
 
@@ -148,7 +175,6 @@ def _parse_json_response(text: str) -> dict:
             return json.loads(json_match.group(1))
         except json.JSONDecodeError:
             pass
-    # Fallback: intentar parsear toda la respuesta como JSON
     try:
         return json.loads(text)
     except json.JSONDecodeError:

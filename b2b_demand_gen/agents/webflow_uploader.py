@@ -13,6 +13,7 @@ Compatible con todos los agentes de copy: service, industry, blog.
 
 import json
 import anthropic
+from .intelsa_context import INTELSA_PROFILE
 from tools.webflow_api import (
     list_sites,
     list_collections,
@@ -24,7 +25,7 @@ from tools.webflow_api import (
 
 MODEL = "claude-opus-4-6"
 
-SYSTEM_PROMPT = """Eres un experto en Webflow CMS y automatización de contenido.
+_SYSTEM_PROMPT = f"""Eres un experto en Webflow CMS y automatización de contenido para Intelsa.co.
 Tu tarea es subir contenido de marketing B2B a Webflow de forma precisa.
 
 Al trabajar con Webflow:
@@ -32,10 +33,13 @@ Al trabajar con Webflow:
 2. Identifica el collection más apropiado según el tipo de página (servicio, industria o blog)
 3. Analiza el schema del collection (campos disponibles)
 4. Mapea el copy generado a los campos correctos del collection
+   - El nuevo schema usa: h1, meta_description, hero_subtitle, cta_primary, sections, faq, cta_final
+   - Mapea estos campos a los campos del CMS de Webflow de forma inteligente
 5. Crea el item como DRAFT para que el equipo pueda revisarlo antes de publicar
-6. Confirma la creación exitosa con el URL del item
+6. Confirma la creación exitosa con el ID del item
 
-IMPORTANTE: Siempre crea el item como draft (isDraft: true) a menos que se indique explícitamente publicar."""
+IMPORTANTE: Siempre crea el item como draft (isDraft: true) a menos que se indique explícitamente publicar.
+{INTELSA_PROFILE}"""
 
 # Definición de tools para el agente Webflow
 WEBFLOW_TOOLS = [
@@ -250,7 +254,7 @@ Pasos a seguir:
             max_tokens=4096,
             thinking={"type": "adaptive"},
             output_config={"effort": "high"},
-            system=SYSTEM_PROMPT,
+            system=[{"type": "text", "text": _SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
             tools=WEBFLOW_TOOLS,
             messages=messages,
         )
@@ -285,13 +289,16 @@ Pasos a seguir:
         if hasattr(block, "text") and block.text is not None:
             final_text += block.text
 
+    usage = response.usage
     return {
         "topic": topic,
         "page_type": page_type,
         "result": final_text,
         "iterations": iteration,
         "usage": {
-            "input_tokens": response.usage.input_tokens,
-            "output_tokens": response.usage.output_tokens,
+            "input_tokens": usage.input_tokens,
+            "output_tokens": usage.output_tokens,
+            "cache_read_input_tokens": getattr(usage, "cache_read_input_tokens", 0) or 0,
+            "cache_creation_input_tokens": getattr(usage, "cache_creation_input_tokens", 0) or 0,
         },
     }

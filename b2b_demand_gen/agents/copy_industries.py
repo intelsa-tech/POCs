@@ -1,126 +1,140 @@
 """
-Agente Copy: Páginas de Industrias B2B.
+Agente Copy: Páginas de Industrias/Verticales BPO — Intelsa.co
 
-Usa Claude Opus 4.6 con adaptive thinking para generar copy específico
-de un vertical/industria, con:
-- Hero orientado a los retos únicos de esa industria
-- Sección de desafíos del sector
-- Casos de uso y aplicaciones concretas
-- Por qué nuestra solución encaja en esta industria
-- Métricas de impacto relevantes al sector
-- Testimonios/social proof placeholder
-- FAQ con terminología de la industria
-- CTA final
+Genera copy específico de un vertical/industria, conectando los retos de CX y operaciones
+del sector con la solución BPO+IA de Intelsa.
 
-Interfaz unificada: acepta output de keyword_research y retorna
-copy_data con page_type="industry".
+OPTIMIZACIONES DE CRÉDITOS:
+- System prompt con INTELSA_PROFILE cacheado
+- Schema JSON estático cacheado
+- Solo el bloque dinámico (industry, keywords, idioma) consume tokens nuevos
 """
 
 import json
 import re
 import anthropic
+from .intelsa_context import INTELSA_PROFILE, get_language_instruction
 
 MODEL = "claude-opus-4-6"
 
-SYSTEM_PROMPT = """Eres un copywriter B2B especializado en marketing de verticales e industrias.
-Tu expertise está en conectar soluciones B2B con los retos específicos de cada sector.
+# ─── System prompt (CACHEADO) ─────────────────────────────────────────────────
+_SYSTEM = f"""Eres un copywriter B2B especializado en marketing de verticales para el sector
+BPO, outsourcing de CX y automatización inteligente.
+
+Tu expertise: conectar los retos específicos de cada industria con la solución de
+Intelsa (IA + talento humano bilingüe nearshore).
 
 Al escribir copy para una página de industria:
-- Usa la terminología propia del sector (no jerga genérica de marketing)
-- Demuestra conocimiento profundo de los pain points del vertical
-- Referencia regulaciones, estándares o tendencias de la industria cuando sea relevante
-- Habla de métricas y KPIs que importan EN ESA INDUSTRIA (no métricas genéricas)
-- El buyer persona puede ser muy específico (CIO en manufactura vs. CMO en SaaS): adáptate
-- Usa casos de uso concretos y aplicaciones reales, no conceptos abstractos
-- El tono debe transmitir: "Entendemos tu industria mejor que nadie"
-
-Principios de copywriting B2B para páginas de industria:
+- Usa la terminología propia del sector — no jerga genérica de marketing
+- Demuestra conocimiento profundo de los pain points de CX y operaciones del vertical
+- Habla de métricas que importan EN ESA INDUSTRIA (CSAT, AHT, FCR, NPS, costo por ticket)
+- El buyer persona puede variar mucho: VP Ops de retail vs. Head of CX de fintech
+- El tono debe transmitir: "Entendemos tu industria y sus retos operacionales"
+- Usa casos de uso concretos de omnicanalidad y automatización para ese vertical
 - Specificity sells: cuanto más específico al sector, más credibilidad
-- Muestra el costo del status quo (no hacer nada)
-- Referencia competidores del sector si aplica
-- Social proof debe ser del mismo vertical siempre que sea posible
-"""
+{INTELSA_PROFILE}"""
+
+# ─── Schema de salida (CACHEADO) ─────────────────────────────────────────────
+_INDUSTRY_SCHEMA = """Genera el copy completo para una PÁGINA DE INDUSTRIA de Intelsa.co.
+
+La página debe demostrar que Intelsa entiende los retos únicos de CX y operaciones
+de esta industria mejor que un BPO genérico.
+
+OUTPUT FORMAT — entrega un JSON válido con EXACTAMENTE estas claves:
+
+{
+  "meta_title": "60-70 chars, incluye nombre de la industria + solución BPO, solo primera mayúscula",
+  "meta_description": "max 155 chars, menciona el sector y el beneficio clave, sin exclamaciones",
+  "h1": "Título específico para este vertical — primera letra mayúscula, resto minúsculas",
+  "hero_subtitle": "1-2 oraciones — valor específico para esta industria, responde ¿por qué Intelsa para [industria]?",
+  "cta_primary": "CTA orientado al sector — bajo riesgo, específico",
+  "sections": [
+    {
+      "h2": "Sección — primera letra mayúscula, no title case",
+      "body": "Cuerpo (150-300 palabras). Específico al sector, con terminología propia.",
+      "h3_items": [
+        {
+          "h3": "Subsección si aplica",
+          "body": "Detalle"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Pregunta específica de este sector",
+      "answer": "Respuesta directa primero (max 50 palabras)"
+    }
+  ],
+  "cta_final": "CTA de cierre — personalizado para el sector"
+}
+
+SECCIONES REQUERIDAS (en este orden):
+1. Los retos de [industria] que frenan las operaciones de CX (Pain points del sector)
+2. Cómo afecta al negocio no resolver esto (costo del status quo)
+3. La solución de Intelsa para [industria] — metodología adaptada al sector
+4. Casos de uso concretos: 3-4 escenarios reales del sector con resultado esperado
+5. Métricas de impacto relevantes para este sector (no genéricas)
+6. Por qué Intelsa entiende [industria] (experiencia, certificaciones relevantes)
+7. FAQ específico del sector (mínimo 6 preguntas — no preguntas genéricas de BPO)
+
+REGLAS OBLIGATORIAS:
+- NUNCA inventar estadísticas — usar "en el sector [X], nuestros clientes reportan..."
+- NUNCA usar title case en títulos — solo primera letra mayúscula
+- NUNCA usar exclamaciones
+- Los KPIs y benchmarks deben ser los que usa realmente esa industria
+- Social proof y casos de uso deben hacer referencia al mismo vertical"""
 
 
-def run_copy_industries(keyword_research: dict, company_context: str = "") -> dict:
+def run_copy_industries(
+    keyword_research: dict,
+    company_context: str = "",
+    output_language: str = "es",
+) -> dict:
     """
-    Genera el copy completo para una página de industria B2B.
+    Genera el copy completo para una página de industria de Intelsa.co.
 
     Args:
         keyword_research: Output de run_keyword_research() con page_type="industry"
-        company_context: Información adicional sobre la empresa/servicio (opcional)
+        company_context: Datos reales disponibles para este vertical (opcional)
+        output_language: Código ISO 639-1 ("es", "en", "pt", "fr", "de")
 
     Returns:
-        dict con page_type="industry" y copy_data estructurado para Webflow
+        dict con page_type="industry" y copy_data en el schema unificado
     """
     client = anthropic.Anthropic()
 
     topic = keyword_research.get("topic") or keyword_research.get("service_topic", "")
-    context_section = f"\n**Contexto de la empresa:**\n{company_context}" if company_context else ""
+    lang = output_language or keyword_research.get("output_language", "es")
+    language_instruction = get_language_instruction(lang)
+
+    context_block = (
+        f"\n**Datos reales del sector disponibles:**\n{company_context}"
+        if company_context
+        else ""
+    )
+
+    dynamic_block = (
+        f"Crea el copy de página de industria para el vertical: **{topic}**\n\n"
+        f"**Investigación de Keywords del Sector:**\n{keyword_research['research']}"
+        f"{context_block}"
+        f"{language_instruction}"
+    )
 
     messages = [
         {
             "role": "user",
-            "content": f"""Con base en esta investigación de keywords, crea el copy completo para una
-página de industria dirigida al vertical: **{topic}**.
-
-**Investigación de Keywords:**
-{keyword_research['research']}
-{context_section}
-
-Genera el copy estructurado para Webflow con estas secciones:
-
----
-
-## 1. SEO META
-- **meta_title**: (60-70 chars, incluye nombre de la industria + solución)
-- **meta_description**: (150-160 chars, menciona el sector y el beneficio clave)
-
-## 2. HERO SECTION
-- **hero_headline**: Headline específico para esta industria (max 12 palabras)
-  Ejemplo: "Acelera el pipeline de ventas en [Industria] con IA"
-- **hero_subheadline**: 1-2 oraciones explicando el valor específico para este vertical
-- **hero_cta_primary**: CTA principal (orientado al sector)
-- **hero_cta_secondary**: CTA secundario (más educativo/informacional)
-
-## 3. INDUSTRY CHALLENGES
-- **challenges_title**: Título de la sección ("Los retos de [Industria] que frenан tu crecimiento")
-- **challenges**: Lista de 4-5 desafíos específicos de esta industria con descripción corta
-
-## 4. OUR APPROACH FOR THIS INDUSTRY
-- **approach_title**: Título ("Cómo resolvemos los retos de [Industria]")
-- **approach_body**: 2-3 párrafos explicando la metodología adaptada al sector
-- **approach_differentiators**: 3-4 diferenciadores específicos para esta industria
-
-## 5. USE CASES
-- **use_cases_title**: Título de la sección
-- **use_cases**: Lista de 3-4 casos de uso concretos con:
-  - nombre del caso de uso
-  - descripción del problema
-  - cómo se resuelve
-  - resultado esperado
-
-## 6. INDUSTRY METRICS
-- **metrics_title**: Título ("Resultados en [Industria]")
-- **industry_metrics**: 3 métricas relevantes para ESTE sector
-  (ej: "40% reducción en ciclo de venta para SaaS", "2x más demos en manufactura")
-
-## 7. SOCIAL PROOF
-- **social_proof_title**: Título de la sección
-- **testimonial_placeholder**: Estructura de testimonio con campos: quote, name, role, company, industry
-- **logos_section_title**: "Empresas de [Industria] que confían en nosotros"
-
-## 8. FAQ INDUSTRY-SPECIFIC
-- **faq_title**: Título
-- **faqs**: 4-5 preguntas específicas de esta industria (no preguntas genéricas)
-
-## 9. CTA FINAL
-- **cta_section_title**: Headline final orientado a la industria
-- **cta_section_body**: 1-2 oraciones de cierre con urgencia sector-específica
-- **cta_final_button**: Texto del CTA (personalizado para el sector)
-
----
-Entrega todo en formato JSON válido con estas claves exactas.""",
+            "content": [
+                {
+                    "type": "text",
+                    "text": _INDUSTRY_SCHEMA,
+                    "cache_control": {"type": "ephemeral"},
+                },
+                {
+                    "type": "text",
+                    "text": dynamic_block,
+                },
+            ],
         }
     ]
 
@@ -129,7 +143,7 @@ Entrega todo en formato JSON válido con estas claves exactas.""",
         max_tokens=8192,
         thinking={"type": "adaptive"},
         output_config={"effort": "high"},
-        system=SYSTEM_PROMPT,
+        system=[{"type": "text", "text": _SYSTEM, "cache_control": {"type": "ephemeral"}}],
         messages=messages,
     ) as stream:
         response = stream.get_final_message()
@@ -139,16 +153,18 @@ Entrega todo en formato JSON válido con estas claves exactas.""",
         if hasattr(block, "text") and block.text is not None:
             copy_text += block.text
 
-    copy_data = _parse_json_response(copy_text)
-
+    usage = response.usage
     return {
         "topic": topic,
         "page_type": "industry",
-        "copy_data": copy_data,
+        "output_language": lang,
+        "copy_data": _parse_json_response(copy_text),
         "raw_response": copy_text,
         "usage": {
-            "input_tokens": response.usage.input_tokens,
-            "output_tokens": response.usage.output_tokens,
+            "input_tokens": usage.input_tokens,
+            "output_tokens": usage.output_tokens,
+            "cache_read_input_tokens": getattr(usage, "cache_read_input_tokens", 0) or 0,
+            "cache_creation_input_tokens": getattr(usage, "cache_creation_input_tokens", 0) or 0,
         },
     }
 

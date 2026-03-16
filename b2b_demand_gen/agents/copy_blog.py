@@ -1,139 +1,162 @@
 """
-Agente Copy: Posts de Blog B2B.
+Agente Copy: Posts de Blog B2B — Intelsa.co
 
-Usa Claude Opus 4.6 con adaptive thinking para generar artículos de blog
-optimizados para SEO y thought leadership B2B, con:
-- Meta SEO (title + description)
-- Título del post y hook de introducción
-- Estructura con secciones (H2/H3)
-- Key takeaways
-- CTA interno (hacia página de servicios)
-- Conclusión
+Genera artículos de blog de thought leadership para posicionar a Intelsa como experta
+en BPO, CX y automatización inteligente. Optimizados para SEO y LLM citation.
 
-El contenido está diseñado para top-of-funnel (TOFU) y atracción orgánica,
-con CTAs que llevan al lector hacia páginas de servicios o industrias.
+Usa framework AIDA (Attention-Interest-Desire-Action) para contenido educativo.
 
-Interfaz unificada: acepta output de keyword_research y retorna
-copy_data con page_type="blog".
+OPTIMIZACIONES DE CRÉDITOS:
+- System prompt con INTELSA_PROFILE cacheado
+- Schema JSON completo cacheado
+- Solo el bloque dinámico (topic, keywords, idioma) consume tokens nuevos
 """
 
 import json
 import re
 import anthropic
+from .intelsa_context import INTELSA_PROFILE, get_language_instruction
 
 MODEL = "claude-opus-4-6"
 
-SYSTEM_PROMPT = """Eres un content strategist y writer B2B especializado en thought leadership
-y SEO de contenidos. Tu expertise está en crear artículos de blog que:
+# ─── System prompt (CACHEADO) ─────────────────────────────────────────────────
+_SYSTEM = f"""Eres un content strategist y writer B2B especializado en thought leadership
+y SEO de contenidos para Intelsa.co en el espacio BPO, CX y automatización inteligente.
 
-1. Rankean en Google para keywords informacionales B2B
-2. Educan al buyer en su proceso de decisión
-3. Posicionan a la empresa como experta en el tema
-4. Generan leads calificados mediante CTAs estratégicos
+Tu misión es crear artículos de blog que:
+1. Rankean en Google para keywords informacionales B2B de alto valor
+2. Educan al comprador (COO, VP Ops, Head of CX) en su proceso de decisión
+3. Posicionan a Intelsa como la experta en CX nearshore + IA
+4. Generan leads calificados mediante CTAs de bajo riesgo
 
-Principios de escritura para blogs B2B:
-- Hook poderoso en los primeros 150 palabras (por qué leer esto AHORA)
+Principios de escritura para blogs B2B de Intelsa:
+- Framework AIDA: hook que captura atención → datos que generan interés → visión del futuro posible → CTA de bajo riesgo
+- Hook poderoso en los primeros 150 palabras (por qué leer esto AHORA, qué aprenderán)
 - Estructura clara con H2/H3 que permita escaneo rápido
-- Datos, estadísticas y ejemplos concretos en cada sección
-- Tono experto pero accesible (no académico, no coloquial)
-- Cada sección debe tener un takeaway accionable
-- CTA interno sutil: el artículo lleva naturalmente hacia el servicio
-- Longitud objetivo: 1500-2500 palabras (depth suficiente para rankear)
-- Featured snippet optimization: responde preguntas directamente en los primeros párrafos
+- Datos, estadísticas y ejemplos concretos — NUNCA inventados
+- Cada sección responde una pregunta del buyer implícita
+- CTA interno sutil: el artículo lleva naturalmente hacia los servicios de Intelsa
+- Longitud objetivo: 1500-2500 palabras para profundidad suficiente de ranking
+- Featured snippet optimization: responder preguntas directamente en los primeros párrafos
 
 El artículo NO es un pitch de ventas. Es contenido genuinamente útil que
-demuestra expertise y genera confianza.
-"""
+demuestra expertise y genera confianza en Intelsa como líder en CX + IA.
+{INTELSA_PROFILE}"""
+
+# ─── Schema de salida (CACHEADO) ─────────────────────────────────────────────
+_BLOG_SCHEMA = """Genera el contenido completo para un ARTÍCULO DE BLOG B2B de Intelsa.co.
+
+Usa el framework AIDA: Attention (hook) → Interest (datos, problem) → Desire (visión, solución) → Action (CTA suave).
+Longitud objetivo: 1500-2500 palabras distribuidas en las secciones.
+
+OUTPUT FORMAT — entrega un JSON válido con EXACTAMENTE estas claves:
+
+{
+  "meta_title": "60-70 chars, keyword primaria al inicio, formato: 'Keyword: subtítulo', solo primera mayúscula",
+  "meta_description": "max 155 chars, incluye keyword y hook que invite al clic, sin exclamaciones",
+  "focus_keyword": "La keyword primaria en la que se enfoca el artículo",
+  "secondary_keywords": ["keyword 2", "keyword 3", "keyword 4"],
+  "h1": "Título del artículo — atractivo, con keyword, max 70 chars, solo primera mayúscula",
+  "hero_subtitle": "Subtítulo opcional que amplía el título (1 oración)",
+  "reading_time": "Tiempo estimado (ej: '8 min de lectura')",
+  "intro_paragraph": "150-200 palabras — hook AIDA: establece el problema, cita dato real si aplica, promete lo que aprenderán, incluye keyword primaria de forma natural",
+  "cta_primary": "CTA de bajo riesgo que conecta el tema con Intelsa",
+  "sections": [
+    {
+      "h2": "Título de sección — primera letra mayúscula, NO title case",
+      "body": "200-350 palabras. Dato o estadística real si existe. Ejemplo concreto. Takeaway accionable al final.",
+      "h3_items": [
+        {
+          "h3": "Subtítulo si la sección lo amerita",
+          "body": "Detalle de la subsección"
+        }
+      ],
+      "key_insight": "Una frase destacable para callout/quote box"
+    }
+  ],
+  "takeaways": ["Punto accionable 1", "Punto accionable 2", "Punto accionable 3"],
+  "internal_cta_title": "Título del bloque CTA interno — no debe sonar como anuncio",
+  "internal_cta_body": "2-3 oraciones que conectan el aprendizaje del artículo con Intelsa",
+  "internal_cta_button": "Texto del CTA — bajo riesgo, específico, sin exclamaciones",
+  "conclusion_body": "150-200 palabras — resume aprendizaje, refuerza propuesta de valor de Intelsa, cierra con reflexión o pregunta",
+  "faq": [
+    {
+      "question": "Pregunta literal que busca el lector",
+      "answer": "Respuesta directa (max 50 palabras) — optimizada para featured snippet"
+    }
+  ],
+  "cta_final": "CTA de cierre del artículo",
+  "category": "Categoría del blog (ej: 'BPO', 'Experiencia del cliente', 'Automatización')",
+  "tags": ["tag1", "tag2", "tag3"],
+  "og_description": "Descripción para LinkedIn/Twitter — más conversacional que meta_description"
+}
+
+SECCIONES REQUERIDAS (5-7 secciones):
+1. El problema / contexto actual (AIDA: Attention)
+2. Por qué esto importa ahora (datos de la industria, AIDA: Interest)
+3. Cómo funciona la solución / mejores prácticas (AIDA: Desire — el cuerpo principal)
+4. Casos concretos o ejemplos aplicados
+5. Qué considerar al implementar / criterios de evaluación
+6. Cómo Intelsa lo resuelve (sutil, no un pitch directo)
+7. Conclusión + FAQ
+
+REGLAS OBLIGATORIAS:
+- NUNCA inventar estadísticas — omitirlas o usar "organizaciones que han implementado esto reportan..."
+- NUNCA usar title case
+- NUNCA usar exclamaciones
+- Mínimo 6 preguntas en FAQ optimizadas para featured snippets
+- El toc_items no se incluye como campo — las secciones ya lo reemplazan"""
 
 
-def run_copy_blog(keyword_research: dict, company_context: str = "") -> dict:
+def run_copy_blog(
+    keyword_research: dict,
+    company_context: str = "",
+    output_language: str = "es",
+) -> dict:
     """
-    Genera el copy completo para un post de blog B2B.
+    Genera el contenido completo para un artículo de blog B2B de Intelsa.co.
 
     Args:
         keyword_research: Output de run_keyword_research() con page_type="blog"
-        company_context: Información adicional sobre la empresa/perspectiva (opcional)
+        company_context: Perspectiva/voz de la empresa, datos reales disponibles (opcional)
+        output_language: Código ISO 639-1 ("es", "en", "pt", "fr", "de")
 
     Returns:
-        dict con page_type="blog" y copy_data estructurado para Webflow
+        dict con page_type="blog" y copy_data en el schema unificado
     """
     client = anthropic.Anthropic()
 
     topic = keyword_research.get("topic") or keyword_research.get("service_topic", "")
-    context_section = f"\n**Perspectiva/voz de la empresa:**\n{company_context}" if company_context else ""
+    lang = output_language or keyword_research.get("output_language", "es")
+    language_instruction = get_language_instruction(lang)
+
+    context_block = (
+        f"\n**Perspectiva/voz de la empresa y datos reales disponibles:**\n{company_context}"
+        if company_context
+        else ""
+    )
+
+    dynamic_block = (
+        f"Crea el artículo de blog completo sobre: **{topic}**\n\n"
+        f"**Investigación de Keywords:**\n{keyword_research['research']}"
+        f"{context_block}"
+        f"{language_instruction}"
+    )
 
     messages = [
         {
             "role": "user",
-            "content": f"""Con base en esta investigación de keywords, crea el contenido completo para un
-artículo de blog B2B sobre: **{topic}**.
-
-**Investigación de Keywords:**
-{keyword_research['research']}
-{context_section}
-
-Genera el contenido estructurado para Webflow con estas secciones:
-
----
-
-## 1. SEO META
-- **meta_title**: (60-70 chars, keyword primaria al inicio, formato: "Keyword Principal: Subtítulo")
-- **meta_description**: (150-160 chars, incluye la keyword y un hook que invite al clic)
-- **focus_keyword**: La keyword primaria en la que se enfoca el artículo
-- **secondary_keywords**: Lista de 3-5 keywords secundarias a incluir naturalmente
-
-## 2. POST HEADER
-- **post_title**: Título del artículo (H1) — atractivo, con keyword, max 70 chars
-  Formatos que funcionan: "X formas de...", "Guía completa de...", "Por qué [empresa] necesita...", "Cómo [lograr resultado] en [tiempo]"
-- **post_subtitle**: Subtítulo opcional (1 oración que amplía el título)
-- **reading_time**: Tiempo estimado de lectura (ej: "8 min de lectura")
-- **author_bio_placeholder**: Estructura sugerida para la bio del autor
-
-## 3. INTRODUCTION (Hook)
-- **intro_paragraph**: Primer párrafo (150-200 palabras) — hook poderoso que:
-  - Establece el problema/oportunidad
-  - Cita una estadística impactante si aplica
-  - Promete lo que el lector va a aprender
-  - Incluye la keyword primaria de forma natural
-
-## 4. TABLE OF CONTENTS
-- **toc_items**: Lista de 5-7 secciones del artículo (títulos de H2)
-
-## 5. BODY SECTIONS
-- **sections**: Array de 5-7 secciones, cada una con:
-  - **h2_title**: Título de la sección (H2)
-  - **body**: Contenido de la sección (200-350 palabras)
-    - Incluye datos/estadísticas cuando sea posible
-    - Un ejemplo o caso concreto por sección
-    - Subtítulos H3 si la sección lo amerita
-  - **key_insight**: Una frase destacable (quote box o callout)
-
-## 6. KEY TAKEAWAYS
-- **takeaways_title**: Título ("Lo que necesitas recordar" o similar)
-- **takeaways**: Lista de 4-6 puntos accionables del artículo
-
-## 7. INTERNAL CTA
-- **internal_cta_title**: Título del bloque CTA (no debe sonar como ad)
-  Ejemplo: "¿Listo para implementar esto en tu empresa?"
-- **internal_cta_body**: 2-3 oraciones que conectan el aprendizaje del artículo con el servicio
-- **internal_cta_button**: Texto del CTA (ej: "Ver cómo lo hacemos", "Agenda una consulta")
-- **internal_cta_url_suggestion**: Página de destino sugerida (ej: "/servicios/demand-generation")
-
-## 8. CONCLUSION
-- **conclusion_title**: "Conclusión" o título más creativo
-- **conclusion_body**: 150-200 palabras — resume el aprendizaje, refuerza la propuesta de valor,
-  y cierra con una pregunta reflexiva o llamada a la acción suave
-
-## 9. BLOG METADATA
-- **category**: Categoría del blog (ej: "Estrategia B2B", "Marketing Digital", "Demand Generation")
-- **tags**: Lista de 5-8 tags relevantes
-- **featured_image_alt**: Texto alt sugerido para la imagen destacada
-- **og_title**: Open Graph title para redes sociales (puede diferir del meta_title)
-- **og_description**: Open Graph description (más conversacional, para compartir en LinkedIn/Twitter)
-
----
-Entrega todo en formato JSON válido con estas claves exactas.
-El body de cada sección debe ser texto completo, no bullets ni esquemas.""",
+            "content": [
+                {
+                    "type": "text",
+                    "text": _BLOG_SCHEMA,
+                    "cache_control": {"type": "ephemeral"},
+                },
+                {
+                    "type": "text",
+                    "text": dynamic_block,
+                },
+            ],
         }
     ]
 
@@ -142,7 +165,7 @@ El body de cada sección debe ser texto completo, no bullets ni esquemas.""",
         max_tokens=12000,
         thinking={"type": "adaptive"},
         output_config={"effort": "max"},
-        system=SYSTEM_PROMPT,
+        system=[{"type": "text", "text": _SYSTEM, "cache_control": {"type": "ephemeral"}}],
         messages=messages,
     ) as stream:
         response = stream.get_final_message()
@@ -152,16 +175,18 @@ El body de cada sección debe ser texto completo, no bullets ni esquemas.""",
         if hasattr(block, "text") and block.text is not None:
             copy_text += block.text
 
-    copy_data = _parse_json_response(copy_text)
-
+    usage = response.usage
     return {
         "topic": topic,
         "page_type": "blog",
-        "copy_data": copy_data,
+        "output_language": lang,
+        "copy_data": _parse_json_response(copy_text),
         "raw_response": copy_text,
         "usage": {
-            "input_tokens": response.usage.input_tokens,
-            "output_tokens": response.usage.output_tokens,
+            "input_tokens": usage.input_tokens,
+            "output_tokens": usage.output_tokens,
+            "cache_read_input_tokens": getattr(usage, "cache_read_input_tokens", 0) or 0,
+            "cache_creation_input_tokens": getattr(usage, "cache_creation_input_tokens", 0) or 0,
         },
     }
 
