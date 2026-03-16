@@ -212,6 +212,7 @@ def run_webflow_upload(
     copywriting_output: dict,
     site_id: str | None = None,
     collection_id: str | None = None,
+    template_item_id: str | None = None,
     auto_publish: bool = False,
 ) -> dict:
     """
@@ -221,6 +222,7 @@ def run_webflow_upload(
         copywriting_output: Output del agente de copywriting
         site_id: ID del sitio Webflow (opcional, se lee de WEBFLOW_SITE_ID si no se provee)
         collection_id: ID de la Collection destino (opcional, se lee de WEBFLOW_COLLECTION_ID_{TYPE})
+        template_item_id: ID de un item existente a usar como referencia de estructura (opcional)
         auto_publish: Si True, publica el item automáticamente (default: False)
 
     Returns:
@@ -258,6 +260,8 @@ def run_webflow_upload(
         context_parts.append(f"- **Site ID:** {site_id}")
     if collection_id:
         context_parts.append(f"- **Collection ID:** {collection_id} — usa get_collection_schema para ver los campos disponibles")
+    if template_item_id:
+        context_parts.append(f"- **Template Item ID:** {template_item_id} — usa get_item para inspeccionar su estructura y úsala como referencia al crear el nuevo item")
     if auto_publish:
         context_parts.append("- **Auto-publish:** Sí, publicar automáticamente al crear")
     context_str = "\n".join(context_parts) if context_parts else "- Ninguno (debes descubrir la estructura)"
