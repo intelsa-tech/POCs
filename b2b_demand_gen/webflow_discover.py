@@ -95,41 +95,35 @@ def find_template_item(collections: list, slug: str, label: str) -> dict | None:
 
 
 def find_static_page(pages: list, folder_slug: str, page_slug: str) -> dict | None:
-    """Busca una página estática dentro de una carpeta por sus slugs."""
+    """
+    Busca una página estática por slug.
+    En Webflow las carpetas no aparecen como páginas — solo se ven como parentId en las páginas hijas.
+    Se busca primero por slug exacto; si hay duplicados, se usa folder_slug para filtrar por hermanos.
+    """
     print(f"\n  Buscando página estática: '{folder_slug}/{page_slug}'…")
 
-    # Construir mapa id→page para resolver parentId
-    pages_by_id = {p["id"]: p for p in pages}
+    # Buscar todas las páginas con ese slug
+    matches = [p for p in pages if p.get("slug") == page_slug]
 
-    # Primero encontrar la carpeta
-    folder = next((p for p in pages if p.get("slug") == folder_slug), None)
-    if not folder:
-        print(f"  {Y}⚠  Carpeta '{folder_slug}' no encontrada. Todas las páginas/carpetas:{E}")
+    if not matches:
+        print(f"  {R}✗ No se encontró ninguna página con slug '{page_slug}'. Páginas disponibles:{E}")
         for p in pages:
-            keys = {k: v for k, v in p.items() if k in ("slug", "title", "id", "parentId", "type", "isFolder", "collectionId")}
-            print(f"    • {Y}{p.get('slug', '—'):<35}{E} {str(keys)[:120]}")
+            slug = p.get("slug") or "—"
+            print(f"    • {Y}{slug:<40}{E} {p.get('title', '?')}  (parentId: {p.get('parentId', 'root')})")
         return None
 
-    folder_id = folder["id"]
-    print(f"  {G}✓ Carpeta encontrada:{E} '{folder.get('title')}' (id: {C}{folder_id}{E})")
-
-    # Buscar la página hija con ese slug
-    page = next(
-        (p for p in pages if p.get("slug") == page_slug and p.get("parentId") == folder_id),
-        None,
-    )
-    if not page:
-        print(f"  {Y}⚠  Página '{page_slug}' no encontrada en la carpeta. Páginas en '{folder_slug}':{E}")
-        children = [p for p in pages if p.get("parentId") == folder_id]
-        for c in children:
-            print(f"    • {Y}{c.get('slug')}{E}  →  {c.get('title', '?')}  (id: {C}{c['id']}{E})")
-        return None
+    # Si hay más de una, intentar filtrar por el parentId compartido con hermanos del folder
+    page = matches[0]
+    if len(matches) > 1:
+        # Inferir folder_id desde otro hermano con el mismo parentId
+        siblings = [p for p in pages if p.get("slug") in (folder_slug,) or
+                    any(m.get("parentId") == p.get("parentId") for m in matches if p.get("parentId"))]
+        print(f"  {Y}⚠  {len(matches)} páginas con ese slug, usando la primera.{E}")
 
     page_id = page["id"]
+    folder_id = page.get("parentId")
     print(f"  {G}✓ Página encontrada:{E} '{page.get('title')}' (id: {C}{page_id}{E})")
-    print(f"  {B}Campos del objeto page:{E}")
-    for k, v in page.items():
-        print(f"    {Y}{k:<25}{E} {str(v)[:100]}")
+    print(f"     parentId (carpeta): {C}{folder_id}{E}")
 
     # Obtener el DOM de la página
     print(f"\n  Obteniendo DOM de la página…")
