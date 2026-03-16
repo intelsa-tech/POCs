@@ -126,6 +126,39 @@ def get_page_dom(page_id: str) -> dict:
         return _handle_response(response)
 
 
+def create_collection_field(
+    collection_id: str,
+    field_type: str,
+    display_name: str,
+    is_required: bool = False,
+    help_text: str = "",
+) -> dict:
+    """
+    Crea un nuevo campo en una Collection de Webflow.
+
+    Args:
+        collection_id: ID de la Collection.
+        field_type: Tipo del campo. Ej: "PlainText", "RichText", "Number", "Switch".
+        display_name: Nombre visible del campo en Webflow Designer.
+        is_required: Si el campo es obligatorio.
+        help_text: Texto de ayuda opcional visible en el editor.
+    """
+    payload: dict = {
+        "type": field_type,
+        "displayName": display_name,
+        "isRequired": is_required,
+    }
+    if help_text:
+        payload["helpText"] = help_text
+    with httpx.Client() as client:
+        response = client.post(
+            f"{WEBFLOW_BASE_URL}/collections/{collection_id}/fields",
+            headers=_get_headers(),
+            json=payload,
+        )
+        return _handle_response(response)
+
+
 def publish_item(collection_id: str, item_id: str) -> dict:
     """Publica un item draft en Webflow (lo hace visible en el sitio)."""
     with httpx.Client() as client:

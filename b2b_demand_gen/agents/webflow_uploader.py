@@ -23,47 +23,39 @@ from tools.webflow_api import (
     list_collection_items,
     create_collection_item,
     publish_item,
+    create_collection_field,
 )
 
 MODEL = "claude-opus-4-6"
 
-# ID del item template cuyo diseño queremos replicar (puede sobrescribirse con env var)
-_TEMPLATE_ITEM_SLUG = "servicio-atencion-cliente"
-
 _SYSTEM_PROMPT = f"""Eres un experto en Webflow CMS y automatización de contenido para Intelsa.co.
-Tu tarea es crear una página nueva en Webflow que use EXACTAMENTE el mismo diseño que la página
-template existente de Intelsa (slug: {_TEMPLATE_ITEM_SLUG}).
+Tu tarea es crear una nueva entrada en la Collection de Servicios de Webflow con el copy generado.
 
 ESTRATEGIA OBLIGATORIA:
-1. Lista los sitios y obtén el site_id
-2. Lista las collections del sitio
-3. Busca el item template con slug "{_TEMPLATE_ITEM_SLUG}" en la collection de Servicios:
-   - Llama list_collection_items en la collection que parezca ser "Servicios"
-   - Identifica cuál item tiene slug == "{_TEMPLATE_ITEM_SLUG}"
-   - Llama get_item con ese collection_id e item_id para obtener sus campos EXACTOS
-4. Usa los nombres de campo EXACTOS del template (fieldData) para crear el nuevo item
-   - NO inventes nombres de campo ni uses nombres genéricos
-   - Usa SOLO los campos que existen en el template
-   - Si un campo es Rich Text, usa HTML válido
-   - Si un campo acepta listas/arrays, usa el mismo formato que el template
-5. Genera un slug limpio para el nuevo item basado en el topic (solo minúsculas, sin tildes, guiones)
-6. Crea el item en la MISMA collection que el template — así heredará el mismo diseño/template
-7. Si auto_publish=True, publica el item inmediatamente
+1. Si ya tienes collection_id → llama get_collection_schema directamente para ver los campos disponibles
+2. Si no tienes collection_id → lista sitios → lista collections → identifica la de Servicios → get_collection_schema
+3. Lee el schema de la collection para conocer los nombres EXACTOS de los campos (fieldData keys)
+4. Mapea el copy_data a los campos usando EXACTAMENTE los slugs del schema:
+   - copy_data.h1             → campo "h1" (PlainText)
+   - copy_data.hero_subtitle  → campo "hero-subtitle" (PlainText)
+   - copy_data.meta_title     → campo "meta-title" (PlainText)  [o usar como "name"]
+   - copy_data.meta_description → campo "meta-description" (PlainText)
+   - copy_data.cta_primary    → campo "cta-primary" (PlainText)
+   - copy_data.sections       → campo "content" (RichText) — convierte a HTML
+   - copy_data.faq            → campo "faq" (RichText) — convierte a HTML
+   - copy_data.cta_final      → campo "cta-final" (PlainText)
+   - name                     → título legible del servicio (de copy_data.h1 o topic)
+   - slug                     → solo minúsculas, sin tildes, guiones (basado en topic)
+5. Para campos RichText convierte el contenido a HTML limpio:
+   sections → <h2>título</h2><p>cuerpo</p><h3>sub</h3><p>detalle</p>
+   faq → <h3>pregunta</h3><p>respuesta</p>
+6. SOLO usa campos que existen en el schema. Si un campo del copy_data no tiene campo en la collection,
+   inclúyelo en el campo "content" como HTML adicional.
+7. Genera el item como draft (isDraft: true) a menos que se indique publicar
+8. Si auto_publish=True, publica el item con publish_page después de crearlo
 
-MAPEO DE CAMPOS (copy_data → campos del template):
-- h1 → campo de título/heading principal del template
-- hero_subtitle → campo de subtítulo/descripción corta
-- meta_description → campo de meta description o description
-- cta_primary → campo de CTA o botón principal
-- sections[0].h2 + sections[0].body → primer bloque de contenido
-- sections completo → campo de contenido rico (Rich Text) o secciones individuales
-- faq → campo de preguntas frecuentes (si existe) o parte del Rich Text
-- cta_final → campo de CTA final o parte del contenido
-
-Para campos Rich Text, convierte el contenido a HTML estructurado:
-<h2>título</h2><p>párrafo</p><h3>subtítulo</h3><p>párrafo</p>
-
-IMPORTANTE: Siempre crea el item como draft (isDraft: true) a menos que se indique explícitamente publicar.
+IMPORTANTE: Algunos campos pueden no existir aún si el diseñador no los ha agregado.
+En ese caso, consolida todo el contenido en los campos "name", "description" y "content" disponibles.
 {INTELSA_PROFILE}"""
 
 # Definición de tools para el agente Webflow
@@ -220,17 +212,15 @@ def run_webflow_upload(
     copywriting_output: dict,
     site_id: str | None = None,
     collection_id: str | None = None,
-    template_item_id: str | None = None,
     auto_publish: bool = False,
 ) -> dict:
     """
-    Sube el contenido generado a Webflow usando el item template como referencia de diseño.
+    Sube el contenido generado a Webflow creando un item en la Collection CMS.
 
     Args:
         copywriting_output: Output del agente de copywriting
         site_id: ID del sitio Webflow (opcional, se lee de WEBFLOW_SITE_ID si no se provee)
         collection_id: ID de la Collection destino (opcional, se lee de WEBFLOW_COLLECTION_ID_{TYPE})
-        template_item_id: ID del item template cuyo schema se usará como referencia (opcional)
         auto_publish: Si True, publica el item automáticamente (default: False)
 
     Returns:
@@ -253,65 +243,53 @@ def run_webflow_upload(
     if len(copy_summary) > 3000:
         copy_summary = copy_summary[:3000] + "\n... [truncado para el contexto]"
 
-    context_parts = []
-    if site_id:
-        context_parts.append(f"- **Site ID conocido:** {site_id}")
-    if collection_id:
-        context_parts.append(f"- **Collection ID conocido:** {collection_id}")
-    if auto_publish:
-        context_parts.append("- **Auto-publish:** Sí, publicar automáticamente al crear")
-
-    context_str = "\n".join(context_parts) if context_parts else "- Ninguno (debes descubrir la estructura)"
-
-    # Resolver template_item_id: parámetro > env var por tipo > env var genérica
-    page_type = copywriting_output.get("page_type", "service")
+    # Resolver IDs desde env vars si no se proveen
     pt_upper = page_type.upper()
-    if not template_item_id:
-        template_item_id = (
-            os.environ.get(f"WEBFLOW_TEMPLATE_ITEM_ID_{pt_upper}")
-            or os.environ.get("WEBFLOW_TEMPLATE_ITEM_ID", "")
-        )
     if not collection_id:
         collection_id = (
             os.environ.get(f"WEBFLOW_COLLECTION_ID_{pt_upper}")
             or os.environ.get("WEBFLOW_COLLECTION_ID", "")
         ) or None
+    if not site_id:
+        site_id = os.environ.get("WEBFLOW_SITE_ID", "") or None
 
-    template_hint = (
-        f"- **Template Item ID conocido:** {template_item_id} — usa get_item para leer sus campos exactos"
-        if template_item_id else
-        f'- Busca el item template con slug "{_TEMPLATE_ITEM_SLUG}" listando items de la collection'
-    )
+    context_parts = []
+    if site_id:
+        context_parts.append(f"- **Site ID:** {site_id}")
+    if collection_id:
+        context_parts.append(f"- **Collection ID:** {collection_id} — usa get_collection_schema para ver los campos disponibles")
+    if auto_publish:
+        context_parts.append("- **Auto-publish:** Sí, publicar automáticamente al crear")
+    context_str = "\n".join(context_parts) if context_parts else "- Ninguno (debes descubrir la estructura)"
 
     messages = [
         {
             "role": "user",
-            "content": f"""Crea una nueva {page_label} en Webflow usando el mismo diseño que la página template existente.
+            "content": f"""Crea una nueva entrada en la Collection de Servicios de Webflow para el siguiente copy.
 
-**Tema del nuevo servicio:** {topic}
-**Tipo de página:** {page_type} ({page_label})
+**Tema:** {topic}
+**Tipo:** {page_type} ({page_label})
 
 **IDs conocidos:**
 {context_str}
-{template_hint}
 
 **PASOS OBLIGATORIOS:**
-1. Lista los sitios → obtén site_id
-2. Lista las collections del sitio
-3. {"Usa collection_id: " + collection_id + " directamente" if collection_id else 'Identifica la collection de Servicios (busca "Servicio", "Services" o similar en el nombre/slug)'}
-4. Llama list_collection_items en esa collection para encontrar el item con slug "{_TEMPLATE_ITEM_SLUG}"
-5. {"Llama get_item(collection_id='" + collection_id + "', item_id='" + template_item_id + "') para ver los campos exactos del template" if template_item_id else f'Llama get_item con el collection_id y el item_id del template "{_TEMPLATE_ITEM_SLUG}"'}
-6. Usa los nombres de campo EXACTOS del template para mapear el nuevo copy
-7. Crea el nuevo item en la MISMA collection con esos campos exactos
-8. {'Publica el item inmediatamente con publish_page' if auto_publish else 'Deja el item como isDraft: true'}
-9. Reporta: item_id, collection_id, URL (si disponible) y resumen del mapeo de campos
+1. {"Llama get_collection_schema con collection_id=" + collection_id + " para ver los campos disponibles" if collection_id else "Lista sitios → lista collections → identifica la de Servicios → llama get_collection_schema"}
+2. Lee los slugs EXACTOS de los campos en el schema
+3. Mapea el copy_data a los campos usando los slugs reales (ej: "h1", "hero-subtitle", "content", "faq")
+4. Convierte sections a HTML para el campo RichText "content":
+   <h2>título</h2><p>cuerpo</p><h3>sub</h3><p>detalle</p>
+5. Convierte faq a HTML para el campo RichText "faq":
+   <h3>pregunta</h3><p>respuesta</p>
+6. Genera un slug limpio para el item: minúsculas, sin tildes, solo guiones
+7. Crea el item con create_page (isDraft: true por defecto)
+8. {"Publica inmediatamente con publish_page" if auto_publish else "Deja el item como draft"}
+9. Reporta: item_id, collection_id y resumen del mapeo
 
-**Copy generado para el nuevo servicio:**
+**Copy generado:**
 ```json
 {copy_summary}
-```
-
-RECUERDA: El objetivo es que la nueva página use el mismo template de diseño que "{_TEMPLATE_ITEM_SLUG}". Esto se logra creando el item en la misma Collection con los mismos nombres de campo.""",
+```""",
         }
     ]
 
