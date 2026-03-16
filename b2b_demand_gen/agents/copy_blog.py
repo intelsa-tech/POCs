@@ -149,7 +149,7 @@ El body de cada sección debe ser texto completo, no bullets ni esquemas.""",
 
     copy_text = ""
     for block in response.content:
-        if hasattr(block, "text"):
+        if hasattr(block, "text") and block.text is not None:
             copy_text += block.text
 
     copy_data = _parse_json_response(copy_text)

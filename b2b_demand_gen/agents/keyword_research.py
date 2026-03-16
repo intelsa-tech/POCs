@@ -116,7 +116,7 @@ Usa búsquedas web para validar tendencias actuales y competencia.""",
     # Extraer texto final (ignorar bloques thinking)
     research_text = ""
     for block in response.content:
-        if hasattr(block, "text"):
+        if hasattr(block, "text") and block.text is not None:
             research_text += block.text
 
     return {

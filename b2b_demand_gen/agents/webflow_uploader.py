@@ -282,7 +282,7 @@ Pasos a seguir:
     # Extraer respuesta final
     final_text = ""
     for block in response.content:
-        if hasattr(block, "text"):
+        if hasattr(block, "text") and block.text is not None:
             final_text += block.text
 
     return {
