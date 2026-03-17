@@ -307,8 +307,6 @@ def run_webflow_upload(
         response = client.messages.create(
             model=MODEL,
             max_tokens=4096,
-            thinking={"type": "adaptive"},
-            output_config={"effort": "high"},
             system=[{"type": "text", "text": _SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
             tools=WEBFLOW_TOOLS,
             messages=messages,

@@ -1069,8 +1069,15 @@ function onPipelineComplete({ status, message, outputs, webflow_preview, keyword
   doneSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function onPipelineError({ message }) {
-  onPipelineComplete({ status: 'error', message: '❌ Error: ' + message });
+function onPipelineError({ message, step }) {
+  const stepLabels = {
+    keyword_research: 'Paso 1: Keyword Research',
+    copywriting: 'Paso 2: Copy',
+    webflow: 'Paso 3: Webflow Upload',
+    init: 'Inicialización',
+  };
+  const stepLabel = step ? ` [${stepLabels[step] || step}]` : '';
+  onPipelineComplete({ status: 'error', message: `❌ Error${stepLabel}: ${message}` });
 }
 
 function resetSubmitBtn() {

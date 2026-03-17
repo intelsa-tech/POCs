@@ -279,6 +279,7 @@ def _generate_html_preview(
 def _run_pipeline(job_id: str, params: dict):
     """Pipeline completo corriendo en un thread de fondo."""
     q = _jobs[job_id]["queue"]
+    _current_step = ["init"]
 
     def emit(event_type: str, data: dict):
         q.put({"type": event_type, "data": data})
@@ -309,6 +310,7 @@ def _run_pipeline(job_id: str, params: dict):
         slug = topic.lower().replace(" ", "_")[:30]
 
         # ── PASO 1: Keyword Research ──────────────────────────────────────────
+        _current_step[0] = "keyword_research"
         emit("step_start", {"step": 1, "name": "Keyword Research"})
 
         keyword_result = run_keyword_research(
@@ -323,6 +325,7 @@ def _run_pipeline(job_id: str, params: dict):
         })
 
         # ── PASO 2: Copy ──────────────────────────────────────────────────────
+        _current_step[0] = "copywriting"
         emit("step_start", {"step": 2, "name": f"Copywriting — {page_type}"})
 
         copy_fn = COPY_AGENTS[page_type]
@@ -471,7 +474,13 @@ def _run_pipeline(job_id: str, params: dict):
         })
 
     except Exception as exc:
-        emit("pipeline_error", {"message": str(exc)})
+        import traceback
+        tb = traceback.format_exc()
+        print(f"\n[PIPELINE ERROR] step={_current_step[0]}\n{tb}")
+        emit("pipeline_error", {
+            "message": str(exc),
+            "step": _current_step[0],
+        })
     finally:
         q.put(None)
 
