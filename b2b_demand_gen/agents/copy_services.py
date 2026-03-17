@@ -139,8 +139,6 @@ def run_copy_services(
     with client.messages.stream(
         model=MODEL,
         max_tokens=8192,
-        thinking={"type": "adaptive"},
-        output_config={"effort": "high"},
         system=[{"type": "text", "text": _SYSTEM, "cache_control": {"type": "ephemeral"}}],
         messages=messages,
     ) as stream:

@@ -163,8 +163,6 @@ def run_copy_blog(
     with client.messages.stream(
         model=MODEL,
         max_tokens=12000,
-        thinking={"type": "adaptive"},
-        output_config={"effort": "max"},
         system=[{"type": "text", "text": _SYSTEM, "cache_control": {"type": "ephemeral"}}],
         messages=messages,
     ) as stream:
