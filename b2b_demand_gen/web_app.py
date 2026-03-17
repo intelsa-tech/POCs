@@ -15,6 +15,7 @@ import sys
 import threading
 import uuid
 from datetime import datetime
+from html import escape as _esc
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -70,6 +71,211 @@ def _sum_cache(usage: dict) -> tuple[int, int]:
     )
 
 
+def _generate_html_preview(
+    copy_data: dict,
+    keyword_research_text: str,
+    page_type: str,
+    topic: str,
+    output_language: str,
+) -> str:
+    """Genera un HTML standalone con el contenido generado, listo para revisar antes de Webflow."""
+    meta_title = _esc(copy_data.get("meta_title", topic))
+    meta_description = _esc(copy_data.get("meta_description", ""))
+    h1 = _esc(copy_data.get("h1", topic))
+    hero_subtitle = _esc(copy_data.get("hero_subtitle", ""))
+    cta_primary = _esc(copy_data.get("cta_primary", "Contáctanos"))
+    cta_final = _esc(copy_data.get("cta_final", ""))
+    sections = copy_data.get("sections", [])
+    faq = copy_data.get("faq", [])
+
+    # Blog-specific fields
+    intro_paragraph = copy_data.get("intro_paragraph", "")
+    takeaways = copy_data.get("takeaways", [])
+    internal_cta_title = copy_data.get("internal_cta_title", "")
+    internal_cta_body = copy_data.get("internal_cta_body", "")
+    internal_cta_button = copy_data.get("internal_cta_button", "")
+    conclusion_body = copy_data.get("conclusion_body", "")
+    focus_keyword = copy_data.get("focus_keyword", "")
+    secondary_keywords = copy_data.get("secondary_keywords", [])
+    reading_time = copy_data.get("reading_time", "")
+    category = copy_data.get("category", "")
+    tags = copy_data.get("tags", [])
+
+    def nl2br(s: str) -> str:
+        return _esc(s).replace("\n", "<br>")
+
+    # Sections HTML
+    sections_html = ""
+    for sec in sections:
+        h2_text = _esc(sec.get("h2", ""))
+        body_text = nl2br(sec.get("body", ""))
+        h3_html = ""
+        for item in sec.get("h3_items", []):
+            h3t = _esc(item.get("h3", ""))
+            h3b = nl2br(item.get("body", ""))
+            if h3t:
+                h3_html += f"<h3>{h3t}</h3><p>{h3b}</p>"
+        ki = sec.get("key_insight", "")
+        insight_html = f'<blockquote class="insight">{_esc(ki)}</blockquote>' if ki else ""
+        sections_html += f"""
+      <section class="content-section">
+        <h2>{h2_text}</h2>
+        <p>{body_text}</p>
+        {h3_html}
+        {insight_html}
+      </section>"""
+
+    # FAQ HTML
+    faq_html = ""
+    for item in faq:
+        q = _esc(item.get("question", ""))
+        a = nl2br(item.get("answer", ""))
+        faq_html += f"""
+      <div class="faq-item">
+        <strong class="question">{q}</strong>
+        <p class="answer">{a}</p>
+      </div>"""
+
+    # Blog extras
+    intro_html = f'<p class="intro-paragraph">{nl2br(intro_paragraph)}</p>' if intro_paragraph else ""
+    takeaways_html = ""
+    if takeaways:
+        items = "".join(f"<li>{_esc(t)}</li>" for t in takeaways)
+        takeaways_html = f'<div class="takeaways"><h3>Puntos clave</h3><ul>{items}</ul></div>'
+    internal_cta_html = ""
+    if internal_cta_title:
+        internal_cta_html = f"""
+      <div class="internal-cta">
+        <h3>{_esc(internal_cta_title)}</h3>
+        <p>{nl2br(internal_cta_body)}</p>
+        <span class="cta-btn">{_esc(internal_cta_button)}</span>
+      </div>"""
+    conclusion_html = f'<div class="conclusion"><p>{nl2br(conclusion_body)}</p></div>' if conclusion_body else ""
+
+    # Keywords / tags badges
+    kw_badges = ""
+    if focus_keyword:
+        kw_badges += f'<span class="badge">&#127919; {_esc(focus_keyword)}</span>'
+    for kw in secondary_keywords[:5]:
+        kw_badges += f'<span class="badge secondary">{_esc(kw)}</span>'
+    tags_html = "".join(f'<span class="tag">{_esc(t)}</span>' for t in tags)
+
+    kw_research_html = ""
+    if keyword_research_text:
+        kw_research_html = f"""
+    <details class="kw-research">
+      <summary>&#128202; Keyword Research completo</summary>
+      <pre class="kw-content">{_esc(keyword_research_text)}</pre>
+    </details>"""
+
+    pt_label = {"service": "Página de Servicios", "industry": "Página de Industria", "blog": "Artículo de Blog"}.get(page_type, page_type)
+    cat_span = f'<span class="label">Categoría:</span><span>{_esc(category)}</span>' if category else ""
+    rt_span = f'<span class="label">Lectura:</span><span>{_esc(reading_time)}</span>' if reading_time else ""
+    kw_section = f'<div class="keywords-badges" style="margin-top:12px;">{kw_badges}</div>' if kw_badges else ""
+    tags_section = f'<div class="tags">{tags_html}</div>' if tags_html else ""
+    faq_section = f'<section class="faq-section"><h2>Preguntas frecuentes</h2>{faq_html}</section>' if faq_html else ""
+    cta_final_section = f'<div class="cta-final-section"><span class="cta-btn">{cta_final}</span></div>' if cta_final else ""
+
+    return f"""<!DOCTYPE html>
+<html lang="{output_language}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{meta_title}</title>
+  <meta name="description" content="{meta_description}">
+  <style>
+    *{{box-sizing:border-box;margin:0;padding:0}}
+    body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1e293b;line-height:1.7;background:#f8fafc}}
+    .meta-bar{{background:#1e293b;color:#94a3b8;padding:8px 24px;font-size:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}}
+    .meta-bar strong{{color:#fff}}.meta-bar .label{{color:#64748b;margin-left:8px}}
+    .container{{max-width:860px;margin:0 auto;padding:0 24px 80px}}
+    .hero{{background:linear-gradient(135deg,#1e40af 0%,#3730a3 100%);color:#fff;padding:64px 24px;text-align:center}}
+    .hero h1{{font-size:clamp(22px,4vw,40px);font-weight:800;line-height:1.2;max-width:800px;margin:0 auto 16px}}
+    .hero .subtitle{{font-size:18px;opacity:.85;max-width:640px;margin:0 auto 32px}}
+    .cta-btn{{display:inline-block;background:#f97316;color:#fff;padding:14px 32px;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none}}
+    .intro-paragraph{{font-size:17px;color:#334155;border-left:4px solid #3b82f6;padding-left:16px;margin:32px 0;font-style:italic}}
+    .keywords-badges{{display:flex;flex-wrap:wrap;gap:8px}}
+    .badge{{background:#dbeafe;color:#1d4ed8;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}}
+    .badge.secondary{{background:#e0f2fe;color:#0369a1}}
+    .meta-info{{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin:24px 0}}
+    .meta-info h4{{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:8px}}
+    .meta-title-text{{font-weight:700;color:#1e293b;font-size:15px}}
+    .meta-desc-text{{color:#64748b;font-size:13px;margin-top:6px}}
+    .tags{{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}}
+    .tag{{background:#f1f5f9;color:#475569;padding:3px 10px;border-radius:20px;font-size:11px}}
+    .content-section{{background:#fff;border-radius:12px;padding:32px;margin:16px 0;border:1px solid #e2e8f0}}
+    .content-section h2{{font-size:22px;font-weight:700;color:#1e293b;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #f1f5f9}}
+    .content-section h3{{font-size:17px;font-weight:600;color:#3730a3;margin:20px 0 8px}}
+    .content-section p{{color:#475569;margin-bottom:10px}}
+    .insight{{border-left:4px solid #f97316;padding:12px 16px;background:#fff7ed;color:#9a3412;font-style:italic;margin:16px 0;border-radius:0 8px 8px 0}}
+    .faq-section{{background:#f8fafc;border-radius:12px;padding:32px;margin:16px 0;border:1px solid #e2e8f0}}
+    .faq-section h2{{font-size:20px;font-weight:700;margin-bottom:20px}}
+    .faq-item{{background:#fff;border-radius:8px;padding:16px;margin-bottom:10px;border:1px solid #e2e8f0}}
+    .question{{display:block;color:#1e293b;font-size:15px;margin-bottom:6px}}
+    .answer{{color:#64748b;font-size:13px;margin:0}}
+    .takeaways{{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:24px;margin:16px 0}}
+    .takeaways h3{{color:#166534;margin-bottom:10px}}
+    .takeaways ul{{list-style:none;padding:0}}
+    .takeaways li{{padding:5px 0 5px 22px;position:relative;color:#15803d}}
+    .takeaways li::before{{content:'✓';position:absolute;left:0;font-weight:700}}
+    .internal-cta{{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:28px;margin:24px 0;text-align:center}}
+    .internal-cta h3{{color:#1e40af;font-size:19px;margin-bottom:10px}}
+    .internal-cta p{{color:#3730a3;margin-bottom:18px}}
+    .conclusion{{background:#fefce8;border:1px solid #fde68a;border-radius:12px;padding:24px;margin:16px 0}}
+    .conclusion p{{color:#78350f}}
+    .cta-final-section{{text-align:center;padding:48px 0}}
+    .cta-final-section .cta-btn{{font-size:18px;padding:18px 44px}}
+    .kw-research{{background:#fff;border:1px solid #e2e8f0;border-radius:12px;margin:32px 0;overflow:hidden}}
+    .kw-research summary{{padding:14px 20px;font-weight:600;color:#374151;cursor:pointer;font-size:13px;user-select:none}}
+    .kw-research summary:hover{{background:#f8fafc}}
+    .kw-content{{padding:20px;font-size:11px;font-family:'Courier New',monospace;white-space:pre-wrap;color:#374151;max-height:500px;overflow-y:auto;background:#f8fafc;border-top:1px solid #e2e8f0}}
+    .generated-notice{{text-align:center;padding:20px;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;margin-top:40px}}
+    hr{{border:none;border-top:1px solid #e2e8f0;margin:24px 0}}
+  </style>
+</head>
+<body>
+
+<div class="meta-bar">
+  <strong>Intelsa B2B Content Generator</strong>
+  <span class="label">Tipo:</span><span>{pt_label}</span>
+  <span class="label">Idioma:</span><span>{output_language.upper()}</span>
+  {cat_span}
+  {rt_span}
+</div>
+
+<div class="hero">
+  <h1>{h1}</h1>
+  {"<p class='subtitle'>" + hero_subtitle + "</p>" if hero_subtitle else ""}
+  <span class="cta-btn">{cta_primary}</span>
+</div>
+
+<div class="container">
+  <div class="meta-info">
+    <h4>SEO Meta</h4>
+    <p class="meta-title-text">{meta_title}</p>
+    <p class="meta-desc-text">{meta_description}</p>
+    {kw_section}
+    {tags_section}
+  </div>
+
+  {intro_html}
+  {sections_html}
+  {takeaways_html}
+  {internal_cta_html}
+  {conclusion_html}
+  {faq_section}
+  {cta_final_section}
+  {kw_research_html}
+
+  <div class="generated-notice">
+    Generado por Intelsa B2B Content Generator &mdash; preview previo a publicación en Webflow
+  </div>
+</div>
+
+</body>
+</html>"""
+
+
 def _run_pipeline(job_id: str, params: dict):
     """Pipeline completo corriendo en un thread de fondo."""
     q = _jobs[job_id]["queue"]
@@ -123,9 +329,22 @@ def _run_pipeline(job_id: str, params: dict):
         copy_result = copy_fn(keyword_result, company_context, output_language)
         _save_output(copy_result, f"{timestamp}_{slug}_copy.json")
 
+        # Generar HTML preview y guardarlo en outputs/
+        html_filename = f"{timestamp}_{slug}_preview.html"
+        html_content = _generate_html_preview(
+            copy_result.get("copy_data", {}),
+            keyword_result.get("research", ""),
+            page_type,
+            topic,
+            output_language,
+        )
+        OUTPUTS_DIR.mkdir(exist_ok=True)
+        (OUTPUTS_DIR / html_filename).write_text(html_content, encoding="utf-8")
+
         emit("step_complete", {
             "step": 2,
             "usage": copy_result["usage"],
+            "html_file": html_filename,
         })
 
         # ── REVISIÓN HUMANA ───────────────────────────────────────────────────
@@ -159,7 +378,8 @@ def _run_pipeline(job_id: str, params: dict):
                     "keyword_research": keyword_result.get("research", ""),
                     "copy_data": copy_result.get("copy_data", {}),
                     "page_type": page_type,
-                    "outputs": [f"{timestamp}_{slug}_keywords.json", f"{timestamp}_{slug}_copy.json"],
+                    "html_file": html_filename,
+                    "outputs": [f"{timestamp}_{slug}_keywords.json", f"{timestamp}_{slug}_copy.json", html_filename],
                 })
                 return
 
@@ -186,7 +406,8 @@ def _run_pipeline(job_id: str, params: dict):
                 "keyword_research": keyword_result.get("research", ""),
                 "copy_data": copy_result.get("copy_data", {}),
                 "page_type": page_type,
-                "outputs": [f"{timestamp}_{slug}_keywords.json", f"{timestamp}_{slug}_copy.json"],
+                "html_file": html_filename,
+                "outputs": [f"{timestamp}_{slug}_keywords.json", f"{timestamp}_{slug}_copy.json", html_filename],
             })
             return
 
@@ -239,9 +460,11 @@ def _run_pipeline(job_id: str, params: dict):
             "copy_data": copy_result.get("copy_data", {}),
             "page_type": page_type,
             "output_language": output_language,
+            "html_file": html_filename,
             "outputs": [
                 f"{timestamp}_{slug}_keywords.json",
                 f"{timestamp}_{slug}_copy.json",
+                html_filename,
                 f"{timestamp}_{slug}_webflow.json",
                 complete_file,
             ],
@@ -449,17 +672,24 @@ async def upload_history_to_webflow(gen_id: int, request: Request):
 
 @app.get("/api/outputs")
 async def list_outputs():
-    """Lista todos los archivos de output generados."""
+    """Lista todos los archivos de output generados (JSON y HTML)."""
     OUTPUTS_DIR.mkdir(exist_ok=True)
-    files = sorted(OUTPUTS_DIR.glob("*.json"), reverse=True)
+    files = sorted(
+        [f for f in OUTPUTS_DIR.iterdir() if f.suffix in (".json", ".html")],
+        reverse=True,
+    )
     return [{"name": f.name, "size": f.stat().st_size} for f in files]
 
 
 @app.get("/api/outputs/{filename}")
 async def get_output(filename: str):
-    """Retorna el contenido de un archivo de output."""
+    """Retorna el contenido de un archivo de output (JSON o HTML)."""
     filepath = OUTPUTS_DIR / filename
-    if not filepath.exists() or filepath.suffix != ".json":
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail="Archivo no encontrado.")
+    if filepath.suffix == ".html":
+        return HTMLResponse(filepath.read_text(encoding="utf-8"))
+    if filepath.suffix != ".json":
         raise HTTPException(status_code=404, detail="Archivo no encontrado.")
     with open(filepath, "r", encoding="utf-8") as f:
         data = json.load(f)

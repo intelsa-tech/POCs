@@ -336,6 +336,10 @@
             class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 rounded-t-lg transition">
             🌐 Webflow
           </button>
+          <button onclick="switchTab('tab-html')" id="btn-tab-html"
+            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 rounded-t-lg transition">
+            🖥 HTML Preview
+          </button>
         </div>
 
         <!-- Tab: Artículo -->
@@ -361,6 +365,27 @@
         <!-- Tab: Webflow -->
         <div id="tab-webflow" class="tab-content hidden">
           <pre id="webflow-full-content" class="text-xs text-slate-700 bg-slate-50 rounded-lg p-4 log-box max-h-[600px] overflow-y-auto"></pre>
+        </div>
+
+        <!-- Tab: HTML Preview -->
+        <div id="tab-html" class="tab-content hidden">
+          <div id="html-preview-actions" class="hidden mb-3 flex gap-2 items-center">
+            <a id="html-open-link" href="#" target="_blank"
+              class="text-xs bg-violet-50 text-violet-700 hover:bg-violet-100 px-3 py-1.5 rounded-lg font-medium transition">
+              🔗 Abrir HTML en nueva pestaña
+            </a>
+            <a id="html-download-link" href="#" download
+              class="text-xs bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-medium transition">
+              ⬇ Descargar HTML
+            </a>
+            <span class="text-xs text-slate-400">Preview temporal hasta configurar Webflow Collections</span>
+          </div>
+          <iframe id="html-preview-frame"
+            class="w-full rounded-xl border border-slate-200 bg-white"
+            style="height:680px;display:none;"
+            sandbox="allow-same-origin">
+          </iframe>
+          <p id="html-preview-placeholder" class="text-sm text-slate-400 p-4">El HTML se generará al completar el paso de Copy.</p>
         </div>
       </div>
 
@@ -907,7 +932,7 @@ function onStepStart({ step, name }) {
   if (step === 3) activateLine('line-3');
 }
 
-function onStepComplete({ step, preview, usage, result_preview }) {
+function onStepComplete({ step, preview, usage, result_preview, html_file }) {
   const map = { 1: 's1', 2: 's2', 3: 's3' };
   const id = map[step];
   if (id) setStepState(`${id}-icon`, 'done');
@@ -930,6 +955,11 @@ function onStepComplete({ step, preview, usage, result_preview }) {
     document.getElementById('preview-content').textContent = previewText;
     show(previewSection);
     previewSection.classList.add('fade-in');
+  }
+
+  // Cargar HTML preview en cuanto esté disponible (paso 2)
+  if (html_file) {
+    setHtmlPreview(html_file);
   }
 }
 
@@ -960,7 +990,24 @@ async function sendReview(approved) {
 document.getElementById('approve-btn').addEventListener('click', () => sendReview(true));
 document.getElementById('reject-btn').addEventListener('click', () => sendReview(false));
 
-function onPipelineComplete({ status, message, outputs, webflow_preview, keyword_research, copy_data, page_type }) {
+function setHtmlPreview(htmlFile) {
+  if (!htmlFile) return;
+  const url = `/api/outputs/${encodeURIComponent(htmlFile)}`;
+  const frame = document.getElementById('html-preview-frame');
+  const actions = document.getElementById('html-preview-actions');
+  const placeholder = document.getElementById('html-preview-placeholder');
+  const openLink = document.getElementById('html-open-link');
+  const dlLink = document.getElementById('html-download-link');
+  frame.src = url;
+  frame.style.display = '';
+  openLink.href = url;
+  dlLink.href = url;
+  dlLink.download = htmlFile;
+  if (actions) actions.classList.remove('hidden');
+  if (placeholder) placeholder.style.display = 'none';
+}
+
+function onPipelineComplete({ status, message, outputs, webflow_preview, keyword_research, copy_data, page_type, html_file }) {
   const isOk = status === 'completed' || status === 'completed_no_upload';
   const isRejected = status === 'rejected';
 
@@ -995,6 +1042,11 @@ function onPipelineComplete({ status, message, outputs, webflow_preview, keyword
     document.getElementById('webflow-full-content').textContent = webflow_preview;
   } else {
     document.getElementById('webflow-full-content').textContent = 'No se ejecutó el upload a Webflow.';
+  }
+
+  // Tab: HTML Preview
+  if (html_file) {
+    setHtmlPreview(html_file);
   }
 
   // Default to article tab

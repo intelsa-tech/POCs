@@ -156,9 +156,7 @@ def run_keyword_research(
 
     with client.messages.stream(
         model=MODEL,
-        max_tokens=4096,
-        thinking={"type": "adaptive"},
-        output_config={"effort": "high"},
+        max_tokens=8192,
         # System prompt CACHEADO — mismo para todos los requests
         system=[
             {
