@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico de gestión de leads — Mundo Yamaha × Intelsa</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --orange: #ff9345;
+  --orange-dark: #e07a2d;
+  --green: #a9d944;
+  --green-dark: #8bbf2e;
+  --dark: #414c4c;
+  --dark-light: #5a6868;
+  --gray-100: #f7f8f8;
+  --gray-200: #eef0f0;
+  --gray-300: #dde0e0;
+  --gray-400: #b0b8b8;
+  --red: #e24b4a;
+  --red-light: #fcebeb;
+  --amber: #ef9f27;
+  --amber-light: #faeeda;
+  --white: #ffffff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Poppins', sans-serif;
+  color: var(--dark);
+  background: var(--white);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* NAV */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 40px;
+  display: flex; align-items: center; height: 56px;
+  gap: 32px;
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.nav-brand .logo-text { font-weight: 700; font-size: 15px; color: var(--orange); letter-spacing: -0.3px; }
+.nav-brand .sep { color: var(--gray-300); font-weight: 300; font-size: 20px; }
+.nav-brand .client { font-weight: 500; font-size: 14px; color: var(--dark); }
+.nav-links { display: flex; gap: 4px; overflow-x: auto; flex: 1; }
+.nav-links a {
+  font-size: 12px; font-weight: 500; color: var(--dark-light);
+  text-decoration: none; padding: 6px 14px; border-radius: 3px;
+  white-space: nowrap; transition: all .2s;
+}
+.nav-links a:hover, .nav-links a.active { background: var(--orange); color: #fff; }
+
+/* HERO */
+.hero {
+  background: var(--dark);
+  padding: 80px 60px 70px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute; right: -60px; top: -60px;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: var(--orange);
+  opacity: .08;
+}
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--orange);
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-size: 36px; font-weight: 700; color: #fff;
+  line-height: 1.2; max-width: 680px; margin-bottom: 12px;
+}
+.hero h1 span { color: var(--orange); }
+.hero-sub {
+  font-size: 16px; font-weight: 300; color: rgba(255,255,255,.6);
+  max-width: 560px; margin-bottom: 40px;
+}
+.hero-stats {
+  display: flex; gap: 40px; flex-wrap: wrap;
+}
+.hero-stat .number {
+  font-size: 42px; font-weight: 700; color: #fff; line-height: 1;
+}
+.hero-stat .number.orange { color: var(--orange); }
+.hero-stat .number.green { color: var(--green); }
+.hero-stat .number.red { color: var(--red); }
+.hero-stat .label {
+  font-size: 12px; font-weight: 500; color: rgba(255,255,255,.45);
+  margin-top: 4px; text-transform: uppercase; letter-spacing: .5px;
+}
+
+/* SECTIONS */
+.section {
+  padding: 64px 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section-alt { background: var(--gray-100); }
+.section-dark { background: var(--dark); color: #fff; }
+.section-orange { background: var(--orange); color: #fff; }
+
+.section-tag {
+  font-size: 10px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--orange);
+  margin-bottom: 8px;
+}
+.section-dark .section-tag { color: var(--green); }
+.section-orange .section-tag { color: rgba(255,255,255,.7); }
+.section-title {
+  font-size: 26px; font-weight: 700; line-height: 1.25;
+  margin-bottom: 8px;
+}
+.section-subtitle {
+  font-size: 14px; color: var(--dark-light);
+  max-width: 600px; margin-bottom: 32px;
+}
+.section-dark .section-subtitle { color: rgba(255,255,255,.5); }
+
+/* FUNNEL */
+.funnel { margin: 24px 0; }
+.funnel-step {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 8px;
+}
+.funnel-label {
+  width: 140px; text-align: right; font-size: 12px;
+  font-weight: 500; color: var(--dark-light); flex-shrink: 0;
+}
+.funnel-bar-track {
+  flex: 1; height: 36px; background: var(--gray-200);
+  border-radius: 3px; overflow: hidden; position: relative;
+}
+.funnel-bar {
+  height: 100%; border-radius: 3px;
+  display: flex; align-items: center; padding: 0 14px;
+  font-size: 12px; font-weight: 600; color: #fff;
+  transition: width .6s ease;
+}
+.funnel-meta {
+  width: 160px; font-size: 11px; color: var(--gray-400); flex-shrink: 0;
+}
+
+/* GRID CARDS */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 3px;
+  padding: 24px;
+  transition: transform .15s, box-shadow .15s;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+.card-icon {
+  width: 40px; height: 40px; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 14px;
+}
+.card-icon.red { background: var(--red-light); color: var(--red); }
+.card-icon.amber { background: var(--amber-light); color: var(--amber); }
+.card-icon.green { background: #eaf3de; color: #639922; }
+.card-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.card-desc { font-size: 12px; color: var(--dark-light); line-height: 1.65; }
+
+/* SEDE BARS */
+.sede-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.sede-row:last-child { border-bottom: none; }
+.sede-name { width: 100px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.sede-bar-wrap { flex: 1; display: flex; align-items: center; gap: 8px; }
+.sede-bar {
+  height: 28px; border-radius: 3px;
+  display: flex; align-items: center; padding: 0 10px;
+  font-size: 11px; font-weight: 600; color: #fff;
+  min-width: 40px;
+  transition: width .5s ease;
+}
+.sede-stats {
+  display: flex; gap: 16px; font-size: 12px; flex-shrink: 0; width: 180px;
+}
+.sede-stats .v { font-weight: 600; }
+.sede-stats .rate { font-weight: 700; }
+.sede-stats .rate.good { color: var(--green-dark); }
+.sede-stats .rate.bad { color: var(--red); }
+.sede-stats .rate.mid { color: var(--amber); }
+
+/* VS TABLE */
+.vs-container { display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; margin: 24px 0; }
+.vs-col {
+  border: 1px solid var(--gray-200);
+  border-radius: 3px;
+  padding: 28px;
+}
+.vs-col.current { border-color: var(--red); border-width: 1px; }
+.vs-col.proposed { border-color: var(--green); border-width: 2px; }
+.vs-mid {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: var(--orange);
+}
+.vs-tag {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; margin-bottom: 16px;
+}
+.vs-tag.red { color: var(--red); }
+.vs-tag.green { color: var(--green-dark); }
+.vs-list { list-style: none; }
+.vs-list li {
+  font-size: 13px; color: var(--dark-light);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.vs-list li:last-child { border-bottom: none; }
+.vs-list .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 6px;
+}
+.vs-list .dot.r { background: var(--red); }
+.vs-list .dot.g { background: var(--green); }
+
+/* SIMULATOR */
+.sim-controls { margin: 24px 0; }
+.sim-row {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 14px;
+}
+.sim-row label {
+  width: 200px; font-size: 13px; font-weight: 500;
+  color: var(--dark-light); flex-shrink: 0;
+}
+.sim-row input[type=range] {
+  flex: 1; height: 6px; -webkit-appearance: none;
+  background: var(--gray-300); border-radius: 3px; outline: none;
+}
+.sim-row input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--orange);
+  cursor: pointer; border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.sim-row .sim-val {
+  min-width: 100px; text-align: right;
+  font-size: 14px; font-weight: 600; color: var(--dark);
+}
+
+.roi-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; margin: 24px 0;
+}
+.roi-card {
+  background: var(--gray-100); border-radius: 3px;
+  padding: 20px; text-align: center;
+}
+.roi-card .roi-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .5px; color: var(--gray-400); margin-bottom: 4px;
+}
+.roi-card .roi-value {
+  font-size: 28px; font-weight: 700; line-height: 1.2;
+}
+.roi-card .roi-value.or { color: var(--orange); }
+.roi-card .roi-value.gr { color: var(--green-dark); }
+.roi-card .roi-value.rd { color: var(--red); }
+.roi-card .roi-value.dk { color: var(--dark); }
+
+.chart-wrap { position: relative; height: 320px; margin: 24px 0; }
+
+.legend-row {
+  display: flex; gap: 20px; margin-bottom: 12px; font-size: 12px; color: var(--dark-light);
+}
+.legend-row span { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 2px; }
+
+/* ZERO ADVISORS */
+.zero-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.zero-tag {
+  background: var(--gray-100); border: 1px solid var(--gray-200);
+  border-radius: 3px; padding: 6px 14px;
+  font-size: 12px; color: var(--dark-light);
+}
+.zero-tag strong { color: var(--red); font-weight: 600; }
+
+/* TOP ADVISORS */
+.top-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 16px 0; }
+.top-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 3px; padding: 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.top-card .rank {
+  font-size: 10px; font-weight: 700; color: var(--green-dark);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.top-card .name { font-size: 14px; font-weight: 600; }
+.top-card .loc { font-size: 11px; color: var(--gray-400); }
+.top-card .stat-row { display: flex; gap: 16px; margin-top: 4px; }
+.top-card .stat { text-align: center; }
+.top-card .stat .n { font-size: 20px; font-weight: 700; color: var(--green-dark); }
+.top-card .stat .l { font-size: 9px; color: var(--gray-400); text-transform: uppercase; letter-spacing: .5px; }
+
+/* AI FLOW */
+.ai-flow { display: flex; gap: 0; align-items: stretch; margin: 24px 0; }
+.ai-step {
+  flex: 1; padding: 24px 18px; position: relative;
+  background: var(--white); border: 1px solid var(--gray-200);
+  text-align: center;
+}
+.ai-step:first-child { border-radius: 3px 0 0 3px; }
+.ai-step:last-child { border-radius: 0 3px 3px 0; }
+.ai-step .step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--orange); color: #fff;
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 10px;
+}
+.ai-step .step-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.ai-step .step-desc { font-size: 10px; color: var(--dark-light); line-height: 1.5; }
+.ai-step .step-time {
+  margin-top: 8px; font-size: 10px; font-weight: 700;
+  color: var(--green-dark); text-transform: uppercase;
+}
+.ai-arrow {
+  width: 32px; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+  color: var(--orange); font-size: 18px;
+}
+
+/* CTA */
+.cta-section {
+  background: var(--orange);
+  padding: 60px;
+  text-align: center;
+}
+.cta-section h2 {
+  font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 10px;
+}
+.cta-section p {
+  font-size: 14px; color: rgba(255,255,255,.8); max-width: 500px;
+  margin: 0 auto 28px;
+}
+.cta-btn {
+  display: inline-block; padding: 14px 36px;
+  background: #fff; color: var(--orange);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px; font-weight: 700;
+  border: none; border-radius: 3px; cursor: pointer;
+  text-decoration: none; transition: transform .15s;
+}
+.cta-btn:hover { transform: scale(1.03); }
+
+/* FOOTER */
+.footer {
+  padding: 32px 60px;
+  border-top: 1px solid var(--gray-200);
+  display: flex; justify-content: space-between;
+  align-items: center; font-size: 11px; color: var(--gray-400);
+}
+
+/* SCROLL REVEAL */
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 768px) {
+  .hero { padding: 48px 24px; }
+  .hero h1 { font-size: 26px; }
+  .hero-stats { gap: 24px; }
+  .hero-stat .number { font-size: 32px; }
+  .section { padding: 40px 24px; }
+  .nav { padding: 0 16px; gap: 16px; }
+  .vs-container { grid-template-columns: 1fr; }
+  .vs-mid { transform: rotate(90deg); padding: 12px; }
+  .ai-flow { flex-direction: column; }
+  .ai-arrow { transform: rotate(90deg); width: auto; height: 32px; }
+  .roi-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    <span class="logo-text">INTELSA</span>
+    <span class="sep">|</span>
+    <span class="client">Mundo Yamaha</span>
+  </div>
+  <div class="nav-links">
+    <a href="#resumen" class="active">Resumen</a>
+    <a href="#funnel">Funnel</a>
+    <a href="#sedes">Sedes</a>
+    <a href="#gaps">Gaps</a>
+    <a href="#modelo">Modelo IA</a>
+    <a href="#simulador">Simulador ROI</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="resumen">
+  <div class="hero-eyebrow">Diagnóstico de gestión de leads · Mayo 2026</div>
+  <h1>Mundo Yamaha genera <span>5,535 leads al mes.</span> Solo convierte el 2.2%.</h1>
+  <p class="hero-sub">El problema no es la generación de demanda — es lo que pasa entre el clic y el cierre. Cada punto porcentual de mejora equivale a ~55 motos adicionales vendidas al mes.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="number">5,535</div>
+      <div class="label">Leads / mes</div>
+    </div>
+    <div class="hero-stat">
+      <div class="number orange">121</div>
+      <div class="label">Ventas cerradas</div>
+    </div>
+    <div class="hero-stat">
+      <div class="number red">2.2%</div>
+      <div class="label">Tasa de conversión</div>
+    </div>
+    <div class="hero-stat">
+      <div class="number">21</div>
+      <div class="label">Campañas activas</div>
+    </div>
+    <div class="hero-stat">
+      <div class="number">7</div>
+      <div class="label">Sedes / equipos</div>
+    </div>
+  </div>
+</section>
+
+<!-- FUNNEL -->
+<section class="section" id="funnel">
+  <div class="reveal">
+    <div class="section-tag">Análisis de funnel</div>
+    <div class="section-title">El embudo tiene fugas en la mitad</div>
+    <div class="section-subtitle">Con 21 campañas activas en Meta (WhatsApp, Cotizar, Contacto), la generación funciona. La pérdida está en la gestión: un 37% de los leads caen en asesores que no convierten.</div>
+  </div>
+  <div class="funnel reveal">
+    <div class="funnel-step">
+      <span class="funnel-label">Impresiones Meta</span>
+      <div class="funnel-bar-track"><div class="funnel-bar" style="width:100%;background:var(--orange)">~250K–400K est.</div></div>
+      <span class="funnel-meta">21 anuncios activos</span>
+    </div>
+    <div class="funnel-step">
+      <span class="funnel-label">Clics / tráfico</span>
+      <div class="funnel-bar-track"><div class="funnel-bar" style="width:52%;background:var(--orange-dark)">~15K–25K est.</div></div>
+      <span class="funnel-meta">CTR estimado 4–6%</span>
+    </div>
+    <div class="funnel-step">
+      <span class="funnel-label">Leads generados</span>
+      <div class="funnel-bar-track"><div class="funnel-bar" style="width:26%;background:#c46020">5,535</div></div>
+      <span class="funnel-meta">Dato real mayo 2026</span>
+    </div>
+    <div class="funnel-step">
+      <span class="funnel-label">Leads contactados</span>
+      <div class="funnel-bar-track"><div class="funnel-bar" style="width:16%;background:var(--gray-400)">~3,489 est. (63%)</div></div>
+      <span class="funnel-meta" style="color:var(--red);font-weight:600">37% sin gestión efectiva</span>
+    </div>
+    <div class="funnel-step">
+      <span class="funnel-label">Ventas cerradas</span>
+      <div class="funnel-bar-track"><div class="funnel-bar" style="width:4%;background:var(--green);min-width:60px">121</div></div>
+      <span class="funnel-meta" style="color:var(--red);font-weight:700">2.2% del total de leads</span>
+    </div>
+  </div>
+</section>
+
+<!-- SEDES -->
+<section class="section section-alt" id="sedes">
+  <div class="reveal">
+    <div class="section-tag">Performance por sede</div>
+    <div class="section-title">La conversión varía 5x entre sedes</div>
+    <div class="section-subtitle">Guayabal convierte al 5.0% mientras San Juan está en 0.0% con 785 leads. La distribución actual no está optimizada.</div>
+  </div>
+
+  <div class="reveal">
+    <div class="legend-row">
+      <span><span class="legend-dot" style="background:var(--orange)"></span> Leads</span>
+      <span><span class="legend-dot" style="background:var(--green)"></span> Ventas</span>
+    </div>
+    <div>
+      <div class="sede-row">
+        <span class="sede-name">Bello</span>
+        <div class="sede-bar-wrap"><div class="sede-bar" style="width:100%;background:var(--orange)">1,591</div></div>
+        <div class="sede-stats"><span class="v">31 ventas</span><span class="rate mid">1.9%</span></div>
+      </div>
+      <div class="sede-row">
+        <span class="sede-name">Digital</span>
+        <div class="sede-bar-wrap"><div class="sede-bar" style="width:76%;background:var(--orange)">1,212</div></div>
+        <div class="sede-stats"><span class="v">35 ventas</span><span class="rate mid">2.9%</span></div>
+      </div>
+      <div class="sede-row">
+        <span class="sede-name" style="color:var(--red)">San Juan</span>
+        <div class="sede-bar-wrap"><div class="sede-bar" style="width:49%;background:var(--red)">785</div></div>
+        <div class="sede-stats"><span class="v">0 ventas</span><span class="rate bad">0.0%</span></div>
+      </div>
+      <div class="sede-row">
+        <span class="sede-name" style="color:var(--green-dark)">Guayabal</span>
+        <div class="sede-bar-wrap"><div class="sede-bar" style="width:42%;background:var(--green)">666</div></div>
+        <div class="sede-stats"><span class="v">33 ventas</span><span class="rate good">5.0%</span></div>
+      </div>
+      <div class="sede-row">
+        <span class="sede-name">La 80</span>
+        <div class="sede-bar-wrap"><div class="sede-bar" style="width:41%;background:var(--orange)">649</div></div>
+        <div class="sede-stats"><span class="v">15 ventas</span><span class="rate mid">2.3%</span></div>
+      </div>
+      <div class="sede-row">
+        <span class="sede-name">Rionegro</span>
+        <div class="sede-bar-wrap"><div class="sede-bar" style="width:25%;background:var(--orange)">397</div></div>
+        <div class="sede-stats"><span class="v">5 ventas</span><span class="rate bad">1.3%</span></div>
+      </div>
+      <div class="sede-row">
+        <span class="sede-name">Ayacucho</span>
+        <div class="sede-bar-wrap"><div class="sede-bar" style="width:15%;background:var(--orange)">235</div></div>
+        <div class="sede-stats"><span class="v">2 ventas</span><span class="rate bad">0.9%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:40px">
+    <div class="section-tag" style="color:var(--green-dark)">Top asesores</div>
+    <div class="section-title" style="font-size:20px">Los mejores demuestran que el potencial existe</div>
+    <div class="top-grid">
+      <div class="top-card"><div class="rank">#1</div><div class="name">Santiago Vanegas</div><div class="loc">Bello · 13 leads</div><div class="stat-row"><div class="stat"><div class="n">3</div><div class="l">Ventas</div></div><div class="stat"><div class="n">23.1%</div><div class="l">Tasa</div></div></div></div>
+      <div class="top-card"><div class="rank">#2</div><div class="name">Andrés Rojas</div><div class="loc">Guayabal · 382 leads</div><div class="stat-row"><div class="stat"><div class="n">30</div><div class="l">Ventas</div></div><div class="stat"><div class="n">7.9%</div><div class="l">Tasa</div></div></div></div>
+      <div class="top-card"><div class="rank">#3</div><div class="name">Daniel Franco</div><div class="loc">La 80 · 152 leads</div><div class="stat-row"><div class="stat"><div class="n">7</div><div class="l">Ventas</div></div><div class="stat"><div class="n">4.6%</div><div class="l">Tasa</div></div></div></div>
+      <div class="top-card"><div class="rank">#4</div><div class="name">Camila Berrio</div><div class="loc">Digital · 155 leads</div><div class="stat-row"><div class="stat"><div class="n">6</div><div class="l">Ventas</div></div><div class="stat"><div class="n">3.9%</div><div class="l">Tasa</div></div></div></div>
+      <div class="top-card"><div class="rank">#5</div><div class="name">Andrea Sánchez</div><div class="loc">La 80 · 94 leads</div><div class="stat-row"><div class="stat"><div class="n">3</div><div class="l">Ventas</div></div><div class="stat"><div class="n">3.2%</div><div class="l">Tasa</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:40px">
+    <div class="section-tag" style="color:var(--red)">Asesores sin conversión</div>
+    <div class="section-title" style="font-size:20px">12 de 33 asesores (36%) cerraron 0 ventas en mayo</div>
+    <p style="font-size:13px;color:var(--dark-light);margin-bottom:16px">Estos asesores gestionaron 2,046 leads sin resultado. Si cada lead costó ~$8,000 COP, representan ~$16.4M en inversión publicitaria sin retorno.</p>
+    <div class="zero-grid">
+      <span class="zero-tag">Andres Zapata · <strong>407 leads</strong></span>
+      <span class="zero-tag">Jhonatan Varela · <strong>223 leads</strong></span>
+      <span class="zero-tag">Yaneth Osorio · <strong>194 leads</strong></span>
+      <span class="zero-tag">Estefania Cardona · <strong>117 leads</strong></span>
+      <span class="zero-tag">Juliana Pajon · <strong>111 leads</strong></span>
+      <span class="zero-tag">Johana Orrego · <strong>94 leads</strong></span>
+      <span class="zero-tag">Fernando Delgado · <strong>91 leads</strong></span>
+      <span class="zero-tag">Lilliany Escalante · <strong>52 leads</strong></span>
+      <span class="zero-tag">Maria A. Acevedo · <strong>44 leads</strong></span>
+      <span class="zero-tag">Bryan Carmona · <strong>35 leads</strong></span>
+      <span class="zero-tag">Juan Rueda · <strong>17 leads</strong></span>
+    </div>
+  </div>
+</section>
+
+<!-- GAPS -->
+<section class="section" id="gaps">
+  <div class="reveal">
+    <div class="section-tag">Gaps operativos</div>
+    <div class="section-title">Cuatro brechas que están costando ventas</div>
+    <div class="section-subtitle">Cada gap representa una oportunidad directa de mejora. Ninguno requiere más presupuesto publicitario — solo mejor gestión del lead existente.</div>
+  </div>
+  <div class="card-grid reveal">
+    <div class="card">
+      <div class="card-icon red">⏱</div>
+      <div class="card-title">Tiempo de respuesta sin SLA</div>
+      <div class="card-desc">21 anuncios activos con CTA directos a WhatsApp y cotización. Sin un equipo BPO dedicado, el tiempo de primer contacto depende de la disponibilidad del asesor en sala. Benchmark de la industria: un lead contactado en menos de 5 minutos convierte 9 veces más que uno contactado después de 30 minutos.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon red">👥</div>
+      <div class="card-title">36% de asesores sin conversión</div>
+      <div class="card-desc">12 de 33 asesores no cerraron ni una venta en mayo, gestionando 2,046 leads. Esto sugiere que el lead está llegando a personas que no tienen el perfil, la disponibilidad o las herramientas para convertirlo. Es el gap con mayor impacto inmediato.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon amber">🔀</div>
+      <div class="card-title">Routing geográfico, no inteligente</div>
+      <div class="card-desc">San Juan recibe 785 leads con 0% de conversión. Guayabal convierte al 5.0%. No hay evidencia de redistribución dinámica de leads entre sedes según capacidad o desempeño. El lead se asigna por ubicación, no por probabilidad de cierre.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon amber">📱</div>
+      <div class="card-title">Canales fragmentados sin trazabilidad</div>
+      <div class="card-desc">WhatsApp, formulario web, teléfono y walk-in coexisten sin un sistema unificado. Sin trazabilidad omnicanal, no hay forma de medir tiempo de respuesta real, tasa de contactabilidad, ni efectividad por canal de entrada.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELO IA -->
+<section class="section section-alt" id="modelo">
+  <div class="reveal">
+    <div class="section-tag">Modelo propuesto</div>
+    <div class="section-title">De gestión reactiva a conversión inteligente</div>
+    <div class="section-subtitle">No reemplazamos el equipo comercial de Mundo Yamaha — lo potenciamos con un layer de IA y un equipo BPO especializado que garantiza que ningún lead se pierda.</div>
+  </div>
+
+  <div class="vs-container reveal">
+    <div class="vs-col current">
+      <div class="vs-tag red">Hoy (estimado)</div>
+      <ul class="vs-list">
+        <li><span class="dot r"></span> Respuesta manual, sin SLA definido</li>
+        <li><span class="dot r"></span> Lead asignado por sede geográfica</li>
+        <li><span class="dot r"></span> Sin scoring ni priorización de leads</li>
+        <li><span class="dot r"></span> Sin seguimiento automatizado post-contacto</li>
+        <li><span class="dot r"></span> Métricas consolidadas de forma manual</li>
+        <li><span class="dot r"></span> 36% de asesores sin resultados</li>
+        <li><span class="dot r"></span> 2.2% conversión global</li>
+      </ul>
+    </div>
+    <div class="vs-mid">→</div>
+    <div class="vs-col proposed">
+      <div class="vs-tag green">Intelsa + IA</div>
+      <ul class="vs-list">
+        <li><span class="dot g"></span> Bot IA en WhatsApp: respuesta en &lt;30 segundos</li>
+        <li><span class="dot g"></span> Lead scoring automático por intención de compra</li>
+        <li><span class="dot g"></span> Routing dinámico al asesor con mejor tasa de cierre</li>
+        <li><span class="dot g"></span> Drip automático por WhatsApp para leads fríos</li>
+        <li><span class="dot g"></span> Dashboard en tiempo real por sede y asesor</li>
+        <li><span class="dot g"></span> 9 agentes Intelsa especializados en calificación</li>
+        <li><span class="dot g"></span> Target: 4–5% conversión (+120% mejora)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:40px">
+    <div class="section-tag" style="color:var(--orange)">Flujo propuesto con IA</div>
+    <div class="ai-flow">
+      <div class="ai-step">
+        <div class="step-num">1</div>
+        <div class="step-title">Lead entra</div>
+        <div class="step-desc">Meta Ad, WhatsApp, web form o llamada</div>
+        <div class="step-time">t = 0 seg</div>
+      </div>
+      <div class="ai-arrow">→</div>
+      <div class="ai-step">
+        <div class="step-num">2</div>
+        <div class="step-title">Bot IA responde</div>
+        <div class="step-desc">Saludo, captura de datos, calificación por intención</div>
+        <div class="step-time">&lt; 30 seg</div>
+      </div>
+      <div class="ai-arrow">→</div>
+      <div class="ai-step">
+        <div class="step-num">3</div>
+        <div class="step-title">Scoring + routing</div>
+        <div class="step-desc">Lead calificado se asigna al mejor asesor disponible</div>
+        <div class="step-time">&lt; 2 min</div>
+      </div>
+      <div class="ai-arrow">→</div>
+      <div class="ai-step">
+        <div class="step-num">4</div>
+        <div class="step-title">Agente Intelsa</div>
+        <div class="step-desc">Contacto humano, agendamiento de visita a sede</div>
+        <div class="step-time">&lt; 5 min</div>
+      </div>
+      <div class="ai-arrow">→</div>
+      <div class="ai-step">
+        <div class="step-num">5</div>
+        <div class="step-title">Follow-up IA</div>
+        <div class="step-desc">Drip automático si no hay cierre, remarketing asistido</div>
+        <div class="step-time">24–72h</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIMULADOR ROI -->
+<section class="section" id="simulador">
+  <div class="reveal">
+    <div class="section-tag">Simulador de ROI</div>
+    <div class="section-title">Ajusta los supuestos y ve el impacto en tiempo real</div>
+    <div class="section-subtitle">Usa los controles para modelar diferentes escenarios con datos reales de mayo 2026. Los valores predeterminados son estimaciones conservadoras de mercado.</div>
+  </div>
+
+  <div class="sim-controls reveal">
+    <div class="sim-row">
+      <label>Costo por lead (COP)</label>
+      <input type="range" min="3000" max="20000" value="8000" step="500" id="s-cpl" oninput="recalc()">
+      <span class="sim-val" id="v-cpl">$8,000</span>
+    </div>
+    <div class="sim-row">
+      <label>Ticket promedio moto (COP)</label>
+      <input type="range" min="5000000" max="30000000" value="10000000" step="500000" id="s-ticket" oninput="recalc()">
+      <span class="sim-val" id="v-ticket">$10.0M</span>
+    </div>
+    <div class="sim-row">
+      <label>Conv. target con Intelsa (%)</label>
+      <input type="range" min="2.5" max="8" value="4.0" step="0.1" id="s-target" oninput="recalc()">
+      <span class="sim-val" id="v-target">4.0%</span>
+    </div>
+  </div>
+
+  <div class="roi-grid reveal">
+    <div class="roi-card">
+      <div class="roi-label">Inversión publicitaria est.</div>
+      <div class="roi-value dk" id="r-ad">$44.3M</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-label">Desperdicio actual</div>
+      <div class="roi-value rd" id="r-waste">$16.4M</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-label">Revenue actual (leads)</div>
+      <div class="roi-value dk" id="r-rev">$1,210M</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-label">Ventas adicionales / mes</div>
+      <div class="roi-value gr" id="r-sales">+100</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-label">Revenue adicional / mes</div>
+      <div class="roi-value gr" id="r-upside">+$1,000M</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-label">ROI multiplier</div>
+      <div class="roi-value or" id="r-roi">22x</div>
+    </div>
+  </div>
+
+  <div class="reveal">
+    <div class="legend-row">
+      <span><span class="legend-dot" style="background:var(--orange)"></span> Ventas actuales</span>
+      <span><span class="legend-dot" style="background:var(--green)"></span> Ventas proyectadas con Intelsa + IA</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="roiChart"></canvas>
+    </div>
+    <p style="font-size:11px;color:var(--gray-400);margin-top:8px;line-height:1.6">
+      Nota: Revenue adicional = (ventas target – ventas actuales) × ticket promedio. ROI = revenue adicional / inversión publicitaria estimada. Los valores del simulador son estimaciones para modelar el caso de negocio; los números finales dependen del CPL real y ticket promedio que confirme Mundo Yamaha.
+    </p>
+  </div>
+
+  <div class="reveal" style="margin-top:40px">
+    <div class="legend-row">
+      <span><span class="legend-dot" style="background:var(--orange)"></span> Ventas actuales</span>
+      <span><span class="legend-dot" style="background:var(--green)"></span> Conversión actual</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="bubbleChart"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>¿Listos para convertir más leads en ventas?</h2>
+  <p>El siguiente paso es una sesión de discovery para mapear el flujo actual y diseñar la operación a medida.</p>
+  <a class="cta-btn" href="#resumen">Agendar sesión de discovery</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>Intelsa BPO & CX · Medellín, Colombia</span>
+  <span>Diagnóstico preparado junio 2026 · Datos de mayo 2026</span>
+</footer>
+
+<script>
+var LEADS = 5535, SALES = 121, WASTE_LEADS = 2046;
+var sedeData = [
+  { name: 'Ayacucho', leads: 235, sales: 2 },
+  { name: 'Rionegro', leads: 397, sales: 5 },
+  { name: 'La 80', leads: 649, sales: 15 },
+  { name: 'San Juan', leads: 785, sales: 0 },
+  { name: 'Guayabal', leads: 666, sales: 33 },
+  { name: 'Digital', leads: 1212, sales: 35 },
+  { name: 'Bello', leads: 1591, sales: 31 }
+];
+
+var barChart = new Chart(document.getElementById('roiChart'), {
+  type: 'bar',
+  data: {
+    labels: sedeData.map(function(s) { return s.name; }),
+    datasets: [
+      { label: 'Ventas actuales', data: sedeData.map(function(s) { return s.sales; }), backgroundColor: '#ff934580', borderColor: '#ff9345', borderWidth: 1, borderRadius: 2 },
+      { label: 'Ventas proyectadas', data: sedeData.map(function(s) { return Math.round(s.leads * 0.04); }), backgroundColor: '#a9d94480', borderColor: '#a9d944', borderWidth: 1, borderRadius: 2 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: 'Poppins', size: 12 } } },
+      y: { title: { display: true, text: 'Ventas / mes', font: { family: 'Poppins', size: 12 } }, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { family: 'Poppins', size: 11 } } }
+    }
+  }
+});
+
+var bubbleChart = new Chart(document.getElementById('bubbleChart'), {
+  type: 'bubble',
+  data: {
+    datasets: [{
+      label: 'Sedes',
+      data: sedeData.map(function(s) {
+        var rate = s.leads > 0 ? (s.sales / s.leads * 100) : 0;
+        return { x: s.leads, y: rate, r: Math.max(6, s.sales / 2), label: s.name };
+      }),
+      backgroundColor: sedeData.map(function(s) {
+        if (s.sales === 0) return '#E24B4A66';
+        var rate = s.sales / s.leads * 100;
+        return rate >= 4 ? '#a9d94466' : '#ff934566';
+      }),
+      borderColor: sedeData.map(function(s) {
+        if (s.sales === 0) return '#E24B4A';
+        var rate = s.sales / s.leads * 100;
+        return rate >= 4 ? '#a9d944' : '#ff9345';
+      }),
+      borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function(c) {
+            var d = c.raw;
+            return d.label + ': ' + d.x.toLocaleString('es-CO') + ' leads, ' + d.y.toFixed(1) + '% conv.';
+          }
+        }
+      }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Leads (mayo)', font: { family: 'Poppins', size: 12 } }, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { family: 'Poppins', size: 11 } } },
+      y: { title: { display: true, text: 'Tasa de conversión (%)', font: { family: 'Poppins', size: 12 } }, min: -0.5, max: 6, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { family: 'Poppins', size: 11 }, callback: function(v) { return v.toFixed(1) + '%'; } } }
+    }
+  },
+  plugins: [{
+    afterDraw: function(chart) {
+      var ctx = chart.ctx;
+      ctx.font = '500 12px Poppins';
+      ctx.fillStyle = '#414c4c';
+      ctx.textAlign = 'center';
+      chart.data.datasets[0].data.forEach(function(d, i) {
+        var meta = chart.getDatasetMeta(0).data[i];
+        if (meta) ctx.fillText(d.label, meta.x, meta.y - d.r - 8);
+      });
+    }
+  }]
+});
+
+function recalc() {
+  var cpl = +document.getElementById('s-cpl').value;
+  var ticket = +document.getElementById('s-ticket').value;
+  var tgt = +document.getElementById('s-target').value;
+
+  document.getElementById('v-cpl').textContent = '$' + cpl.toLocaleString('es-CO');
+  document.getElementById('v-ticket').textContent = '$' + (ticket / 1e6).toFixed(1) + 'M';
+  document.getElementById('v-target').textContent = tgt.toFixed(1) + '%';
+
+  var adSpend = LEADS * cpl;
+  var waste = WASTE_LEADS * cpl;
+  var revCurrent = SALES * ticket;
+  var tgtSales = Math.round(LEADS * (tgt / 100));
+  var addSales = Math.max(0, tgtSales - SALES);
+  var addRev = addSales * ticket;
+  var roi = adSpend > 0 ? Math.round(addRev / adSpend) : 0;
+
+  document.getElementById('r-ad').textContent = '$' + (adSpend / 1e6).toFixed(1) + 'M';
+  document.getElementById('r-waste').textContent = '$' + (waste / 1e6).toFixed(1) + 'M';
+  document.getElementById('r-rev').textContent = '$' + (revCurrent / 1e6).toFixed(0) + 'M';
+  document.getElementById('r-sales').textContent = '+' + addSales;
+  document.getElementById('r-upside').textContent = '+$' + (addRev / 1e6).toFixed(0) + 'M';
+  document.getElementById('r-roi').textContent = roi + 'x';
+
+  var projected = sedeData.map(function(s) { return Math.round(s.leads * (tgt / 100)); });
+  barChart.data.datasets[1].data = projected;
+  barChart.update();
+}
+
+recalc();
+
+// NAV ACTIVE STATE
+var sections = document.querySelectorAll('section[id]');
+var navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', function() {
+  var scrollY = window.pageYOffset;
+  sections.forEach(function(sec) {
+    var top = sec.offsetTop - 80;
+    var bottom = top + sec.offsetHeight;
+    var id = sec.getAttribute('id');
+    if (scrollY >= top && scrollY < bottom) {
+      navLinks.forEach(function(a) {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === '#' + id) a.classList.add('active');
+      });
+    }
+  });
+});
+
+// SCROLL REVEAL
+var reveals = document.querySelectorAll('.reveal');
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(function(el) { observer.observe(el); });
+</script>
+
+</body>
+</html>
