@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de precio por reunión · Intelsa para Lulo Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #ff9345;
+  --orange-soft: #fff2e8;
+  --orange-line: #ffd9bf;
+  --green: #a9d944;
+  --green-soft: #eef7d6;
+  --dark: #414c4c;
+  --dark-soft: #6b7676;
+  --dark-softer: #9ba5a5;
+  --line: #e5e7e7;
+  --bg: #ffffff;
+  --bg-alt: #fafbfb;
+  --radius: 3px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  color: var(--dark);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* ========== ACCESS GATE ========== */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: linear-gradient(135deg, #414c4c 0%, #2d3535 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+.gate-box {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 48px 44px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.gate-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--dark);
+  margin-bottom: 32px;
+}
+.gate-brand svg { width: 36px; height: 36px; }
+.gate-eyebrow {
+  display: inline-block;
+  font-size: 10px; font-weight: 600;
+  color: var(--orange);
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 5px 12px;
+  background: var(--orange-soft);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+.gate-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.gate-desc {
+  font-size: 13px;
+  color: var(--dark-soft);
+  margin-bottom: 32px;
+}
+.gate-input-wrap { margin-bottom: 16px; }
+.gate-input {
+  width: 100%;
+  padding: 14px 18px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: var(--dark);
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color 0.15s;
+  margin-bottom: 10px;
+}
+.gate-input:focus {
+  border-color: var(--orange);
+  background: #fff;
+}
+.gate-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.gate-btn:hover { background: #f08535; }
+.gate-error {
+  font-size: 12px;
+  color: #d64545;
+  margin-top: 12px;
+  min-height: 16px;
+}
+.gate-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--dark-softer);
+}
+
+/* ========== CONTENT ========== */
+.content { display: none; padding: 56px 32px; }
+.content.unlocked { display: block; }
+.container { max-width: 1240px; margin: 0 auto; }
+
+/* Header */
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 48px;
+}
+.brand { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 20px; color: var(--dark); }
+.brand-mark { width: 36px; height: 36px; }
+.doc-meta { text-align: right; font-size: 12px; color: var(--dark-soft); }
+.doc-meta strong { color: var(--dark); font-weight: 500; display: block; margin-bottom: 4px; font-size: 13px; }
+
+/* Intro */
+.eyebrow {
+  display: inline-block;
+  font-size: 11px; font-weight: 600;
+  color: var(--orange);
+  letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 20px;
+  padding: 6px 14px;
+  background: var(--orange-soft);
+  border-radius: var(--radius);
+}
+h1 {
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--dark);
+  margin-bottom: 16px;
+}
+h1 .accent { color: var(--orange); }
+.lead { font-size: 16px; color: var(--dark-soft); max-width: 780px; margin-bottom: 48px; }
+
+/* Video section */
+.video-section {
+  margin-bottom: 56px;
+  background: var(--dark);
+  border-radius: var(--radius);
+  padding: 40px;
+}
+.video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.video-title {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+}
+.video-subtitle {
+  color: rgba(255,255,255,0.65);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.video-badge {
+  padding: 6px 14px;
+  background: rgba(255,147,69,0.15);
+  color: var(--orange);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+}
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: #000;
+}
+.video-wrapper iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}
+.video-placeholder {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2d3535 0%, #414c4c 100%);
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+}
+.video-placeholder svg { width: 64px; height: 64px; margin-bottom: 16px; }
+.video-placeholder-text { font-size: 14px; font-weight: 500; }
+
+/* Calculator grid */
+.calc-wrap {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+.calc-panel {
+  background: var(--bg-alt);
+  border-radius: var(--radius);
+  padding: 40px;
+  border: 1px solid var(--line);
+}
+.calc-panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dark-soft);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.control-group { margin-bottom: 32px; }
+.control-group:last-child { margin-bottom: 0; }
+.control-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  color: var(--dark);
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+.control-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--orange);
+  font-variant-numeric: tabular-nums;
+}
+
+.model-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.model-btn {
+  padding: 16px 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--dark-soft);
+  transition: all 0.15s;
+  text-align: center;
+}
+.model-btn:hover { border-color: var(--orange-line); background: var(--orange-soft); }
+.model-btn.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+.model-btn strong { display: block; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.model-btn small { display: block; font-size: 11px; opacity: 0.8; }
+
+.slider-wrap { position: relative; }
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius);
+  background: var(--line);
+  outline: none;
+  cursor: pointer;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--orange);
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(255,147,69,0.4);
+  transition: transform 0.1s;
+}
+.slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+.slider::-moz-range-thumb {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--orange);
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(255,147,69,0.4);
+}
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--dark-soft);
+}
+.slider-hint {
+  font-size: 11px;
+  color: var(--dark-soft);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+.result-panel {
+  background: var(--dark);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.result-panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.result-hero {
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.result-hero-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 8px;
+}
+.result-hero-value {
+  font-size: 56px;
+  font-weight: 600;
+  color: var(--orange);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 12px;
+  transition: color 0.3s;
+}
+.result-hero-value.green { color: var(--green); }
+.result-hero-suffix {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  margin-top: -4px;
+}
+.result-breakdown { display: grid; gap: 10px; margin-top: 20px; }
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+}
+.result-row.total {
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  font-weight: 600;
+  color: #fff;
+  font-size: 16px;
+}
+.result-row strong { font-variant-numeric: tabular-nums; color: #fff; font-weight: 500; }
+
+/* Value proposition callout */
+.value-callout {
+  background: linear-gradient(135deg, var(--orange) 0%, #f7842d 100%);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+.value-callout h3 { color: #fff; font-size: 22px; font-weight: 600; margin-bottom: 12px; line-height: 1.2; }
+.value-callout p { font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.6; }
+.value-list { list-style: none; }
+.value-list li {
+  padding: 8px 0 8px 24px;
+  position: relative;
+  font-size: 13px;
+  color: rgba(255,255,255,0.95);
+}
+.value-list li:before {
+  content: "";
+  position: absolute;
+  left: 0; top: 15px;
+  width: 12px; height: 2px;
+  background: #fff;
+}
+
+/* Footer */
+.doc-footer {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--dark-soft);
+}
+
+@media (max-width: 900px) {
+  .content { padding: 32px 20px; }
+  h1 { font-size: 30px; }
+  .doc-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+  .doc-meta { text-align: left; }
+  .calc-wrap, .value-callout { grid-template-columns: 1fr; gap: 24px; }
+  .calc-panel, .result-panel { padding: 24px; }
+  .result-hero-value { font-size: 40px; }
+  .model-buttons { grid-template-columns: 1fr; }
+  .video-section { padding: 24px; }
+  .video-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .gate-box { padding: 32px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ ACCESS GATE ============ -->
+<div id="gate" class="gate">
+  <div class="gate-box">
+    <div class="gate-brand">
+      <svg viewBox="0 0 40 40" fill="none">
+        <path d="M6 30 Q6 14 22 14" stroke="#a9d944" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+        <path d="M12 30 Q12 22 20 22" stroke="#ff9345" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <circle cx="10" cy="30" r="2.5" fill="#ff9345"/>
+      </svg>
+      intelsa
+    </div>
+
+    <div class="gate-eyebrow">Documento confidencial</div>
+    <div class="gate-title">Propuesta comercial · Lulo Bank</div>
+    <div class="gate-desc">Ingrese la contraseña compartida por su representante de Intelsa para acceder al documento.</div>
+
+    <div class="gate-input-wrap">
+      <input type="email" id="userEmail" class="gate-input" placeholder="Su correo electrónico" required>
+      <input type="password" id="password" class="gate-input" placeholder="Contraseña de acceso" required>
+    </div>
+    <button class="gate-btn" onclick="unlock()">Acceder a la propuesta</button>
+    <div class="gate-error" id="gateError"></div>
+
+    <div class="gate-footer">
+      Este documento es confidencial y su acceso queda registrado.<br>
+      Óscar Barrera · mdigital@intelsa.co · (+57) 323 828 8269
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONTENT ============ -->
+<div id="content" class="content">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="doc-header">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 40 40" fill="none">
+          <path d="M6 30 Q6 14 22 14" stroke="#a9d944" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+          <path d="M12 30 Q12 22 20 22" stroke="#ff9345" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <circle cx="10" cy="30" r="2.5" fill="#ff9345"/>
+        </svg>
+        intelsa
+      </div>
+      <div class="doc-meta">
+        <strong>Calculadora de precio por reunión</strong>
+        Growth Squad para Lulo Empresas · Julio 2026
+      </div>
+    </div>
+
+    <!-- Intro -->
+    <div>
+      <div class="eyebrow">Propuesta interactiva</div>
+      <h1>Growth Squad para Lulo Bank<br>Modelo económico <span class="accent">interactivo.</span></h1>
+      <p class="lead">
+        Este documento incluye una presentación en video que explica la propuesta completa, y una calculadora en vivo donde puede ajustar los parámetros del modelo y ver el precio por reunión efectiva en tiempo real.
+      </p>
+    </div>
+
+    <!-- Video section -->
+    <div class="video-section" id="videoSection">
+      <div class="video-header">
+        <div>
+          <div class="video-title">Presentación en video</div>
+          <div class="video-subtitle">Óscar Barrera · Growth Manager · Duración estimada 8 minutos</div>
+        </div>
+        <div class="video-badge">Ver primero</div>
+      </div>
+      <div class="video-wrapper">
+        <!-- REEMPLAZAR el src del iframe con el link de Loom, YouTube unlisted o Vimeo -->
+        <div class="video-placeholder" id="videoPlaceholder" onclick="loadVideo()">
+          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="32" cy="32" r="28"/>
+            <path d="M26 22l16 10-16 10z" fill="currentColor"/>
+          </svg>
+          <div class="video-placeholder-text">Reproducir presentación</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calculator -->
+    <div class="calc-wrap">
+
+      <div class="calc-panel">
+        <div class="calc-panel-title">Parámetros</div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Modelo Growth Squad</span>
+            <span class="control-value" id="modelName">Scale</span>
+          </div>
+          <div class="model-buttons">
+            <button class="model-btn" data-model="1"><strong>Básico</strong><small>2 SDR</small></button>
+            <button class="model-btn active" data-model="2"><strong>Scale</strong><small>3 SDR</small></button>
+            <button class="model-btn" data-model="3"><strong>Growth</strong><small>4 SDR</small></button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Reuniones efectivas al mes</span>
+            <span class="control-value" id="meetingsVal">40</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="meetingsSlider" class="slider" min="30" max="50" value="40" step="1">
+            <div class="slider-labels">
+              <span id="minLabel">30 · piso</span>
+              <span id="maxLabel">50 · tope</span>
+            </div>
+          </div>
+          <div class="slider-hint" id="thresholdHint">Piso incluido en fee: 30 reuniones. Variable activa desde la reunión 31.</div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Mezcla champ · decisor</span>
+            <span class="control-value" id="mixVal">60% · 40%</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="mixSlider" class="slider" min="0" max="100" value="60" step="5">
+            <div class="slider-labels">
+              <span>0% champ</span>
+              <span>100% champ</span>
+            </div>
+          </div>
+          <div class="slider-hint">El champ es más frecuente y más económico. El decisor es más denso y vale 2,2x.</div>
+        </div>
+      </div>
+
+      <div class="result-panel">
+        <div>
+          <div class="result-panel-title">Resultado en vivo</div>
+          <div class="result-hero">
+            <div class="result-hero-label">Precio por reunión efectiva</div>
+            <div class="result-hero-value" id="pricePerMeeting">$653.000</div>
+            <div class="result-hero-suffix">COP por reunión realizada · con show comprobado</div>
+          </div>
+          <div class="result-breakdown">
+            <div class="result-row">
+              <span>Fee base mensual</span>
+              <strong id="feeVal">$22.500.000</strong>
+            </div>
+            <div class="result-row">
+              <span>Reuniones sobre el piso</span>
+              <strong id="overFloorVal">10 reuniones</strong>
+            </div>
+            <div class="result-row">
+              <span>Comisión variable</span>
+              <strong id="variableVal">$3.625.000</strong>
+            </div>
+            <div class="result-row total">
+              <span>Facturación mensual total</span>
+              <strong id="totalVal">$26.125.000</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Value proposition -->
+    <div class="value-callout">
+      <div>
+        <h3>Más que agendamiento. Una operación completa con trazabilidad certificada.</h3>
+        <p>Cada peso invertido cubre un stack tecnológico, un equipo con especialidades verticales y un sistema de gestión que ninguna agencia de appointment setting puede replicar.</p>
+      </div>
+      <div>
+        <ul class="value-list">
+          <li>Data Marshal dedicado con Apollo, Clay e Informa Colombia</li>
+          <li>Dashboard en vivo con acceso permanente del cliente</li>
+          <li>ISO 27001 vigente para tratamiento de datos financieros</li>
+          <li>Grabación total de llamadas con auditoría abierta</li>
+          <li>Diferenciación champ vs decisor única en el mercado local</li>
+          <li>Tope máximo de facturación pactado por contrato</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="doc-footer">
+      <div>Óscar Barrera · Business Development · mdigital@intelsa.co · (+57) 323 828 8269</div>
+      <div>Intelsa BPO and CX · Medellín, Colombia</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  /* ============================================================
+     CONFIGURACIÓN
+     Reemplace estos valores antes de compartir el enlace.
+     ============================================================ */
+  const CONFIG = {
+    // Contraseña para acceder al documento
+    accessPassword: "LULO2026",
+
+    // Dominio permitido para el acceso (Opción 2)
+    allowedDomain: "@lulobank.com",
+
+    // Webhook de Make.com (o Zapier) donde se registran los eventos
+    // Cree un webhook en https://make.com y pegue la URL aquí
+    trackingWebhook: "https://hook.us1.make.com/REEMPLAZAR_CON_SU_WEBHOOK",
+
+    // URL del video (Loom, YouTube unlisted, Vimeo)
+    // Ejemplo Loom: https://www.loom.com/embed/ABC123
+    // Ejemplo YouTube: https://www.youtube.com/embed/ABC123?rel=0
+    videoUrl: "https://www.loom.com/embed/REEMPLAZAR_CON_SU_VIDEO",
+
+    // Identificador de este documento (útil si envía varios)
+    documentId: "lulo-bank-propuesta-v1"
+  };
+
+  /* ============================================================
+     MODELOS ECONÓMICOS
+     ============================================================ */
+  const MODELS = {
+    1: { name: "Básico", sdrs: 2, fee: 17000000, commChamp: 250000, commDecisor: 550000, floor: 20, max: 35, capVar: 12500000 },
+    2: { name: "Scale", sdrs: 3, fee: 22500000, commChamp: 225000, commDecisor: 500000, floor: 30, max: 50, capVar: 15000000 },
+    3: { name: "Growth", sdrs: 4, fee: 27500000, commChamp: 200000, commDecisor: 450000, floor: 45, max: 65, capVar: 17500000 }
+  };
+
+  let state = { model: 2, meetings: 40, mixChamp: 60 };
+  let session = { email: null, startTime: null, unlockedAt: null };
+
+  /* ============================================================
+     TRACKING
+     ============================================================ */
+  function track(eventName, extraData = {}) {
+    if (!CONFIG.trackingWebhook || CONFIG.trackingWebhook.includes("REEMPLAZAR")) return;
+
+    const payload = {
+      event: eventName,
+      documentId: CONFIG.documentId,
+      email: session.email,
+      timestamp: new Date().toISOString(),
+      timeOnPageSeconds: session.startTime ? Math.round((Date.now() - session.startTime) / 1000) : null,
+      userAgent: navigator.userAgent,
+      referrer: document.referrer,
+      screenSize: window.innerWidth + "x" + window.innerHeight,
+      ...extraData
+    };
+
+    fetch(CONFIG.trackingWebhook, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true
+    }).catch(() => {}); // Silent fail para no bloquear la experiencia
+  }
+
+  /* ============================================================
+     ACCESS GATE
+     ============================================================ */
+  function unlock() {
+    const emailInput = document.getElementById('userEmail');
+    const passwordInput = document.getElementById('password');
+    const errorEl = document.getElementById('gateError');
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !email.includes("@")) {
+      errorEl.textContent = "Ingrese un correo electrónico válido.";
+      return;
+    }
+
+    // Validación por dominio (Opción 2)
+    if (CONFIG.allowedDomain && !email.toLowerCase().endsWith(CONFIG.allowedDomain.toLowerCase())) {
+      errorEl.textContent = `Acceso permitido únicamente para correos ${CONFIG.allowedDomain}`;
+      track("access_denied_domain", { attemptedEmail: email });
+      return;
+    }
+
+    if (password !== CONFIG.accessPassword) {
+      errorEl.textContent = "Contraseña incorrecta.";
+      track("access_denied", { attemptedEmail: email });
+      return;
+    }
+
+    // Access granted
+    session.email = email;
+    session.unlockedAt = new Date().toISOString();
+    session.startTime = Date.now();
+
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('content').classList.add('unlocked');
+
+    track("document_opened", { email });
+  }
+
+  // Permitir enter en el password
+  document.getElementById('password').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') unlock();
+  });
+  document.getElementById('userEmail').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') unlock();
+  });
+
+  /* ============================================================
+     VIDEO
+     ============================================================ */
+  function loadVideo() {
+    const wrapper = document.querySelector('.video-wrapper');
+    const iframe = document.createElement('iframe');
+    iframe.src = CONFIG.videoUrl + (CONFIG.videoUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+    iframe.allow = "autoplay; fullscreen";
+    iframe.allowFullscreen = true;
+    wrapper.innerHTML = '';
+    wrapper.appendChild(iframe);
+    track("video_played");
+  }
+
+  /* ============================================================
+     CALCULADORA
+     ============================================================ */
+  function formatMoney(amount) {
+    return '$' + Math.round(amount).toLocaleString('es-CO').replace(/,/g, '.');
+  }
+
+  function calculate() {
+    const m = MODELS[state.model];
+    const overFloor = Math.max(0, state.meetings - m.floor);
+    const champMeet = overFloor * (state.mixChamp / 100);
+    const decisorMeet = overFloor * ((100 - state.mixChamp) / 100);
+    const commission = (champMeet * m.commChamp) + (decisorMeet * m.commDecisor);
+    const cappedVariable = Math.min(commission, m.capVar);
+    const total = m.fee + cappedVariable;
+    const pricePerMeeting = total / state.meetings;
+
+    document.getElementById('feeVal').textContent = formatMoney(m.fee);
+    document.getElementById('overFloorVal').textContent = overFloor + ' reuniones';
+    document.getElementById('variableVal').textContent = formatMoney(cappedVariable);
+    document.getElementById('totalVal').textContent = formatMoney(total);
+    document.getElementById('pricePerMeeting').textContent = formatMoney(pricePerMeeting);
+    document.getElementById('modelName').textContent = m.name;
+
+    const heroEl = document.getElementById('pricePerMeeting');
+    heroEl.className = pricePerMeeting < 700000 ? 'result-hero-value green' : 'result-hero-value';
+  }
+
+  function updateModel(modelId) {
+    state.model = parseInt(modelId);
+    const m = MODELS[state.model];
+
+    const slider = document.getElementById('meetingsSlider');
+    slider.min = m.floor;
+    slider.max = m.max;
+    const midPoint = Math.round((m.floor + m.max) / 2);
+    slider.value = midPoint;
+    state.meetings = midPoint;
+    document.getElementById('meetingsVal').textContent = midPoint;
+    document.getElementById('minLabel').textContent = m.floor + ' · piso';
+    document.getElementById('maxLabel').textContent = m.max + ' · tope';
+    document.getElementById('thresholdHint').textContent = 'Piso incluido en fee: ' + m.floor + ' reuniones. Variable activa desde la reunión ' + (m.floor + 1) + '.';
+
+    document.querySelectorAll('.model-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.model) === state.model);
+    });
+
+    calculate();
+    track("model_changed", { model: m.name });
+  }
+
+  function updateMeetings() {
+    state.meetings = parseInt(document.getElementById('meetingsSlider').value);
+    document.getElementById('meetingsVal').textContent = state.meetings;
+    calculate();
+  }
+
+  function updateMix() {
+    state.mixChamp = parseInt(document.getElementById('mixSlider').value);
+    document.getElementById('mixVal').textContent = state.mixChamp + '% · ' + (100 - state.mixChamp) + '%';
+    calculate();
+  }
+
+  // Event listeners
+  document.querySelectorAll('.model-btn').forEach(btn => {
+    btn.addEventListener('click', () => updateModel(btn.dataset.model));
+  });
+  document.getElementById('meetingsSlider').addEventListener('input', updateMeetings);
+  document.getElementById('mixSlider').addEventListener('input', updateMix);
+
+  // Debounce para el tracking de calculadora
+  let calcTrackTimer;
+  ['meetingsSlider', 'mixSlider'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      clearTimeout(calcTrackTimer);
+      calcTrackTimer = setTimeout(() => {
+        track("calculator_adjusted", { 
+          model: MODELS[state.model].name, 
+          meetings: state.meetings, 
+          mixChamp: state.mixChamp 
+        });
+      }, 1000);
+    });
+  });
+
+  // Track cuando el usuario se va (con tiempo total)
+  window.addEventListener('beforeunload', () => {
+    if (session.startTime) {
+      track("session_ended", { 
+        totalTimeSeconds: Math.round((Date.now() - session.startTime) / 1000) 
+      });
+    }
+  });
+
+  // Track cuando llega al final del documento
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        track("scrolled_to_bottom");
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.5 });
+  
+  // Esperar a que se desbloquee para observar
+  const checkUnlock = setInterval(() => {
+    const footer = document.querySelector('.doc-footer');
+    if (footer && document.getElementById('content').classList.contains('unlocked')) {
+      observer.observe(footer);
+      clearInterval(checkUnlock);
+    }
+  }, 500);
+
+  calculate();
+</script>
+
+</body>
+</html>
