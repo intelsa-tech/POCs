@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>B2B Content Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .log-box { font-family: 'Courier New', monospace; }
+    .step-pulse { animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+    pre { white-space: pre-wrap; word-break: break-word; }
+    .expandable { max-height: 300px; overflow-y: auto; position: relative; }
+    .expandable.expanded { max-height: none; }
+    .expand-btn { cursor: pointer; text-align: center; padding: 6px; border-top: 1px solid #e2e8f0; margin-top: 8px; }
+    .tab-active { border-color: rgb(99 102 241); color: rgb(99 102 241); background: rgb(238 242 255); }
+    .nav-active { background: rgb(238 242 255); color: rgb(99 102 241); font-weight: 600; }
+    .cache-badge { background: #dcfce7; color: #166534; font-size: 10px; padding: 1px 6px; border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<!-- ── Header ──────────────────────────────────────────────────────────────── -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-10">
+  <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-slate-900 leading-tight">B2B Content Generator</h1>
+        <p class="text-xs text-slate-500">Intelsa · Keyword Research → Copy → Webflow</p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="showView('generator')" id="nav-generator"
+        class="px-3 py-1.5 text-xs font-medium rounded-lg transition nav-active">
+        Generar
+      </button>
+      <button onclick="showView('history')" id="nav-history"
+        class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 rounded-lg transition">
+        Historial
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-6 py-8 space-y-6">
+
+<!-- ── Vista: Generador ──────────────────────────────────────────────────── -->
+<div id="view-generator">
+
+  <!-- ── Formulario ────────────────────────────────────────────────────────── -->
+  <section id="form-section" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <h2 class="text-base font-semibold text-slate-800 mb-5">Configurar generación de contenido</h2>
+    <form id="pipeline-form" class="space-y-5">
+
+      <!-- Tema -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Tema / Servicio / Industria</label>
+        <input id="topic" type="text" required
+          placeholder="ej: Generación de Demanda B2B, SaaS, Cómo generar más leads en 2025…"
+          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+
+      <!-- Tipo de página -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Tipo de página</label>
+        <div class="flex gap-3">
+          <label class="flex-1 cursor-pointer">
+            <input type="radio" name="page_type" value="service" checked class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-xl p-3 text-center transition">
+              <div class="text-xl mb-1">🏢</div>
+              <div class="text-xs font-semibold text-slate-700">Servicios</div>
+              <div class="text-xs text-slate-400 mt-0.5">Hero, Pain Points, CTA</div>
+            </div>
+          </label>
+          <label class="flex-1 cursor-pointer">
+            <input type="radio" name="page_type" value="industry" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-xl p-3 text-center transition">
+              <div class="text-xl mb-1">🏭</div>
+              <div class="text-xs font-semibold text-slate-700">Industrias</div>
+              <div class="text-xs text-slate-400 mt-0.5">Vertical, Casos de uso</div>
+            </div>
+          </label>
+          <label class="flex-1 cursor-pointer">
+            <input type="radio" name="page_type" value="blog" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-xl p-3 text-center transition">
+              <div class="text-xl mb-1">✍️</div>
+              <div class="text-xs font-semibold text-slate-700">Blog</div>
+              <div class="text-xs text-slate-400 mt-0.5">SEO, Secciones, CTA interno</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Mercado objetivo -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Mercado objetivo</label>
+        <input id="target_market" type="text"
+          value="empresas B2B medianas y grandes (100-5000 empleados)"
+          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      </div>
+
+      <!-- Idioma de salida -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Idioma del output</label>
+        <div class="flex gap-2 flex-wrap">
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="es" checked class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇨🇴 Español
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="en" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇺🇸 English
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="pt" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇧🇷 Português
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="fr" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇫🇷 Français
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="output_language" value="de" class="sr-only peer" />
+            <div class="border-2 border-slate-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 rounded-lg px-4 py-1.5 text-xs font-semibold text-slate-600 peer-checked:text-indigo-700 transition">
+              🇩🇪 Deutsch
+            </div>
+          </label>
+        </div>
+        <p class="text-xs text-slate-400 mt-1.5">El copy completo (títulos, CTAs, FAQs) se genera en el idioma seleccionado</p>
+      </div>
+
+      <!-- Contexto empresa -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">
+          Datos reales disponibles
+          <span class="text-slate-400 font-normal">(opcional)</span>
+        </label>
+        <textarea id="company_context" rows="3"
+          placeholder="Métricas reales, casos de éxito, testimoniales, diferenciadores específicos del servicio…"
+          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+        <p class="text-xs text-slate-400 mt-1">Estos datos reales se usan en el copy — el modelo nunca inventará estadísticas</p>
+      </div>
+
+      <!-- Opciones avanzadas -->
+      <details class="group">
+        <summary class="cursor-pointer text-sm text-indigo-600 font-medium flex items-center gap-1 select-none">
+          <svg class="w-4 h-4 transition group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+          Opciones avanzadas
+        </summary>
+        <div class="mt-4 space-y-4 pl-5 border-l-2 border-slate-100">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Webflow Site ID</label>
+              <input id="site_id" type="text" placeholder="Dejar vacío → usa .env"
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Collection ID</label>
+              <input id="collection_id" type="text" placeholder="Dejar vacío → usa .env por tipo"
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">
+              Template Item ID
+              <span class="font-normal text-slate-400 ml-1">— ID del item de Webflow cuyo diseño se replicará</span>
+            </label>
+            <input id="template_item_id" type="text" placeholder="Dejar vacío → usa .env por tipo (WEBFLOW_TEMPLATE_ITEM_ID_SERVICE / _INDUSTRY / _BLOG)"
+              class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div class="flex flex-wrap gap-5">
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input id="skip_upload" type="checkbox" class="w-4 h-4 rounded text-indigo-600" />
+              <span class="text-sm text-slate-700">Omitir upload a Webflow</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input id="skip_review" type="checkbox" class="w-4 h-4 rounded text-indigo-600" />
+              <span class="text-sm text-slate-700">Omitir revisión humana</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input id="auto_publish" type="checkbox" class="w-4 h-4 rounded text-indigo-600" />
+              <span class="text-sm text-slate-700">Auto-publicar en Webflow</span>
+            </label>
+          </div>
+        </div>
+      </details>
+
+      <!-- Submit -->
+      <div class="pt-2">
+        <button type="submit" id="submit-btn"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-3 px-6 rounded-xl transition text-sm flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Generar Contenido
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ── Panel de Progreso ─────────────────────────────────────────────────── -->
+  <section id="progress-section" class="hidden fade-in">
+
+    <!-- Steps -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-4">
+      <h3 class="text-sm font-semibold text-slate-700 mb-4">Progreso del Pipeline</h3>
+      <div class="flex items-start gap-0">
+
+        <!-- Step 1 -->
+        <div class="flex flex-col items-center flex-1">
+          <div id="s1-icon" class="w-9 h-9 rounded-full border-2 border-slate-200 flex items-center justify-center text-slate-400 text-sm font-bold transition">1</div>
+          <div class="text-xs text-slate-500 mt-2 text-center font-medium" id="s1-label">Keyword<br/>Research</div>
+          <div id="s1-tokens" class="text-xs text-slate-400 mt-1 text-center"></div>
+        </div>
+        <div class="flex-1 h-0.5 bg-slate-200 mt-4" id="line-1"></div>
+
+        <!-- Step 2 -->
+        <div class="flex flex-col items-center flex-1">
+          <div id="s2-icon" class="w-9 h-9 rounded-full border-2 border-slate-200 flex items-center justify-center text-slate-400 text-sm font-bold transition">2</div>
+          <div class="text-xs text-slate-500 mt-2 text-center font-medium">Copy<br/>Writing</div>
+          <div id="s2-tokens" class="text-xs text-slate-400 mt-1 text-center"></div>
+        </div>
+        <div class="flex-1 h-0.5 bg-slate-200 mt-4" id="line-2"></div>
+
+        <!-- Review -->
+        <div class="flex flex-col items-center flex-1">
+          <div id="sr-icon" class="w-9 h-9 rounded-full border-2 border-slate-200 flex items-center justify-center text-slate-400 text-sm transition">👁</div>
+          <div class="text-xs text-slate-500 mt-2 text-center font-medium">Revisión<br/>Humana</div>
+        </div>
+        <div class="flex-1 h-0.5 bg-slate-200 mt-4" id="line-3"></div>
+
+        <!-- Step 3 -->
+        <div class="flex flex-col items-center flex-1">
+          <div id="s3-icon" class="w-9 h-9 rounded-full border-2 border-slate-200 flex items-center justify-center text-slate-400 text-sm font-bold transition">3</div>
+          <div class="text-xs text-slate-500 mt-2 text-center font-medium">Webflow<br/>Upload</div>
+          <div id="s3-tokens" class="text-xs text-slate-400 mt-1 text-center"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Preview del último paso -->
+    <div id="step-preview" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-4 fade-in">
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide" id="preview-label">Preview</h4>
+        <button onclick="toggleExpand('preview-content')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Expandir / Contraer</button>
+      </div>
+      <pre id="preview-content" class="text-xs text-slate-700 log-box expandable"></pre>
+    </div>
+
+  </section>
+
+  <!-- ── Panel de Revisión Humana ──────────────────────────────────────────── -->
+  <section id="review-section" class="hidden fade-in">
+    <div class="bg-white rounded-2xl border-2 border-amber-400 shadow-sm overflow-hidden">
+
+      <!-- Header -->
+      <div class="bg-amber-50 px-6 py-4 border-b border-amber-200 flex items-center gap-3">
+        <div class="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center text-white font-bold">!</div>
+        <div>
+          <h3 class="font-semibold text-amber-900">Revisión Humana Requerida</h3>
+          <p class="text-xs text-amber-700">Revisa el copy generado antes de subirlo a Webflow</p>
+        </div>
+      </div>
+
+      <!-- Copy preview -->
+      <div class="p-6">
+        <div id="copy-preview-content" class="space-y-4"></div>
+      </div>
+
+      <!-- Botones -->
+      <div class="px-6 pb-6 flex gap-3">
+        <button id="approve-btn"
+          class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Aprobar y subir a Webflow
+        </button>
+        <button id="reject-btn"
+          class="flex-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          Rechazar y detener
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Panel de Resultados ──────────────────────────────────────────────── -->
+  <section id="done-section" class="hidden fade-in">
+    <div id="done-card" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div id="done-icon" class="w-10 h-10 rounded-full flex items-center justify-center text-xl">✅</div>
+        <div>
+          <h3 id="done-title" class="font-semibold text-slate-900">Pipeline Completado</h3>
+          <p id="done-message" class="text-sm text-slate-500"></p>
+        </div>
+      </div>
+
+      <!-- Tabs de contenido -->
+      <div id="result-tabs" class="hidden mb-4">
+        <div class="flex border-b border-slate-200 gap-1 mb-4">
+          <button onclick="switchTab('tab-article')" id="btn-tab-article"
+            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 rounded-t-lg transition tab-active">
+            📝 Artículo / Copy
+          </button>
+          <button onclick="switchTab('tab-keywords')" id="btn-tab-keywords"
+            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 rounded-t-lg transition">
+            🔍 Keywords
+          </button>
+          <button onclick="switchTab('tab-webflow')" id="btn-tab-webflow"
+            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 rounded-t-lg transition">
+            🌐 Webflow
+          </button>
+          <button onclick="switchTab('tab-html')" id="btn-tab-html"
+            class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 rounded-t-lg transition">
+            🖥 HTML Preview
+          </button>
+        </div>
+
+        <!-- Tab: Artículo -->
+        <div id="tab-article" class="tab-content">
+          <div id="article-preview-content" class="space-y-4"></div>
+          <div class="mt-4 flex gap-2">
+            <button onclick="downloadJSON('copy')" class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-medium transition">
+              ⬇ Descargar Copy (JSON)
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab: Keywords -->
+        <div id="tab-keywords" class="tab-content hidden">
+          <pre id="keywords-full-content" class="text-xs text-slate-700 bg-slate-50 rounded-lg p-4 log-box max-h-[600px] overflow-y-auto"></pre>
+          <div class="mt-4">
+            <button onclick="downloadJSON('keywords')" class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-medium transition">
+              ⬇ Descargar Keywords (JSON)
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab: Webflow -->
+        <div id="tab-webflow" class="tab-content hidden">
+          <pre id="webflow-full-content" class="text-xs text-slate-700 bg-slate-50 rounded-lg p-4 log-box max-h-[600px] overflow-y-auto"></pre>
+        </div>
+
+        <!-- Tab: HTML Preview -->
+        <div id="tab-html" class="tab-content hidden">
+          <div id="html-preview-actions" class="hidden mb-3 flex gap-2 items-center">
+            <a id="html-open-link" href="#" target="_blank"
+              class="text-xs bg-violet-50 text-violet-700 hover:bg-violet-100 px-3 py-1.5 rounded-lg font-medium transition">
+              🔗 Abrir HTML en nueva pestaña
+            </a>
+            <a id="html-download-link" href="#" download
+              class="text-xs bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-medium transition">
+              ⬇ Descargar HTML
+            </a>
+            <span class="text-xs text-slate-400">Preview temporal hasta configurar Webflow Collections</span>
+          </div>
+          <iframe id="html-preview-frame"
+            class="w-full rounded-xl border border-slate-200 bg-white"
+            style="height:680px;display:none;"
+            sandbox="allow-same-origin">
+          </iframe>
+          <p id="html-preview-placeholder" class="text-sm text-slate-400 p-4">El HTML se generará al completar el paso de Copy.</p>
+        </div>
+      </div>
+
+      <div id="outputs-list" class="hidden mt-4">
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Archivos generados (en outputs/)</h4>
+        <ul id="outputs-items" class="space-y-1"></ul>
+      </div>
+
+      <!-- Nueva generación -->
+      <button id="new-btn"
+        class="mt-5 w-full border border-indigo-300 text-indigo-600 hover:bg-indigo-50 font-medium py-2.5 rounded-xl transition text-sm">
+        + Generar nuevo contenido
+      </button>
+    </div>
+  </section>
+
+</div> <!-- end view-generator -->
+
+<!-- ── Vista: Historial ──────────────────────────────────────────────────── -->
+<div id="view-history" class="hidden">
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-base font-semibold text-slate-800">Historial de generaciones</h2>
+      <div class="flex items-center gap-2">
+        <div id="stats-badge" class="text-xs text-slate-500"></div>
+        <button onclick="loadHistory()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">↻ Actualizar</button>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex gap-2 mb-4 flex-wrap">
+      <select id="filter-page-type" onchange="loadHistory()" class="text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        <option value="">Todos los tipos</option>
+        <option value="service">Servicios</option>
+        <option value="industry">Industrias</option>
+        <option value="blog">Blog</option>
+      </select>
+      <select id="filter-status" onchange="loadHistory()" class="text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        <option value="">Todos los status</option>
+        <option value="draft">Draft</option>
+        <option value="approved">Aprobado</option>
+        <option value="published">Publicado</option>
+        <option value="rejected">Rechazado</option>
+      </select>
+      <select id="filter-language" onchange="loadHistory()" class="text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        <option value="">Todos los idiomas</option>
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="pt">Português</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+      </select>
+    </div>
+
+    <div id="history-loading" class="text-sm text-slate-400 py-8 text-center">Cargando historial…</div>
+    <div id="history-list" class="hidden space-y-2"></div>
+    <div id="history-empty" class="hidden text-sm text-slate-400 py-8 text-center">No hay generaciones aún.</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ─── Estado global ─────────────────────────────────────────────────────────
+let currentJobId = null;
+let currentEventSource = null;
+
+// ─── Navegación entre vistas ─────────────────────────────────────────────────
+function showView(view) {
+  document.getElementById('view-generator').classList.toggle('hidden', view !== 'generator');
+  document.getElementById('view-history').classList.toggle('hidden', view !== 'history');
+  document.getElementById('nav-generator').classList.toggle('nav-active', view === 'generator');
+  document.getElementById('nav-generator').classList.toggle('text-slate-500', view !== 'generator');
+  document.getElementById('nav-history').classList.toggle('nav-active', view === 'history');
+  document.getElementById('nav-history').classList.toggle('text-slate-500', view !== 'history');
+  if (view === 'history') loadHistory();
+}
+
+// ─── Elementos DOM ──────────────────────────────────────────────────────────
+const formSection    = document.getElementById('form-section');
+const progressSection = document.getElementById('progress-section');
+const reviewSection  = document.getElementById('review-section');
+const doneSection    = document.getElementById('done-section');
+const form           = document.getElementById('pipeline-form');
+const submitBtn      = document.getElementById('submit-btn');
+
+// ─── Helpers de UI ──────────────────────────────────────────────────────────
+const show = el => el.classList.remove('hidden');
+const hide = el => el.classList.add('hidden');
+
+function setStepState(stepId, state) {
+  const icon = document.getElementById(stepId);
+  if (!icon) return;
+  const base = 'w-9 h-9 rounded-full border-2 flex items-center justify-center text-sm font-bold transition';
+  const states = {
+    idle:    `${base} border-slate-200 text-slate-400`,
+    active:  `${base} border-indigo-500 bg-indigo-50 text-indigo-600 step-pulse`,
+    done:    `${base} border-emerald-500 bg-emerald-50 text-emerald-600`,
+    review:  `${base} border-amber-400 bg-amber-50 text-amber-600`,
+    error:   `${base} border-red-400 bg-red-50 text-red-600`,
+  };
+  icon.className = states[state] || states.idle;
+}
+
+function activateLine(lineId) {
+  const line = document.getElementById(lineId);
+  if (line) line.classList.replace('bg-slate-200', 'bg-indigo-400');
+}
+
+function renderCopyPreview(copyData, pageType) {
+  const container = document.getElementById('copy-preview-content');
+  container.innerHTML = '';
+
+  // ── Campos del schema unificado ──────────────────────────────────────────
+  // Soporta el nuevo schema (h1, hero_subtitle, cta_primary, sections, faq)
+  // y el schema legacy por compatibilidad con archivos anteriores
+
+  // Meta title (nuevo: meta_title, legacy: meta_title)
+  const metaTitle = copyData.meta_title;
+  if (metaTitle) _appendField(container, 'Meta Title', metaTitle);
+
+  // Meta description
+  const metaDesc = copyData.meta_description;
+  if (metaDesc) _appendField(container, 'Meta Description', metaDesc);
+
+  // H1 / Título principal (nuevo: h1, legacy: hero_headline / post_title)
+  const h1 = copyData.h1 || copyData.hero_headline || copyData.post_title;
+  if (h1) {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">H1 / Título principal</div>
+      <div class="text-xl font-bold text-slate-900 leading-tight">${escHtml(h1)}</div>
+    `;
+    container.appendChild(div);
+  }
+
+  // Hero subtitle
+  const subtitle = copyData.hero_subtitle || copyData.hero_subheadline || copyData.post_subtitle;
+  if (subtitle) _appendField(container, 'Hero / Subtítulo', subtitle);
+
+  // CTAs
+  const ctaPrimary = copyData.cta_primary || copyData.hero_cta_primary;
+  if (ctaPrimary) _appendBadge(container, 'CTA Principal', ctaPrimary, 'indigo');
+
+  const ctaFinal = copyData.cta_final || copyData.cta_section_title;
+  if (ctaFinal) _appendBadge(container, 'CTA Final', ctaFinal, 'emerald');
+
+  // Blog-specific
+  if (copyData.focus_keyword) _appendBadge(container, 'Keyword Principal', copyData.focus_keyword, 'violet');
+  if (copyData.reading_time) _appendBadge(container, 'Tiempo de lectura', copyData.reading_time, 'slate');
+  if (copyData.category) _appendBadge(container, 'Categoría', copyData.category, 'amber');
+
+  // Intro paragraph (blog)
+  if (copyData.intro_paragraph) _appendField(container, 'Introducción (hook)', copyData.intro_paragraph);
+
+  // Sections preview (nuevo schema)
+  if (Array.isArray(copyData.sections) && copyData.sections.length > 0) {
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">📑 Secciones (${copyData.sections.length})</div>`;
+    const ol = document.createElement('ol');
+    ol.className = 'space-y-1 list-decimal list-inside';
+    copyData.sections.forEach(s => {
+      const li = document.createElement('li');
+      li.className = 'text-sm text-slate-700';
+      li.textContent = s.h2 || s.title || 'Sin título';
+      ol.appendChild(li);
+    });
+    div.appendChild(ol);
+    container.appendChild(div);
+  }
+
+  // FAQs preview
+  const faqArray = copyData.faq || copyData.faqs;
+  _renderFaqs(container, faqArray, 3);
+
+  // Takeaways (blog)
+  if (Array.isArray(copyData.takeaways) && copyData.takeaways.length > 0) {
+    _renderList(container, copyData.takeaways, '💡 Takeaways', 'emerald');
+  }
+}
+
+function _appendField(container, label, value) {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">${label}</div>
+    <div class="text-sm text-slate-700">${escHtml(value)}</div>
+  `;
+  container.appendChild(div);
+}
+
+function _appendBadge(container, label, value, color = 'indigo') {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-medium text-slate-500">${label}:</span>
+      <span class="bg-${color}-100 text-${color}-700 text-xs font-semibold px-2 py-0.5 rounded-full">${escHtml(value)}</span>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+function _renderList(container, items, label, color = 'indigo') {
+  if (!Array.isArray(items) || items.length === 0) return;
+  const div = document.createElement('div');
+  div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">${label}</div>`;
+  const ul = document.createElement('ul');
+  ul.className = 'space-y-1';
+  items.forEach(m => {
+    const li = document.createElement('li');
+    li.className = `text-sm text-${color}-700 bg-${color}-50 rounded-lg px-3 py-1.5`;
+    li.textContent = '• ' + (typeof m === 'string' ? m : JSON.stringify(m));
+    ul.appendChild(li);
+  });
+  div.appendChild(ul);
+  container.appendChild(div);
+}
+
+function _renderFaqs(container, faqs, limit = 3) {
+  if (!Array.isArray(faqs) || faqs.length === 0) return;
+  const div = document.createElement('div');
+  div.innerHTML = `<div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">❓ FAQs (${faqs.length} generadas, mostrando ${Math.min(limit, faqs.length)})</div>`;
+  faqs.slice(0, limit).forEach(faq => {
+    const card = document.createElement('div');
+    card.className = 'bg-slate-50 rounded-lg px-3 py-2 text-xs mb-2';
+    const q = typeof faq === 'object' ? faq.question || faq.q : faq;
+    const a = typeof faq === 'object' ? faq.answer || faq.a || '' : '';
+    card.innerHTML = `<div class="font-medium text-slate-700">Q: ${escHtml(q)}</div>${a ? `<div class="text-slate-500 mt-1">A: ${escHtml(a.substring(0, 150))}${a.length > 150 ? '…' : ''}</div>` : ''}`;
+    div.appendChild(card);
+  });
+  container.appendChild(div);
+}
+
+// ─── Historial ────────────────────────────────────────────────────────────────
+const PAGE_TYPE_LABELS = { service: '🏢 Servicio', industry: '🏭 Industria', blog: '✍️ Blog' };
+const STATUS_COLORS = {
+  draft: 'bg-slate-100 text-slate-600',
+  approved: 'bg-blue-100 text-blue-700',
+  published: 'bg-emerald-100 text-emerald-700',
+  rejected: 'bg-red-100 text-red-600',
+};
+const LANG_FLAGS = { es: '🇨🇴', en: '🇺🇸', pt: '🇧🇷', fr: '🇫🇷', de: '🇩🇪' };
+
+async function loadHistory() {
+  const ptFilter = document.getElementById('filter-page-type')?.value || '';
+  const stFilter = document.getElementById('filter-status')?.value || '';
+  const lgFilter = document.getElementById('filter-language')?.value || '';
+
+  const qs = new URLSearchParams();
+  if (ptFilter) qs.set('page_type', ptFilter);
+  if (stFilter) qs.set('status', stFilter);
+  if (lgFilter) qs.set('language', lgFilter);
+
+  const listEl = document.getElementById('history-list');
+  const loadEl = document.getElementById('history-loading');
+  const emptyEl = document.getElementById('history-empty');
+  show(loadEl); hide(listEl); hide(emptyEl);
+
+  try {
+    const [histResp, statsResp] = await Promise.all([
+      fetch(`/api/history?${qs}`),
+      fetch('/api/history/stats'),
+    ]);
+    const history = await histResp.json();
+    const stats = await statsResp.json();
+
+    // Stats badge
+    const statsEl = document.getElementById('stats-badge');
+    if (statsEl && stats.total_generations > 0) {
+      const cacheRate = stats.total_tokens > 0
+        ? Math.round((stats.total_cache_read / stats.total_tokens) * 100)
+        : 0;
+      statsEl.innerHTML = `${stats.total_generations} generaciones · ${(stats.total_tokens||0).toLocaleString()} tokens`
+        + (cacheRate > 0 ? ` · <span class="cache-badge">💰 ${cacheRate}% cached</span>` : '');
+    }
+
+    hide(loadEl);
+    if (!history.length) { show(emptyEl); return; }
+
+    listEl.innerHTML = '';
+    history.forEach(gen => {
+      const date = new Date(gen.created_at).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' });
+      const statusClass = STATUS_COLORS[gen.status] || STATUS_COLORS.draft;
+      const flag = LANG_FLAGS[gen.output_language] || '';
+      const cached = gen.cache_read_tokens > 0
+        ? `<span class="cache-badge">💰 ${gen.cache_read_tokens.toLocaleString()} cached</span>`
+        : '';
+
+      const card = document.createElement('div');
+      card.className = 'flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3 hover:bg-slate-100 transition';
+      card.innerHTML = `
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm font-semibold text-slate-800 truncate">${escHtml(gen.topic)}</span>
+            <span class="text-xs text-slate-400">${PAGE_TYPE_LABELS[gen.page_type] || gen.page_type}</span>
+            <span class="text-xs">${flag}</span>
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium ${statusClass}">${gen.status}</span>
+          </div>
+          <div class="flex items-center gap-3 mt-1 text-xs text-slate-400">
+            <span>${date}</span>
+            <span>${(gen.total_tokens||0).toLocaleString()} tokens</span>
+            ${cached}
+          </div>
+        </div>
+        <div class="ml-4 flex items-center gap-2 flex-shrink-0">
+          ${gen.complete_file ? `
+          <button onclick="loadOutputFile('${escHtml(gen.complete_file)}')"
+            class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+            Ver →
+          </button>` : ''}
+          ${(gen.status !== 'published' && gen.complete_file) ? `
+          <button id="wf-btn-${gen.id}"
+            onclick="uploadToWebflow(${gen.id}, '${escHtml(gen.topic)}')"
+            class="text-xs bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200 px-2 py-1 rounded-lg font-medium transition">
+            📤 Webflow
+          </button>` : ''}
+        </div>
+      `;
+      listEl.appendChild(card);
+    });
+    show(listEl);
+  } catch (e) {
+    hide(loadEl);
+    document.getElementById('history-list').innerHTML = `<p class="text-sm text-red-500">Error cargando historial: ${e.message}</p>`;
+    show(listEl);
+  }
+}
+
+async function loadOutputFile(filename) {
+  try {
+    const resp = await fetch(`/api/outputs/${filename}`);
+    if (!resp.ok) throw new Error('Archivo no encontrado');
+    const data = await resp.json();
+
+    // Switch to generator view and show the data
+    showView('generator');
+    lastPipelineData = {
+      copy_data: data.copywriting?.copy_data || {},
+      keyword_research: data.keyword_research?.research || '',
+      webflow_preview: data.webflow?.result || '',
+    };
+    const pageType = data.copywriting?.page_type || 'service';
+
+    const icon = document.getElementById('done-icon');
+    const title = document.getElementById('done-title');
+    const msg = document.getElementById('done-message');
+    icon.textContent = '📂';
+    title.textContent = 'Generación cargada del historial';
+    msg.textContent = data.keyword_research?.topic || '';
+
+    show(document.getElementById('result-tabs'));
+    renderCopyPreview(lastPipelineData.copy_data, pageType);
+    renderFullArticle(lastPipelineData.copy_data, pageType);
+    if (lastPipelineData.keyword_research) {
+      document.getElementById('keywords-full-content').textContent = lastPipelineData.keyword_research;
+    }
+    if (lastPipelineData.webflow_preview) {
+      document.getElementById('webflow-full-content').textContent = lastPipelineData.webflow_preview;
+    }
+    switchTab('tab-article');
+    show(doneSection);
+    doneSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch(e) {
+    alert('Error cargando el archivo: ' + e.message);
+  }
+}
+
+async function uploadToWebflow(genId, topic) {
+  const btn = document.getElementById(`wf-btn-${genId}`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Subiendo…'; }
+
+  try {
+    const resp = await fetch(`/api/history/${genId}/webflow-upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ auto_publish: false }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || 'Error en el upload');
+
+    if (btn) { btn.textContent = '✅ Subido'; btn.classList.replace('bg-violet-50', 'bg-emerald-50'); btn.classList.replace('text-violet-700', 'text-emerald-700'); }
+    alert(`✅ "${topic}" subido a Webflow exitosamente.\n\nRespuesta del agente:\n${(data.webflow_result || '').slice(0, 300)}`);
+    setTimeout(() => loadHistory(), 1500);
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = '📤 Webflow'; }
+    alert(`Error al subir a Webflow: ${e.message}`);
+  }
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ─── Tabs y expansión ─────────────────────────────────────────────────────
+function toggleExpand(elementId) {
+  const el = document.getElementById(elementId);
+  if (el) el.classList.toggle('expanded');
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('[id^="btn-tab-"]').forEach(btn => btn.classList.remove('tab-active'));
+  const tab = document.getElementById(tabId);
+  const btn = document.getElementById('btn-' + tabId);
+  if (tab) tab.classList.remove('hidden');
+  if (btn) btn.classList.add('tab-active');
+}
+
+// Almacena los datos del último pipeline para descargas
+let lastPipelineData = {};
+
+function downloadJSON(type) {
+  let data, filename;
+  if (type === 'copy' && lastPipelineData.copy_data) {
+    data = lastPipelineData.copy_data;
+    filename = 'copy_generated.json';
+  } else if (type === 'keywords' && lastPipelineData.keyword_research) {
+    data = { research: lastPipelineData.keyword_research };
+    filename = 'keyword_research.json';
+  } else {
+    alert('No hay datos para descargar.');
+    return;
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function renderFullArticle(copyData, pageType) {
+  const container = document.getElementById('article-preview-content');
+  container.innerHTML = '';
+  renderCopyPreview(copyData, pageType);
+  // Clone the review preview into the article tab
+  const reviewContent = document.getElementById('copy-preview-content');
+  container.innerHTML = reviewContent.innerHTML;
+
+  // Also add the full raw copy_data as expandable JSON
+  const jsonSection = document.createElement('details');
+  jsonSection.className = 'mt-4';
+  jsonSection.innerHTML = `
+    <summary class="cursor-pointer text-xs font-semibold text-slate-500 uppercase tracking-wide">Ver datos completos (JSON)</summary>
+    <pre class="text-xs text-slate-600 bg-slate-50 rounded-lg p-3 mt-2 log-box max-h-[500px] overflow-y-auto">${escHtml(JSON.stringify(copyData, null, 2))}</pre>
+  `;
+  container.appendChild(jsonSection);
+}
+
+// ─── Submit del formulario ───────────────────────────────────────────────────
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const params = {
+    topic:           document.getElementById('topic').value.trim(),
+    page_type:       document.querySelector('input[name="page_type"]:checked').value,
+    target_market:   document.getElementById('target_market').value.trim(),
+    company_context: document.getElementById('company_context').value.trim(),
+    output_language: document.querySelector('input[name="output_language"]:checked')?.value || 'es',
+    site_id:          document.getElementById('site_id').value.trim() || null,
+    collection_id:    document.getElementById('collection_id').value.trim() || null,
+    template_item_id: document.getElementById('template_item_id').value.trim() || null,
+    skip_upload:     document.getElementById('skip_upload').checked,
+    skip_review:     document.getElementById('skip_review').checked,
+    auto_publish:    document.getElementById('auto_publish').checked,
+  };
+
+  // Reset UI
+  hide(doneSection);
+  hide(reviewSection);
+  show(progressSection);
+  ['s1','s2','sr','s3'].forEach(id => setStepState(`${id}-icon`, 'idle'));
+  ['line-1','line-2','line-3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'flex-1 h-0.5 bg-slate-200 mt-4';
+  });
+  hide(document.getElementById('step-preview'));
+  document.getElementById('s1-tokens').textContent = '';
+  document.getElementById('s2-tokens').textContent = '';
+  document.getElementById('s3-tokens').textContent = '';
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<svg class="w-4 h-4 spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Generando…`;
+
+  try {
+    const resp = await fetch('/api/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      alert('Error: ' + (err.detail || 'Error desconocido'));
+      resetSubmitBtn();
+      return;
+    }
+
+    const { job_id } = await resp.json();
+    currentJobId = job_id;
+    startSSE(job_id);
+
+  } catch (err) {
+    alert('Error de conexión: ' + err.message);
+    resetSubmitBtn();
+  }
+});
+
+// ─── SSE ─────────────────────────────────────────────────────────────────────
+function startSSE(jobId) {
+  if (currentEventSource) currentEventSource.close();
+
+  currentEventSource = new EventSource(`/api/jobs/${jobId}/stream`);
+
+  const handlers = {
+    step_start:       onStepStart,
+    step_complete:    onStepComplete,
+    review_needed:    onReviewNeeded,
+    review_approved:  onReviewApproved,
+    pipeline_complete: onPipelineComplete,
+    pipeline_error:   onPipelineError,
+    done:             () => { currentEventSource.close(); resetSubmitBtn(); },
+  };
+
+  Object.entries(handlers).forEach(([evt, fn]) => {
+    currentEventSource.addEventListener(evt, e => {
+      try { fn(JSON.parse(e.data)); } catch (_) { fn({}); }
+    });
+  });
+
+  currentEventSource.onerror = () => {
+    currentEventSource.close();
+    resetSubmitBtn();
+  };
+}
+
+function onStepStart({ step, name }) {
+  const map = { 1: 's1', 2: 's2', 3: 's3' };
+  const id = map[step];
+  if (id) setStepState(`${id}-icon`, 'active');
+  if (step === 2) activateLine('line-1');
+  if (step === 3) activateLine('line-3');
+}
+
+function onStepComplete({ step, preview, usage, result_preview, html_file }) {
+  const map = { 1: 's1', 2: 's2', 3: 's3' };
+  const id = map[step];
+  if (id) setStepState(`${id}-icon`, 'done');
+
+  if (usage) {
+    const tokenEl = document.getElementById(`${id}-tokens`);
+    if (tokenEl) {
+      const total = (usage.input_tokens||0) + (usage.output_tokens||0);
+      const cached = usage.cache_read_input_tokens || 0;
+      const cacheInfo = cached > 0 ? ` <span class="cache-badge">💰 ${cached.toLocaleString()} cached</span>` : '';
+      tokenEl.innerHTML = `${total.toLocaleString()} tokens${cacheInfo}`;
+    }
+  }
+
+  const previewText = preview || result_preview;
+  if (previewText) {
+    const previewSection = document.getElementById('step-preview');
+    const labels = { 1: '🔍 Preview: Keyword Research', 2: '✍️ Copy generado (fragmento)', 3: '🌐 Respuesta Webflow' };
+    document.getElementById('preview-label').textContent = labels[step] || 'Preview';
+    document.getElementById('preview-content').textContent = previewText;
+    show(previewSection);
+    previewSection.classList.add('fade-in');
+  }
+
+  // Cargar HTML preview en cuanto esté disponible (paso 2)
+  if (html_file) {
+    setHtmlPreview(html_file);
+  }
+}
+
+function onReviewNeeded({ copy_data, page_type, topic }) {
+  setStepState('sr-icon', 'review');
+  activateLine('line-2');
+  renderCopyPreview(copy_data || {}, page_type || 'service');
+  show(reviewSection);
+  reviewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function onReviewApproved() {
+  setStepState('sr-icon', 'done');
+  hide(reviewSection);
+}
+
+async function sendReview(approved) {
+  if (!currentJobId) return;
+  document.getElementById('approve-btn').disabled = true;
+  document.getElementById('reject-btn').disabled = true;
+  await fetch(`/api/jobs/${currentJobId}/review`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ approved }),
+  });
+}
+
+document.getElementById('approve-btn').addEventListener('click', () => sendReview(true));
+document.getElementById('reject-btn').addEventListener('click', () => sendReview(false));
+
+function setHtmlPreview(htmlFile) {
+  if (!htmlFile) return;
+  const url = `/api/outputs/${encodeURIComponent(htmlFile)}`;
+  const frame = document.getElementById('html-preview-frame');
+  const actions = document.getElementById('html-preview-actions');
+  const placeholder = document.getElementById('html-preview-placeholder');
+  const openLink = document.getElementById('html-open-link');
+  const dlLink = document.getElementById('html-download-link');
+  frame.src = url;
+  frame.style.display = '';
+  openLink.href = url;
+  dlLink.href = url;
+  dlLink.download = htmlFile;
+  if (actions) actions.classList.remove('hidden');
+  if (placeholder) placeholder.style.display = 'none';
+}
+
+function onPipelineComplete({ status, message, outputs, webflow_preview, keyword_research, copy_data, page_type, html_file }) {
+  const isOk = status === 'completed' || status === 'completed_no_upload';
+  const isRejected = status === 'rejected';
+
+  const icon   = document.getElementById('done-icon');
+  const title  = document.getElementById('done-title');
+  const msg    = document.getElementById('done-message');
+
+  icon.textContent  = isRejected ? '❌' : isOk ? '✅' : '⚠️';
+  title.textContent = isRejected ? 'Pipeline detenido' : isOk ? 'Pipeline completado' : 'Completado con advertencias';
+  msg.textContent   = message || '';
+
+  // Guardar datos para descargas
+  lastPipelineData = { copy_data, keyword_research, webflow_preview };
+
+  // Mostrar tabs con contenido completo
+  const resultTabs = document.getElementById('result-tabs');
+  show(resultTabs);
+
+  // Tab: Artículo / Copy
+  if (copy_data && Object.keys(copy_data).length > 0) {
+    renderCopyPreview(copy_data, page_type || 'service');
+    renderFullArticle(copy_data, page_type || 'service');
+  }
+
+  // Tab: Keywords
+  if (keyword_research) {
+    document.getElementById('keywords-full-content').textContent = keyword_research;
+  }
+
+  // Tab: Webflow
+  if (webflow_preview) {
+    document.getElementById('webflow-full-content').textContent = webflow_preview;
+  } else {
+    document.getElementById('webflow-full-content').textContent = 'No se ejecutó el upload a Webflow.';
+  }
+
+  // Tab: HTML Preview
+  if (html_file) {
+    setHtmlPreview(html_file);
+  }
+
+  // Default to article tab
+  switchTab('tab-article');
+
+  if (Array.isArray(outputs) && outputs.length > 0) {
+    const ul = document.getElementById('outputs-items');
+    ul.innerHTML = '';
+    outputs.forEach(f => {
+      const li = document.createElement('li');
+      li.className = 'flex items-center gap-2 text-xs text-slate-600';
+      li.innerHTML = `<svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><code class="font-mono">${escHtml(f)}</code>`;
+      ul.appendChild(li);
+    });
+    show(document.getElementById('outputs-list'));
+  }
+
+  hide(reviewSection);
+  show(doneSection);
+  doneSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function onPipelineError({ message, step }) {
+  const stepLabels = {
+    keyword_research: 'Paso 1: Keyword Research',
+    copywriting: 'Paso 2: Copy',
+    webflow: 'Paso 3: Webflow Upload',
+    init: 'Inicialización',
+  };
+  const stepLabel = step ? ` [${stepLabels[step] || step}]` : '';
+  onPipelineComplete({ status: 'error', message: `❌ Error${stepLabel}: ${message}` });
+}
+
+function resetSubmitBtn() {
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Generar Contenido`;
+}
+
+// ─── Nueva generación ────────────────────────────────────────────────────────
+document.getElementById('new-btn').addEventListener('click', () => {
+  hide(doneSection);
+  hide(progressSection);
+  hide(reviewSection);
+  hide(document.getElementById('result-tabs'));
+  hide(document.getElementById('outputs-list'));
+  hide(document.getElementById('step-preview'));
+  lastPipelineData = {};
+  document.getElementById('topic').focus();
+  resetSubmitBtn();
+});
+</script>
+</body>
+</html>
