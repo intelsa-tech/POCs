@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playbook SDR · MOCA · Intelsa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --intelsa-orange: #ff9345;
+  --intelsa-green: #a9d944;
+  --intelsa-dark: #414c4c;
+  --intelsa-bg: #ffffff;
+  --intelsa-muted-bg: #f7f7f7;
+  --intelsa-border: #e5e7e7;
+  --intelsa-gray: #8a9494;
+  --intelsa-warning: #e8a33d;
+  --intelsa-risk: #c0392b;
+  --intelsa-radius: 3px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  color: var(--intelsa-dark);
+  background: var(--intelsa-bg);
+  line-height: 1.6;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 24px 32px 64px; }
+
+.header { padding: 28px 0 20px; border-bottom: 1px solid var(--intelsa-border); margin-bottom: 24px; }
+.header .kicker { font-size: 11px; font-weight: 600; color: var(--intelsa-orange); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
+.header h1 { font-size: 32px; font-weight: 600; margin: 0 0 6px; color: var(--intelsa-dark); }
+.header .subtitle { font-size: 14px; color: var(--intelsa-gray); font-weight: 400; }
+.header-meta { display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
+.header-meta div { font-size: 12px; color: var(--intelsa-gray); }
+.header-meta strong { color: var(--intelsa-dark); font-weight: 600; }
+
+/* Tabs */
+.tabs { display: flex; gap: 2px; border-bottom: 2px solid var(--intelsa-border); margin-bottom: 32px; overflow-x: auto; flex-wrap: wrap; }
+.tab { padding: 10px 16px; font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 12px; color: var(--intelsa-gray); cursor: pointer; border: none; background: transparent; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
+.tab:hover { color: var(--intelsa-dark); }
+.tab.active { color: var(--intelsa-orange); border-bottom-color: var(--intelsa-orange); font-weight: 600; }
+.panel { display: none; } .panel.active { display: block; }
+
+/* Sections */
+.sect { border-left: 4px solid var(--intelsa-orange); padding: 4px 0 4px 16px; margin: 28px 0 14px; }
+.sect-title { font-weight: 600; font-size: 20px; color: var(--intelsa-dark); }
+.sect-sub { font-size: 13px; color: var(--intelsa-gray); margin-top: 2px; font-weight: 400; }
+.sect h3 { font-weight: 600; font-size: 16px; color: var(--intelsa-dark); margin: 20px 0 10px; }
+h4 { font-weight: 600; font-size: 14px; color: var(--intelsa-dark); margin: 16px 0 8px; }
+
+/* Cards */
+.card { background: #fff; border: 1px solid var(--intelsa-border); border-radius: var(--intelsa-radius); padding: 18px; }
+.card-title { font-weight: 600; font-size: 15px; color: var(--intelsa-dark); margin-bottom: 8px; }
+.card-body { font-size: 13.5px; color: var(--intelsa-dark); line-height: 1.6; }
+.card-emph { border: 2px solid var(--intelsa-orange); }
+.card-green { border: 2px solid var(--intelsa-green); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 800px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+/* KPI */
+.kpi { background: #fff; border: 1px solid var(--intelsa-border); border-radius: var(--intelsa-radius); padding: 16px; }
+.kpi-label { font-weight: 400; font-size: 10px; color: var(--intelsa-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi-value { font-weight: 600; font-size: 24px; color: var(--intelsa-orange); margin: 6px 0 2px; }
+.kpi-value.green { color: #6ba368; }
+.kpi-value.dark { color: var(--intelsa-dark); }
+.kpi-sub { font-weight: 500; font-size: 11px; color: var(--intelsa-gray); }
+
+/* Callout */
+.callout { background: var(--intelsa-muted-bg); border-left: 4px solid var(--intelsa-orange); border-radius: var(--intelsa-radius); padding: 14px 18px; font-size: 13.5px; color: var(--intelsa-dark); line-height: 1.6; margin: 14px 0; }
+.callout-label { font-weight: 600; color: var(--intelsa-orange); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.callout.green { border-left-color: var(--intelsa-green); } .callout.green .callout-label { color: #6ba368; }
+.callout.risk { border-left-color: var(--intelsa-risk); } .callout.risk .callout-label { color: var(--intelsa-risk); }
+.callout.warn { border-left-color: var(--intelsa-warning); } .callout.warn .callout-label { color: var(--intelsa-warning); }
+
+/* Tables */
+table.data { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--intelsa-dark); margin: 12px 0; }
+table.data thead tr { background: var(--intelsa-orange); color: #fff; }
+table.data th { padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11.5px; }
+table.data th.num { text-align: right; }
+table.data td { padding: 8px 12px; border-bottom: 1px solid var(--intelsa-border); vertical-align: top; }
+table.data td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.data tbody tr:nth-child(even) { background: var(--intelsa-muted-bg); }
+table.data tr.total { border-top: 2px solid var(--intelsa-orange); font-weight: 600; }
+
+/* Badges */
+.badge { display: inline-block; background: var(--intelsa-green); color: var(--intelsa-dark); font-weight: 600; font-size: 10px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+.badge.orange { background: var(--intelsa-orange); color: #fff; }
+.badge.neutral { background: var(--intelsa-border); color: var(--intelsa-dark); }
+.badge.warn { background: var(--intelsa-warning); color: #fff; }
+.badge.risk { background: var(--intelsa-risk); color: #fff; }
+.badge.dark { background: var(--intelsa-dark); color: #fff; }
+
+/* Message blocks (copy-ready) */
+.msg-block { background: #fdfdfd; border: 1px solid var(--intelsa-border); border-radius: var(--intelsa-radius); padding: 16px 18px; margin: 10px 0; position: relative; }
+.msg-block.selected { border-left: 4px solid var(--intelsa-green); background: #fbfef4; }
+.msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.msg-tag { font-size: 10px; font-weight: 600; color: var(--intelsa-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+.msg-tag.chosen { color: #6ba368; }
+.msg-body { font-family: 'Poppins', sans-serif; font-size: 13px; color: var(--intelsa-dark); line-height: 1.65; white-space: pre-wrap; }
+.msg-body .var { background: rgba(255, 147, 69, 0.15); color: var(--intelsa-orange); padding: 1px 5px; border-radius: 3px; font-weight: 600; font-size: 12px; }
+.copy-btn { background: var(--intelsa-orange); color: white; border: none; border-radius: 3px; padding: 5px 10px; font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 0.4px; }
+.copy-btn:hover { background: #e67d2d; }
+.copy-btn.copied { background: #6ba368; }
+
+/* Cadence timeline */
+.cadence { border: 1px solid var(--intelsa-border); border-radius: var(--intelsa-radius); padding: 0; margin: 14px 0; overflow: hidden; }
+.day-row { display: grid; grid-template-columns: 80px 100px 1fr; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--intelsa-border); align-items: start; font-size: 13px; }
+.day-row:last-child { border-bottom: none; }
+.day-row:nth-child(odd) { background: var(--intelsa-muted-bg); }
+.day-num { font-weight: 700; font-size: 14px; color: var(--intelsa-orange); }
+.day-chan { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: var(--intelsa-dark); }
+.day-desc { color: var(--intelsa-dark); }
+
+/* Objections */
+.obj-block { border: 1px solid var(--intelsa-border); border-radius: var(--intelsa-radius); margin-bottom: 10px; overflow: hidden; }
+.obj-q { background: var(--intelsa-muted-bg); padding: 12px 16px; font-weight: 600; font-size: 14px; color: var(--intelsa-dark); border-bottom: 1px solid var(--intelsa-border); }
+.obj-q::before { content: '💬 '; }
+.obj-body { padding: 14px 16px; font-size: 13px; line-height: 1.65; }
+.obj-body .lbl { font-weight: 600; color: var(--intelsa-orange); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+.obj-body .say { background: #fff9f4; padding: 10px 12px; border-left: 3px solid var(--intelsa-orange); border-radius: 3px; margin: 6px 0 12px; font-style: italic; }
+
+/* Days 30 */
+.week-day { padding: 12px 16px; border: 1px solid var(--intelsa-border); border-radius: var(--intelsa-radius); margin-bottom: 8px; background: #fff; }
+.week-day h4 { margin: 0 0 6px; color: var(--intelsa-orange); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+.week-day ul { margin: 4px 0 0; padding-left: 20px; font-size: 13px; }
+.week-day li { margin-bottom: 3px; }
+
+/* Utility */
+ul.clean { padding-left: 20px; margin: 8px 0; }
+ul.clean li { margin-bottom: 6px; font-size: 13.5px; line-height: 1.6; }
+ol.clean { padding-left: 22px; margin: 8px 0; }
+ol.clean li { margin-bottom: 8px; font-size: 13.5px; line-height: 1.65; }
+.hr { border: none; border-top: 1px solid var(--intelsa-border); margin: 20px 0; }
+b, strong { font-weight: 600; color: var(--intelsa-dark); }
+
+.footer { border-top: 1px solid var(--intelsa-border); padding: 20px 24px; font-size: 11px; color: var(--intelsa-gray); text-align: center; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <div class="kicker">Playbook interno · SDR · MOCA</div>
+  <h1>Playbook del SDR <span style="color:var(--intelsa-orange);">·</span> Intelsa</h1>
+  <div class="subtitle">Manual de consulta diaria: qué vender, a quién, cómo prospectar, qué decir, qué hacer y qué medir. Basado en el Playbook Comercial de David + el diseño operativo MOCA.</div>
+  <div class="header-meta">
+    <div><strong>Owner del proyecto</strong> · Oscar Barrera</div>
+    <div><strong>Sponsors</strong> · David, Vanessa</div>
+    <div><strong>Meta 6 meses</strong> · COP 150M MRR firmado</div>
+    <div><strong>Tu meta diaria</strong> · 1 reunión calificada / día</div>
+    <div><strong>Versión</strong> · 1.0 · Julio 2026</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-panel="p1">1 · Bienvenido</button>
+  <button class="tab" data-panel="p2">2 · Qué vendemos</button>
+  <button class="tab" data-panel="p3">3 · A quién</button>
+  <button class="tab" data-panel="p6">4 · Mensajes copy</button>
+  <button class="tab" data-panel="p7">5 · Objeciones</button>
+  <button class="tab" data-panel="p8">6 · CRM y proceso</button>
+  <button class="tab" data-panel="p9">7 · Métricas</button>
+  <button class="tab" data-panel="p10">8 · Reglas de oro</button>
+</div>
+
+<!-- ============ 1 · BIENVENIDO ============ -->
+<div class="panel active" id="p1">
+  <div class="sect">
+    <div class="sect-title">Bienvenido a Intelsa y a MOCA</div>
+    <div class="sect-sub">Contexto básico antes de leer el resto</div>
+  </div>
+
+  <div class="card card-emph">
+    <div class="card-body">
+      <b>Lo que necesitas saber en 90 segundos.</b><br><br>
+      Trabajas en <b>Intelsa</b>, una empresa colombiana con sede en Medellín que combina talento humano y soluciones híbridas IA + Humanos para operar contact centers de marcas medianas y grandes (Alpina, Éxito, Movistar, Renault, Coordinadora, entre muchas).<br><br>
+      Estás en un proyecto llamado <b>MOCA</b> (Modelo Operativo de Crecimiento Acelerado). Su meta es <b>COP 150M de nuevo MRR firmado en 6 meses</b>. No estás aquí para cerrar ventas: estás para <b>abrir puertas</b>. Tu victoria es la reunión calificada. Las demos, propuestas y cierres los hacen David (Gerencia), Vanessa (Operations) y Oscar (Growth Manager).<br><br>
+      <b>Tu meta operativa:</b> 1 reunión calificada agendada al día. Todo lo demás en este playbook existe para ayudarte a lograr eso con disciplina.
+    </div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Quiénes somos</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Intelsa</div>
+      <div class="card-body">
+        BPO + AI Workforce con más de una década operando contact centers en Colombia. Sede en Medellín. Reconocida con premios LATAM (Oro, Plata, Bronce) en customer experience y tercerización. Certificaciones ISO 9001:2015 y ISO 27001:2022.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Qué nos diferencia</div>
+      <div class="card-body">
+        Combinamos <b>agentes humanos e inteligencia artificial</b> en una sola operación híbrida. No somos un BPO tradicional (Teleperformance, Concentrix) ni una consultora de IA. Somos ambos, y esa combinación nos permite entregar mejor servicio a menor costo por interacción.
+      </div>
+    </div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Con quién trabajas</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Persona</th><th>Cómo te apoya</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>Oscar Barrera</b></td><td>Te da contexto, revisa métricas contigo, valida tu pipeline, hace la primera reunión con los prospectos que agendas</td></tr>
+      <tr><td><b>David</b></td><td>Toma decisiones estratégicas, entra en cierres grandes, define pricing en casos complejos</td></tr>
+      <tr><td><b>Vanessa</b></td><td>Valida dimensionamiento y margen antes de cotizar. Es tu aliada para responder preguntas técnicas de operación</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="callout-label">Filosofía del proyecto</div>
+    MOCA no busca acertar en el primer intento. Busca <b>decidir con datos</b>. Cada semana revisamos qué funciona y qué no, y ajustamos. Tu trabajo no es "hacer lo que siempre se ha hecho": es ejecutar con disciplina el playbook, reportar limpio en CRM, y traer aprendizajes al comité del viernes.
+  </div>
+</div>
+
+<!-- ============ 2 · QUÉ VENDEMOS ============ -->
+<div class="panel" id="p2">
+  <div class="sect">
+    <div class="sect-title">La oferta central</div>
+    <div class="sect-sub">Lo que estás vendiendo, en una frase y en detalle</div>
+  </div>
+
+  <div class="card card-emph">
+    <div class="card-body">
+      <b>Frase de una sola línea (memorízala):</b><br><br>
+      "En Intelsa combinamos agentes humanos e inteligencia artificial para operar servicio al cliente, ventas y back office 24/7, a una fracción del costo de una operación tradicional."
+    </div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Cómo funciona en la práctica</div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      La inteligencia artificial atiende o asiste los contactos <b>simples y repetitivos</b> (consulta de estado, preguntas frecuentes, primer filtro, agendamiento básico). El equipo humano resuelve los casos que <b>requieren criterio, empatía, negociación o excepción</b>.<br><br>
+      El cliente compra <b>una operación completa</b>, no una tecnología y aparte un equipo. Nosotros diseñamos, implementamos, operamos y mejoramos continuamente.
+    </div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Líneas de servicio activas</div>
+    <div class="sect-sub">Lo que puedes vender a un prospecto</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card"><div class="card-title">Servicio al Cliente (SAC) híbrido 24/7</div><div class="card-body">Atención de clientes por múltiples canales, con IA absorbiendo lo repetitivo y humanos manejando casos complejos.</div></div>
+    <div class="card"><div class="card-title">Canales digitales inteligentes</div><div class="card-body">WhatsApp, chat web, correo, redes sociales y ticketing. Todo integrado y con IA generativa que asiste al agente.</div></div>
+    <div class="card"><div class="card-title">Back Office y automatización</div><div class="card-body">Procesamiento de documentos, validaciones, actualización de sistemas, gestión de solicitudes.</div></div>
+    <div class="card"><div class="card-title">Telemarketing</div><div class="card-body">Campañas outbound para calificación de leads, reactivación de clientes inactivos, campañas específicas.</div></div>
+    <div class="card"><div class="card-title">Televenta</div><div class="card-body">Cierre de ventas por teléfono con equipo entrenado en producto del cliente, apoyado en scripts y CRM.</div></div>
+    <div class="card"><div class="card-title" style="color:var(--intelsa-risk);">Cobranza especializada ⚠</div><div class="card-body">Existe como servicio, pero <b>NO está en el foco de crecimiento actual</b>. No prospectar por esta línea.</div></div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Modelos de pricing permitidos</div>
+    <div class="sect-sub">Solo estos tres. No inventes otros.</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Modelo</th><th>Cuándo aplica</th><th>Ejemplo</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>Por posición</b></td><td>Cuando el volumen lo justifica y el cliente entiende el modelo BPO clásico</td><td>10 agentes dedicados a un turno específico</td></tr>
+      <tr><td><b>Por interacción</b></td><td>Cuando el cliente quiere pagar solo por lo que consume y hay volumen medible</td><td>COP X por cada ticket resuelto o llamada atendida</td></tr>
+      <tr><td><b>Por resultado</b></td><td>Cuando el resultado es claro y medible (cita agendada, lead calificado, venta cerrada)</td><td>COP X por cada cita efectivamente confirmada</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout risk">
+    <div class="callout-label">Nunca ofrezcas</div>
+    Ni FTE en USD (con la TRM actual comprime margen), ni variable puro (nunca sin mínimo mensual garantizado), ni pricing "creativo" fuera de estos tres modelos. Si el prospect pide algo distinto, escala a Oscar antes de decir nada.
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Diferenciadores versus competencia</div>
+    <div class="sect-sub">Lo que dices cuando te comparan con Teleperformance, Concentrix, Atento</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-green">
+      <div class="card-title">Vs BPO tradicional</div>
+      <div class="card-body">
+        Tienen personas, no IA propia integrada. Cuando meten IA es un add-on que compras aparte y no habla con la operación. Nosotros lo entregamos como una sola cosa.
+      </div>
+    </div>
+    <div class="card card-green">
+      <div class="card-title">Vs consultora de IA</div>
+      <div class="card-body">
+        Te implementan tecnología pero no operan. Te dejan con un chatbot que nadie mantiene. Nosotros nos quedamos operando la solución todos los días.
+      </div>
+    </div>
+    <div class="card card-green">
+      <div class="card-title">Vs equipo interno</div>
+      <div class="card-body">
+        Contratar y entrenar 20 agentes toma 3-4 meses. Nosotros lo hacemos en 4-8 semanas y tú no cargas nómina, prestaciones, ni rotación.
+      </div>
+    </div>
+    <div class="card card-green">
+      <div class="card-title">Vs offshore (Filipinas, India)</div>
+      <div class="card-body">
+        Cuando prospectas cuentas USA: mismo huso horario, cultura latina, español nativo cuando lo necesitan, e inglés bilingüe. Nearshore real.
+      </div>
+    </div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Casos y prueba social que puedes mencionar</div>
+    <div class="sect-sub">Marcas que ya trabajan con Intelsa (públicas)</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Sector</th><th>Marcas nombrables</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Retail y consumo masivo</td><td>Éxito, Coordinadora, Alpina, Imusa, Colanta, Landers, Stihl</td></tr>
+      <tr><td>Telecom</td><td>Movistar</td></tr>
+      <tr><td>Automotriz</td><td>Renault</td></tr>
+      <tr><td>Fintech</td><td>Finaktiva, FinanceLobby, Prestémonos</td></tr>
+      <tr><td>Inmobiliario</td><td>Prodesa</td></tr>
+      <tr><td>Salud</td><td>Clínica Fundadores, Promedan IPS</td></tr>
+      <tr><td>Educación</td><td>EAFIT</td></tr>
+      <tr><td>Viajes</td><td>Trivago</td></tr>
+      <tr><td>Tabaco</td><td>BAT</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <div class="callout-label">Empresas a NO contactar</div>
+    <b>BAT, SHEIN, PROMEDAN, STHIL, PAYU.</b> Son clientes actuales o cuentas ya trabajadas. Puedes <b>mencionarlas como casos de éxito</b>, pero no las prospectes como leads nuevos.
+  </div>
+</div>
+
+<!-- ============ 3 · A QUIÉN LE VENDEMOS ============ -->
+<div class="panel" id="p3">
+  <div class="sect">
+    <div class="sect-title">El ICP · perfil de empresa ideal</div>
+    <div class="sect-sub">Cómo saber si una cuenta vale la pena antes de invertir tiempo</div>
+  </div>
+
+  <div class="card card-emph">
+    <div class="card-body">
+      <b>Una empresa ICP tiene, mínimo:</b>
+      <ul class="clean" style="margin-top:8px;">
+        <li><b>Volumen alto</b> de interacciones diarias con clientes (soporte, ventas, back office)</li>
+        <li><b>Dolor operativo visible</b> (saturación, calidad baja, costo alto, cobertura insuficiente)</li>
+        <li><b>Dueño de proceso identificable</b> (una persona con nombre y apellido que puede decidir o influir)</li>
+        <li><b>Capacidad real de decidir</b> en un plazo de 6 meses (no proyectos "algún día")</li>
+        <li><b>Presupuesto mínimo de COP 20-40M mensuales</b> para operación</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Los 4 verticales prioritarios</div>
+    <div class="sect-sub">Donde tenemos casos, argumentos y probabilidad de cierre más alta</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🛒 Ecommerce y retail</div>
+      <div class="card-body">
+        <b>Dolor:</b> picos por temporada (Black Friday, cyber, navidad), devoluciones, tiempos de respuesta que degradan NPS, atención omnicanal fragmentada.<br><br>
+        <b>Marcas objetivo:</b> tiendas online con más de 5.000 pedidos/mes, retailers con presencia física + digital.<br><br>
+        <b>Cargo objetivo:</b> Head of Ecommerce, Director de CX, COO.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏥 Salud (IPS, clínicas, aseguradoras)</div>
+      <div class="card-body">
+        <b>Dolor:</b> agendamiento de citas perdidas, autorizaciones lentas, seguimiento inconsistente, trazabilidad para auditoría.<br><br>
+        <b>Marcas objetivo:</b> IPS con más de 5 sedes, aseguradoras, clínicas de especialidad.<br><br>
+        <b>Cargo objetivo:</b> Director de Operaciones, Gerente de Servicio al Paciente, COO.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏘️ Inmobiliario</div>
+      <div class="card-body">
+        <b>Dolor:</b> leads de pauta que se enfrían, tiempo de respuesta que pierde la visita, seguimiento inconsistente, postventa desatendida.<br><br>
+        <b>Marcas objetivo:</b> constructoras, inmobiliarias, plataformas de finca raíz con inversión en pauta digital.<br><br>
+        <b>Cargo objetivo:</b> Gerente Comercial, Director de Ventas, VP Comercial.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🥫 Consumo masivo</div>
+      <div class="card-body">
+        <b>Dolor:</b> servicio al cliente masivo (PQRS), garantías, campañas de activación, atención a distribuidores y consumidor final.<br><br>
+        <b>Marcas objetivo:</b> marcas nacionales de alimentos, bebidas, cuidado personal, hogar.<br><br>
+        <b>Cargo objetivo:</b> Director de Mercadeo, Director de Servicio al Cliente, Head of CX.
+      </div>
+    </div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Buyer personas · a quién le hablas dentro de la empresa</div>
+    <div class="sect-sub">Los 6 cargos que decidieron o influyen en compras como esta</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Cargo</th><th>Qué le importa</th><th>Cómo abordarlo</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>COO / Director de Operaciones</b></td><td>Costo, eficiencia, escalabilidad, riesgo operativo</td><td>Hablar de costo por interacción, cobertura 24/7, tiempo de respuesta</td></tr>
+      <tr><td><b>Director de Servicio al Cliente / CX</b></td><td>NPS, CSAT, calidad, experiencia del cliente</td><td>Hablar de calidad de atención, resolución en primer contacto, satisfacción</td></tr>
+      <tr><td><b>VP Customer Success / Head of Support</b></td><td>Retención, churn, ticket resolution</td><td>Hablar de tiempo de resolución, satisfacción, evitar churn por mal servicio</td></tr>
+      <tr><td><b>Director Comercial / Ventas</b></td><td>Pipeline, conversión, leads calientes</td><td>Hablar de tiempo de respuesta a leads, tasa de contacto, agendamiento</td></tr>
+      <tr><td><b>Head of Digital / Ecommerce</b></td><td>Conversión digital, carritos, atención omnicanal</td><td>Hablar de recuperación de carritos, atención en WhatsApp, tiempos</td></tr>
+      <tr><td><b>CFO</b></td><td>Costo, ROI, capital de trabajo</td><td>Hablar de costo por interacción vs equipo interno, modelo variable</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sect">
+    <div class="sect-title">Sistema de Tiers · dónde poner tu energía</div>
+    <div class="sect-sub">Del playbook de David · 120 cuentas priorizadas</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Tier</th><th class="num">Cantidad</th><th>Criterio</th><th>Tu rol</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>Tier A</b></td><td class="num">30</td><td>Ticket potencial COP 40M+/mes, dolor visible, acceso o referencia</td><td>Apoyas al closer (David/Oscar) con investigación y multithreading</td></tr>
+      <tr><td><b>Tier B</b></td><td class="num">50</td><td>Ticket COP 20-40M/mes, fit alto, sin acceso directo</td><td><b>Tú lideras la cadencia completa de 15 días</b></td></tr>
+      <tr><td><b>Tier C</b></td><td class="num">40</td><td>Fit razonable, menor urgencia o ticket incierto</td><td>Nurturing suave, señales de intención, retargeting</td></tr>
+      <tr class="total"><td colspan="2"><b>Total</b></td><td colspan="2"><b>120 cuentas Colombia + universo USA (que trabaja la agencia)</b></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <div class="callout-label">Regla clave del playbook</div>
+    Tú trabajas <b>Colombia 100%</b>. No haces cold outreach a decisores en Estados Unidos. La agencia contratada trabaja exclusivamente USA. Cada uno donde tiene ventaja.
+  </div>
+</div>
+
+<!-- ============ 6 · MENSAJES COPY ============ -->
+<div class="panel" id="p6">
+  <div class="sect">
+    <div class="sect-title">Copy de mensajes · listos para usar</div>
+    <div class="sect-sub">Los mensajes están validados. Puedes personalizar el nombre y la empresa, pero mantén la estructura.</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Variables a reemplazar</div>
+    <span class="var">{firstName}</span> nombre del prospect · <span class="var">{companyName}</span> nombre de su empresa · <span class="var">{cargo}</span> el rol específico según el contexto
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Genérico · para cargos de CX y Operaciones que no calzan en un vertical claro</div>
+  </div>
+
+  <h4>Invitación LinkedIn</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Hola, <span class="var">{firstName}</span>. Estoy conectando con líderes de atención al cliente y operaciones en Colombia que gestionan altos volúmenes o picos de solicitudes. Vi tu perfil y me pareció valioso conectar.</div>
+  </div>
+
+  <h4>Después de aceptar · para SAC/CX/Operaciones</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Gracias por aceptar, <span class="var">{firstName}</span>. No sé si has percibido lo mismo, pero desde la llegada de la IA los clientes esperan respuestas más rápidas, personalizadas y disponibles 24/7. Sin embargo, delegar toda la atención a herramientas automáticas también puede afectar la experiencia.
+
+En INTELSA buscamos ese equilibrio combinando IA para las consultas repetitivas y agentes humanos para los casos que requieren criterio y empatía.
+
+¿Cómo están abordando actualmente ese equilibrio entre automatización y atención humana?</div>
+  </div>
+
+  <h4>Después de aceptar · para Mercadeo/Ventas/CS</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Gracias por aceptar, <span class="var">{firstName}</span>. No sé si has percibido lo mismo, pero desde la llegada de la IA los prospectos esperan respuestas prácticamente inmediatas. Sin embargo, delegar completamente la atención y calificación a herramientas automáticas puede hacer que se pierdan contexto y oportunidades valiosas.
+
+En INTELSA combinamos IA y agentes humanos para atender y calificar leads 24/7, evitando que se enfríen y que la inversión en marketing se convierta en ROI perdido.
+
+¿Cómo están manejando actualmente este proceso?</div>
+  </div>
+
+  <h4>Seguimiento</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body"><span class="var">{firstName}</span>, una atención tardía puede traducirse en leads perdidos, clientes que se van y una inversión comercial que no genera el retorno esperado.
+
+En INTELSA podemos comenzar con un diagnóstico gratuito para identificar cómo están respondiendo actualmente y cuánto valor podría recuperarse. Si encontramos una oportunidad, podemos iniciar con un piloto medido por interacciones gestionadas con éxito.
+
+¿Te parece si agendamos una conversación de 15 minutos?</div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">🛒 Ecommerce y retail</div>
+  </div>
+
+  <h4>Invitación LinkedIn</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Hola, <span class="var">{firstName}</span>. Estoy conectando con responsables de servicio al cliente y operaciones en ecommerce, retail y consumo masivo que gestionan picos de solicitudes, especialmente en temporadas donde una consulta o carrito sin responder a tiempo puede convertirse en una venta perdida. Me pareció valioso conectar.</div>
+  </div>
+
+  <h4>Después de aceptar</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body"><span class="var">{firstName}</span>, podemos cubrir la operación 24/7 combinando agentes humanos e inteligencia artificial, a una fracción del costo de aumentar el equipo interno.
+
+Podemos comenzar con un diagnóstico gratuito para identificar cuánto valor podría recuperarse mejorando los tiempos de respuesta. Si encontramos una oportunidad, iniciamos con un piloto medido por interacciones gestionadas con éxito.
+
+¿Te parece si agendamos una conversación de 15 minutos?</div>
+  </div>
+
+  <h4>Seguimiento</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body"><span class="var">{firstName}</span>, podemos comenzar con un diagnóstico gratuito y, si encontramos una oportunidad, implementar un piloto medido por tickets efectivamente procesados, tiempos de respuesta y calidad.
+
+¿Actualmente tienen tickets, consultas o solicitudes de posventa que se estén quedando sin respuesta a tiempo y puedan estar afectando las ventas o la experiencia del cliente?</div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">🏥 Salud · agendamiento de citas</div>
+  </div>
+
+  <h4>Invitación LinkedIn</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Hola, <span class="var">{firstName}</span>. Vi que lideras <span class="var">{cargo}</span> en <span class="var">{companyName}</span>. En INTELSA ayudamos a instituciones de salud a que ninguna solicitud de cita se quede sin respuesta, con atención 24/7. Me pareció valioso conectar.</div>
+  </div>
+
+  <h4>Después de aceptar</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Gracias por aceptar, <span class="var">{firstName}</span>. Cada llamada o mensaje de cita que no se responde a tiempo es un paciente que termina agendándose en otra parte. Cubrimos agendamiento, confirmación y recordatorios 24/7 con agentes humanos + IA, a una fracción del costo de ampliar el call center.
+
+¿Hoy el agendamiento lo manejan internamente o con un aliado?</div>
+  </div>
+
+  <h4>Seguimiento</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Podemos empezar con un diagnóstico gratuito de cuántas solicitudes de cita se están quedando sin respuesta o fuera de tiempo, y un piloto medido por citas efectivamente agendadas.
+
+¿Tienen picos de llamadas o franjas sin cubrir donde se pierden citas?</div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">🏘️ Inmobiliario · speed-to-lead</div>
+  </div>
+
+  <h4>Invitación LinkedIn</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Hola, <span class="var">{firstName}</span>. Vi que lideras <span class="var">{cargo}</span> en <span class="var">{companyName}</span>. En INTELSA ayudamos a inmobiliarias a responder en minutos los leads de portales y pauta, con atención 24/7. Me pareció valioso conectar.</div>
+  </div>
+
+  <h4>Después de aceptar</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Gracias por aceptar, <span class="var">{firstName}</span>. En finca raíz el lead se lo lleva el que contesta primero: cada minuto de demora es una visita que se pierde y plata de pauta que se va a la basura. Calificamos y respondemos tus leads 24/7 con humanos + IA, a una fracción del costo de un equipo dedicado.
+
+¿Hoy cómo están respondiendo los leads que llegan por portales y campañas?</div>
+  </div>
+
+  <h4>Seguimiento</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Podemos arrancar con un diagnóstico gratuito de tu tiempo de respuesta actual y un piloto medido por leads contactados y visitas agendadas.
+
+¿Cuánto se demoran hoy, en promedio, en contactar un lead nuevo?</div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">🏦 Financieras · speed-to-lead</div>
+  </div>
+
+  <h4>Invitación LinkedIn</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Hola, <span class="var">{firstName}</span>. Vi que lideras <span class="var">{cargo}</span> en <span class="var">{companyName}</span>. En INTELSA ayudamos a entidades financieras a no dejar enfriar las solicitudes que llegan por marketing, respondiendo 24/7. Me pareció valioso conectar.</div>
+  </div>
+
+  <h4>Después de aceptar</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Gracias por aceptar, <span class="var">{firstName}</span>. Cuando una solicitud de crédito o producto no se contacta rápido, el interesado ya está aplicando con otro, y el costo de adquisición que pagaste se pierde. Contactamos y prefiltramos esas solicitudes 24/7 con humanos + IA, a una fracción del costo de un equipo interno.
+
+¿Hoy cómo gestionan las solicitudes que entran por campañas?</div>
+  </div>
+
+  <h4>Seguimiento</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Podemos empezar con un diagnóstico gratuito de tu tiempo de respuesta y tasa de contacto, y un piloto medido por solicitudes efectivamente contactadas y calificadas.
+
+¿Tienen visibilidad de cuántas solicitudes se enfrían por no contactarlas a tiempo?</div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">🔁 Reactivación de clientes inactivos</div>
+  </div>
+
+  <h4>Invitación LinkedIn</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Hola, <span class="var">{firstName}</span>. Vi que lideras <span class="var">{cargo}</span> en <span class="var">{companyName}</span>. En INTELSA ayudamos a identificar y reactivar clientes que dejaron de comprar. Me pareció interesante conectar.</div>
+  </div>
+
+  <h4>Después de aceptar</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Gracias por aceptar, <span class="var">{firstName}</span>. Realizamos diagnósticos sobre bases de clientes inactivos para entender por qué se alejaron, priorizar segmentos y ejecutar campañas de reactivación.
+
+¿Actualmente trabajan de forma estructurada la recuperación de antiguos clientes?</div>
+  </div>
+
+  <h4>Seguimiento</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Además del contacto, buscamos identificar causas de abandono, oportunidades de recompra y señales útiles para Customer Success y Mercadeo.
+
+¿Aproximadamente cuántos clientes tienen inactivos hoy, y hace cuánto no reciben una campaña de reactivación estructurada?</div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">🏢 Empresas que ya tienen un BPO</div>
+  </div>
+
+  <h4>Invitación LinkedIn</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Hola, <span class="var">{firstName}</span>. Estoy conectando con líderes de Customer Experience y Operaciones en Colombia que gestionan altos volúmenes de atención y proveedores externos. Me pareció valioso conectar e intercambiar perspectivas sobre el sector.</div>
+  </div>
+
+  <h4>Después de aceptar</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Gracias por aceptar, <span class="var">{firstName}</span>. En INTELSA operamos procesos de CX combinando equipos humanos, tecnología y automatización.
+
+¿Actualmente trabajan con un solo BPO o distribuyen la operación entre diferentes aliados?</div>
+  </div>
+
+  <h4>Seguimiento</h4>
+  <div class="msg-block selected">
+    <div class="msg-header"><span class="msg-tag chosen">✓ Mensaje elegido</span><button class="copy-btn" onclick="copyMsg(this)">Copiar</button></div>
+    <div class="msg-body">Podemos apoyar operaciones de overflow, picos de demanda, nuevos canales o funcionar como benchmark, sin plantear un cambio total de proveedor.
+
+El diferencial es ofrecer la misma cobertura 24/7 combinando agentes humanos e inteligencia artificial, a una fracción del costo por interacción.
+
+¿Tienen actualmente algún frente en crecimiento o que estén buscando optimizar?</div>
+  </div>
+</div>
+
+<!-- ============ 7 · OBJECIONES ============ -->
+<div class="panel" id="p7">
+  <div class="sect">
+    <div class="sect-title">Manejo de objeciones</div>
+    <div class="sect-sub">Las 10 objeciones más comunes y cómo responderlas sin discutir</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Principio general</div>
+    <b>No discutas. No vendas. Pregunta.</b> Toda objeción es una oportunidad de aprender más sobre el prospect. Tu meta no es rebatir, es entender por qué lo dice y mantener la conversación abierta.
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"Ya trabajamos con Teleperformance (o Concentrix, Atento, otro BPO). No nos interesa cambiar."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Entiendo perfectamente, y no venimos a plantear un cambio total de proveedor. Muchos de nuestros clientes actuales tienen operaciones distribuidas: usan un BPO principal + Intelsa para overflow, nuevos canales, o como benchmark. ¿Tienen algún frente en crecimiento donde podría tener sentido explorar una segunda opinión?</div>
+    </div>
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"No tenemos presupuesto para eso ahora."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Lo entiendo. Justo por eso trabajamos con un modelo de diagnóstico gratuito de entrada: dedicamos 2 semanas a entender su operación y les mostramos el business case con números concretos. Si el ROI no salta a la vista, no hay conversación. ¿Vale la pena que agendemos 15 min para ver si vale la pena hacer ese diagnóstico?</div>
+    </div>
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"La IA todavía no funciona bien en español."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Esa era la realidad hasta hace un año. Los modelos actuales que usamos manejan español conversacional al nivel de un agente humano en el 60-70% de los casos simples. Precisamente por eso nunca dejamos toda la atención en IA: los casos que requieren criterio o empatía siempre pasan a humano. ¿Te interesa ver cómo funciona en un caso real?</div>
+    </div>
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"Ya estamos implementando IA propia con nuestro equipo."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Excelente. Muchos de nuestros clientes empezaron por ahí y llegaron al mismo problema: implementar toma 6-9 meses y después necesitas un equipo permanente para mantenerlo, entrenarlo y operarlo. Nosotros no reemplazamos su IA, la complementamos con la capa humana + operación. ¿Cómo van con el proyecto interno?</div>
+    </div>
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"Cambiar de operación es muy complicado, ya estamos ordenados."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Totalmente. Por eso no proponemos migrar toda la operación de golpe. Empezamos con un piloto de 8 semanas sobre un pedazo pequeño y medible (un canal, un turno, un tipo de gestión). Si funciona escalamos, si no, cortamos sin costo hundido. ¿Cuál sería el proceso más doloroso que probarías primero?</div>
+    </div>
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"Necesito ver el ROI antes de agendar una reunión."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Es exactamente lo que hacemos en el diagnóstico. En 30 minutos de conversación levantamos volumen, costos actuales y KPI objetivo. Con eso te armamos un business case con números reales de tu operación, no genéricos. ¿Te sirve que agendemos esa media hora?</div>
+    </div>
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"No es prioridad este trimestre. Vuelve en 3 meses."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Perfecto, agendo un recordatorio para el [fecha específica en 90 días]. Mientras tanto, ¿te parece que te comparta cada 3-4 semanas casos o insights del sector que puedan serte útiles? Sin agenda comercial, solo para que llegues informado cuando decidas evaluar.</div>
+    </div>
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"Mándame información y la revisamos."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Con gusto. Antes de mandarte algo genérico que probablemente no va a hablar de tu caso, ¿me das 10 minutos por teléfono? Te hago 3 preguntas y con eso te mando algo específico y útil, no un brochure genérico. ¿Qué te parece esta semana entre martes y jueves?</div>
+    </div>
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"No soy yo quien decide esto."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Perfecto que me lo digas ahora. ¿Podrías ponerme en contacto con la persona que sí toma esa decisión? Y de tu lado, ¿cuál es tu opinión sobre este tema? Si lo ves con potencial, tu input a esa persona pesa más que el mío.</div>
+    </div>
+  </div>
+
+  <div class="obj-block">
+    <div class="obj-q">"No confío en outsourcing, prefiero tener el equipo interno."</div>
+    <div class="obj-body">
+      <span class="lbl">Cómo responder</span>
+      <div class="say">Válido, y muchos de nuestros clientes empezaron pensando igual. Nosotros no somos "outsourcing" en el sentido clásico donde te desligas del proceso. Trabajamos como extensión de tu equipo: reportamos a tu líder, usamos tus KPI, y tu marca está protegida. ¿Qué es lo que más te preocupa de la experiencia con proveedores?</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-label">Cuando escalar a Oscar</div>
+    Si un prospect pide algo que no sabes responder (pricing específico, capacidad técnica, compromiso de SLA, contrato personalizado), NO improvises. Di: "Excelente pregunta. Prefiero que quien tiene la respuesta técnica exacta te la dé de primera mano. ¿Te parece si agendamos 20 minutos con nuestro Growth Manager esta semana?"
+  </div>
+</div>
+
+<!-- ============ 8 · CRM Y PROCESO ============ -->
+<div class="panel" id="p8">
+  <div class="sect">
+    <div class="sect-title">Disciplina de CRM</div>
+    <div class="sect-sub">El CRM no es papeleo, es tu memoria y la del equipo</div>
+  </div>
+
+  <div class="callout risk">
+    <div class="callout-label">Regla del playbook</div>
+    Las oportunidades sin actividad durante 14 días <b>salen del forecast activo</b>. Si no está en CRM, no existe. Actualiza al final de cada día, no al final de la semana.
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Campos obligatorios en cada oportunidad</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Campo</th><th>Regla</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>Cuenta, mercado y tier</b></td><td>Toda oportunidad pertenece a una cuenta con tier (A/B/C) y mercado (Colombia)</td></tr>
+      <tr><td><b>Origen</b></td><td>SEO, Raptor CX, SDR outbound, agencia USA, referido, evento, inbound</td></tr>
+      <tr><td><b>Contacto, cargo y canal</b></td><td>No aceptar registros sin persona responsable con nombre y cargo</td></tr>
+      <tr><td><b>Dolor y KPI afectado</b></td><td>En una frase concreta. "Tienen picos de tickets" NO sirve. "Reciben 3.000 tickets/mes y tardan 4h en primera respuesta" SÍ sirve</td></tr>
+      <tr><td><b>Valor mensual potencial</b></td><td>En COP, con rango de confianza (bajo/medio/alto)</td></tr>
+      <tr><td><b>Modelo de pricing sugerido</b></td><td>Posición, interacción o resultado</td></tr>
+      <tr><td><b>Etapa</b></td><td>Basada en evidencia real, no en corazonada</td></tr>
+      <tr><td><b>Probabilidad</b></td><td>10%, 25%, 50%, 75% o 90% según hito alcanzado</td></tr>
+      <tr><td><b>Siguiente paso</b></td><td>Acción específica + responsable + fecha (ejemplo: "María envía casos por WhatsApp el jueves 15")</td></tr>
+      <tr><td><b>Fecha estimada de firma</b></td><td>Se actualiza semanalmente. Si se corre 3 veces, revisar por qué</td></tr>
+      <tr><td><b>Estado de revenue</b></td><td>Pipeline / firmado / implementación / go-live / facturado</td></tr>
+      <tr><td><b>Bloqueo</b></td><td>Compras, legal, datos, sponsor, precio, timing, capacidad</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sect">
+    <div class="sect-title">Las etapas del pipeline</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Etapa</th><th>Prob.</th><th>Qué la desbloquea</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1 · Contacto inicial</td><td class="num">10%</td><td>El prospect respondió al menos un mensaje</td></tr>
+      <tr><td>2 · Reunión agendada</td><td class="num">25%</td><td>Reunión en calendario, no cancelada</td></tr>
+      <tr><td>3 · Reunión realizada</td><td class="num">40%</td><td>La reunión ocurrió y hay siguiente paso claro</td></tr>
+      <tr><td>4 · Oportunidad calificada</td><td class="num">50%</td><td>Hay dolor real, presupuesto tentativo, decisor identificado, timing en 6 meses</td></tr>
+      <tr><td>5 · Diagnóstico o piloto en curso</td><td class="num">65%</td><td>Firmaron el paso de entrada (diagnóstico gratuito o piloto pagado)</td></tr>
+      <tr><td>6 · Propuesta enviada</td><td class="num">75%</td><td>Cotización formal socializada con el cliente</td></tr>
+      <tr><td>7 · Negociación final</td><td class="num">90%</td><td>Ajustes finales, negociación de términos, aprobación interna</td></tr>
+      <tr><td>8 · Firmado</td><td class="num">100%</td><td>Contrato firmado por ambas partes</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sect">
+    <div class="sect-title">Qué es una reunión calificada (SQL)</div>
+    <div class="sect-sub">Tu meta operativa · 1 SQL al día en promedio</div>
+  </div>
+
+  <div class="card card-emph">
+    <div class="card-body">
+      Una reunión es SQL cuando, después de que ocurre, puedes marcar SÍ en <b>al menos 4 de estos 5 criterios</b>:
+      <ol class="clean">
+        <li>La empresa <b>encaja con el ICP</b> (vertical, tamaño, dolor)</li>
+        <li>La persona con la que hablaste <b>tiene influencia o decisión</b> sobre este tipo de contratación</li>
+        <li>Hay <b>un dolor operativo real</b>, no una curiosidad</li>
+        <li>Existe <b>presupuesto o capacidad</b> de tener presupuesto en 6 meses</li>
+        <li>Hay <b>un siguiente paso concreto acordado</b> (no "te escribo en unos días")</li>
+      </ol>
+      <br>
+      <b>Si marcas 3 o menos:</b> la reunión no cuenta como SQL. La reportas honestamente como MQL o descarte.
+    </div>
+  </div>
+</div>
+
+<!-- ============ 9 · MÉTRICAS ============ -->
+<div class="panel" id="p9">
+  <div class="sect">
+    <div class="sect-title">Cómo se mide tu desempeño</div>
+    <div class="sect-sub">Sin sorpresas: estos son los números que David y Oscar miran cada viernes</div>
+  </div>
+
+  <div class="grid-4">
+    <div class="kpi"><div class="kpi-label">Reuniones agendadas</div><div class="kpi-value">24-36/mes</div><div class="kpi-sub">Semanales: 6-9</div></div>
+    <div class="kpi"><div class="kpi-label">Show rate</div><div class="kpi-value dark">65-75%</div><div class="kpi-sub">Reuniones que ocurren</div></div>
+    <div class="kpi"><div class="kpi-label">Cuentas activadas</div><div class="kpi-value dark">60-80/mes</div><div class="kpi-sub">Tier B principalmente</div></div>
+    <div class="kpi"><div class="kpi-label">SQL / reunión</div><div class="kpi-value green">55-75%</div><div class="kpi-sub">Reuniones calificadas</div></div>
+  </div>
+
+  <div class="sect">
+    <div class="sect-title">Meta semanal del embudo</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Indicador</th><th class="num">Semanal</th><th class="num">Mensual</th><th class="num">6 meses</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Cuentas nuevas activadas</td><td class="num">15-20</td><td class="num">60-80</td><td class="num">120 únicas</td></tr>
+      <tr><td>Contactos válidos trabajados</td><td class="num">75-125</td><td class="num">300-500</td><td class="num">1.800-3.000</td></tr>
+      <tr><td>Reuniones agendadas</td><td class="num">6-9</td><td class="num">24-36</td><td class="num">140-200</td></tr>
+      <tr><td>Reuniones realizadas</td><td class="num">5-7</td><td class="num">20-28</td><td class="num">120-160</td></tr>
+      <tr><td>Oportunidades calificadas</td><td class="num">2-3</td><td class="num">8-12</td><td class="num">45-65</td></tr>
+      <tr><td>Pilotos / diagnósticos iniciados</td><td class="num">1</td><td class="num">3-4</td><td class="num">15-20</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sect">
+    <div class="sect-title">Conversiones que debes vigilar</div>
+    <div class="sect-sub">Si alguna cae bajo el piso 2 semanas seguidas, hablas con Oscar</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Conversión</th><th class="num">Piso</th><th class="num">Meta</th><th>Qué hacer si falla</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Agendada a realizada</td><td class="num">65%</td><td class="num">75%+</td><td>Confirmación 24h antes, recordatorio 2h antes, mejor calificación previa</td></tr>
+      <tr><td>Realizada a oportunidad</td><td class="num">25%</td><td class="num">35%+</td><td>Revisar ICP y nivel del interlocutor. Puede que estés agendando cargos que no deciden</td></tr>
+      <tr><td>Contactos a respuesta</td><td class="num">2%</td><td class="num">5%+</td><td>Revisar mensaje, personalización, o lista (probablemente mala)</td></tr>
+      <tr><td>Respuestas a reunión</td><td class="num">25%</td><td class="num">40%+</td><td>Revisar CTA, si estás pidiendo la reunión bien o dando demasiada info</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sect">
+    <div class="sect-title">Los gates de 6 meses</div>
+    <div class="sect-sub">Momentos donde el equipo decide continuar, ajustar o cortar</div>
+  </div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Momento</th><th>Meta acumulada</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Fin mes 1</td><td>20-25 reuniones agendadas, 6-10 oportunidades, 2-3 pilotos iniciados</td></tr>
+      <tr><td>Fin mes 2</td><td>45-55 reuniones acumuladas, 15-20 oportunidades, 4-6 pilotos activos</td></tr>
+      <tr><td>Día 105</td><td>Pipeline calificado COP 300M+, COP 90-120M en propuesta o negociación</td></tr>
+      <tr><td>Fin mes 4</td><td>Primeros cierres, handoff a operaciones</td></tr>
+      <tr><td>Fin mes 5</td><td>COP 75-110M firmado acumulado</td></tr>
+      <tr><td><b>Fin mes 6</b></td><td><b>COP 150M de nuevo MRR firmado</b></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout green">
+    <div class="callout-label">Tu compensación</div>
+    Base COP $2.2M + variable por reuniones calificadas realizadas, oportunidades avanzadas y clientes cerrados. Los detalles del variable los ves con Oscar en tu primera semana.
+  </div>
+</div>
+
+<!-- ============ 10 · REGLAS DE ORO ============ -->
+<div class="panel" id="p10">
+  <div class="sect">
+    <div class="sect-title">Las 12 reglas que no se rompen</div>
+    <div class="sect-sub">Del playbook de David · aplican a todos, incluyendo Gerencia</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card"><div class="card-title">1 · Mínimo mensual garantizado</div><div class="card-body">Todo contrato tiene mínimo mensual garantizado. <b>No se acepta variable puro.</b></div></div>
+    <div class="card"><div class="card-title">2 · Validación previa</div><div class="card-body">Operaciones y finanzas validan dimensionamiento, margen y punto de equilibrio antes de cotizar.</div></div>
+    <div class="card"><div class="card-title">3 · La IA no es ahorro presupuestado</div><div class="card-body">La IA no se presupuesta como ahorro hasta que exista evidencia en la operación real.</div></div>
+    <div class="card"><div class="card-title">4 · Contrato mínimo 12 meses</div><div class="card-body">Salvo piloto pagado con conversión explícita.</div></div>
+    <div class="card"><div class="card-title">5 · Toda reunión con siguiente paso</div><div class="card-body">Termina con siguiente paso, dueño y fecha. Nunca "te llamamos".</div></div>
+    <div class="card"><div class="card-title">6 · 14 días máximo sin actividad</div><div class="card-body">Las oportunidades sin actividad 14 días salen del forecast activo.</div></div>
+    <div class="card"><div class="card-title">7 · Closer con respaldo</div><div class="card-body">Ninguna oportunidad depende de una sola persona. Multithreading obligatorio.</div></div>
+    <div class="card"><div class="card-title">8 · Propuestas en 72 horas</div><div class="card-body">Máximo 72 horas una vez estén completos los datos.</div></div>
+    <div class="card"><div class="card-title">9 · No contratar sin respaldo</div><div class="card-body">No se contrata personal operativo sin contrato, orden o probabilidad alta con fecha.</div></div>
+    <div class="card"><div class="card-title">10 · Capital de trabajo antes de firmar</div><div class="card-body">Se modela antes de firmar, no después.</div></div>
+    <div class="card"><div class="card-title">11 · USA no en FTE USD</div><div class="card-body">En Estados Unidos no se cotiza FTE mientras la TRM esté baja. Se cotiza por interacción o resultado.</div></div>
+    <div class="card"><div class="card-title">12 · Estados de revenue separados</div><div class="card-body">Firmado, facturado y revenue reconocido se reportan como estados diferentes.</div></div>
+  </div>
+
+  <div class="callout risk">
+    <div class="callout-label">Lo que nunca haces</div>
+    <ul class="clean" style="margin-top:6px;">
+      <li>Nunca prometes capacidad técnica sin validar con Vanessa</li>
+      <li>Nunca inventas casos o números que no puedes respaldar</li>
+      <li>Nunca cambias precio en la reunión sin autorización de Oscar</li>
+      <li>Nunca contactas empresas de la lista NO contactar (BAT, SHEIN, PROMEDAN, STHIL, PAYU)</li>
+      <li>Nunca envías cotización sin socializarla en reunión</li>
+      <li>Nunca omites actualizar CRM porque "hoy no me dio tiempo"</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  Intelsa BPO &amp; CX · Playbook del SDR · MOCA · Versión 1.0 · Julio 2026 · Owner: Oscar Barrera · Basado en el Playbook Comercial de David
+</div>
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.panel).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+function copyMsg(btn) {
+  const block = btn.closest('.msg-block');
+  const body = block.querySelector('.msg-body');
+  const text = body.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copiar';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
