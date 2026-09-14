@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Intelsa · Propuesta Sequoia Wireless</title>
+<title>Intelsa · Sequoia Wireless Recovery Partnership</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -220,6 +220,21 @@
   .roi .lab b{color:var(--ink);font-weight:600}
   .roifoot{margin-top:22px;font-size:12px;color:var(--ink-faint);line-height:1.5;max-width:88ch}
 
+  /* roi matrix */
+  .rmatrix{margin-top:24px;background:var(--white);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .rmatrix table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  .rmatrix th,.rmatrix td{padding:13px 16px;text-align:right;font-size:13.5px;border-bottom:1px solid var(--line)}
+  .rmatrix th:first-child,.rmatrix td:first-child{text-align:left}
+  .rmatrix thead th{font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;background:var(--panel);border-bottom:1.5px solid var(--line-strong)}
+  .rmatrix thead th.grp{color:var(--pine);border-left:1px solid var(--line-strong)}
+  .rmatrix tbody tr:nth-child(even){background:rgba(159,198,66,.05)}
+  .rmatrix td.mix{font-weight:600;color:var(--ink)}
+  .rmatrix td.mix span{display:block;font-weight:400;color:var(--ink-faint);font-size:11.5px;letter-spacing:.02em;margin-top:2px}
+  .rmatrix td.val{font-family:'Space Grotesk',sans-serif;color:var(--ink)}
+  .rmatrix td.roi{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--lime-deep)}
+  .rmatrix tr.base td{background:rgba(245,134,52,.08)}
+  .rmatrix tr.base td.mix{color:var(--orange-deep)}
+
   /* diff grid */
   .diff{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}
   @media (max-width:820px){.diff{grid-template-columns:1fr}}
@@ -234,6 +249,15 @@
   .casestrip .ct b{color:var(--ink)}
   .casestrip .cbig{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:34px;color:var(--pine);line-height:1}
   .casestrip .cbig small{display:block;font-size:12px;font-weight:500;color:var(--ink-faint);letter-spacing:.02em;margin-top:4px}
+
+  /* base funnel */
+  .funnel{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+  @media (max-width:820px){.funnel{grid-template-columns:1fr}}
+  .fstep{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:22px 20px;text-align:center;position:relative}
+  .fstep .fnum{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(30px,3.6vw,44px);color:var(--pine);letter-spacing:-.02em;line-height:1}
+  .fstep:nth-child(3) .fnum{color:var(--orange)}
+  .fstep .flab{font-family:'Space Grotesk',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-top:10px;font-weight:600}
+  .fstep .fdesc{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin-top:8px}
 
   /* compliance */
   .complist{display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;margin-top:24px}
@@ -276,7 +300,7 @@
   .closing .rise-together{font-family:'Space Grotesk',sans-serif;font-style:italic;font-weight:600;color:#fff;font-size:clamp(20px,2.6vw,30px);margin-top:34px}
   .closing .contact{margin-top:40px;display:flex;gap:40px;flex-wrap:wrap;color:#fff}
   .closing .contact .who b{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;display:block}
-  .closing .contact .who span{font-size:13.5px;color:rgba(255,255,255,.82)}
+  .closing .contact .who span{font-size:13.5px;color:rgba(255,255,255,.82);display:block;margin-top:2px}
   .closing .contact .who a{color:#fff;text-decoration:none;font-size:13.5px}
   .closing .valid{margin-top:30px;font-size:12.5px;color:rgba(255,255,255,.75)}
   .closing .covermark{position:absolute;right:-6%;bottom:-14%;width:min(46vw,520px);color:#fff;opacity:.13;pointer-events:none}
@@ -304,21 +328,21 @@
   </svg>
   <div class="wordmark"><span class="name">intelsa</span><span class="sub">BPO AND CX</span></div>
 </div>
-<div class="seclabel" id="seclabel">Portada</div>
+<div class="seclabel" id="seclabel">Cover</div>
 
 <div class="deck" id="deck">
 
   <!-- 1 · COVER -->
-  <section class="slide cover slide-dark" data-label="Portada">
+  <section class="slide cover" data-label="Cover">
     <div class="wrap">
-      <div class="ref rise"><span>PE 1007 — 312</span><span>11 de julio de 2026</span><span>Confidencial</span></div>
-      <h1 class="rise">Campaña bilingüe de<br><em>recuperación de clientes</em></h1>
-      <div class="kicker rise">Reactivación de usuarios California LifeLine<span class="dot"></span>Piloto controlado</div>
+      <div class="ref rise"><span>PE 1007 — 314</span><span>September 2026</span><span>Confidential</span></div>
+      <h1 class="rise">Bilingual customer<br><em>recovery partnership</em></h1>
+      <div class="kicker rise">California LifeLine reactivation<span class="dot"></span>Controlled pilot with a path to partnership</div>
       <div class="client rise">
-        <span class="pill">Preparada para <b>Sequoia Wireless, LLC</b></span>
-        <span class="pill">Nearshore · <b>Zona Horaria del Pacífico</b></span>
+        <span class="pill">Prepared for <b>Sequoia Wireless, LLC</b></span>
+        <span class="pill">Nearshore · <b>Pacific Time Zone</b></span>
       </div>
-      <div class="meta rise">Preparada por Oscar Barrera — Growth Manager &nbsp;·&nbsp; Revisión: Vanessa Restrepo — Directora de Proyectos y Operaciones</div>
+      <div class="meta rise">Prepared by <b style="color:var(--ink)">David Echeverri</b>, CEO &nbsp;·&nbsp; <b style="color:var(--ink)">Oscar Barrera</b>, Growth Manager &nbsp;·&nbsp; <b style="color:var(--ink)">Vanessa Restrepo</b>, Director of Projects &amp; Operations</div>
     </div>
     <svg class="covermark" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="12" cy="88" r="11" fill="currentColor"/>
@@ -327,230 +351,267 @@
     </svg>
   </section>
 
-  <!-- 2 · EL RETO -->
-  <section class="slide" data-label="El reto">
+  <!-- 2 · THE OPPORTUNITY -->
+  <section class="slide" data-label="The opportunity">
     <div class="wrap">
-      <div class="eyebrow rise">Contexto y entendimiento</div>
-      <h2 class="rise">Una ventana de recuperación<br>que hoy es <span class="g">competitiva</span></h2>
-      <p class="lead rise">Sequoia tiene <b>20.000 antiguos usuarios</b> de California LifeLine que quedaron inactivos o transfirieron su beneficio durante la pausa de inscripciones por la revisión regulatoria de la CPUC. Reactivarlos reabre el flujo de <b>US$39 por inscripción</b> más <b>US$29 mensual recurrente</b> por línea.</p>
-      <p class="lead rise">La separación entre California LifeLine y el Lifeline federal (feb-2026) elevó la fricción de renovación para toda la industria: se abren ventanas de recuperación y <b>gana quien contacte primero y mejor</b>.</p>
+      <div class="eyebrow rise">Context &amp; understanding</div>
+      <h2 class="rise">A recovery window<br>that today is <span class="g">competitive</span></h2>
+      <p class="lead rise">Sequoia holds a historical base of former California LifeLine customers who churned during the enrollment pause driven by the CPUC regulatory review. Reactivating them reopens the flow of <b>US$19–$39 per enrollment</b> and <b>US$19 monthly recurring</b> per active line.</p>
+      <p class="lead rise">The separation between California LifeLine and the federal Lifeline program (Feb 2026) increased renewal friction across the industry: recovery windows are open, and <b>the winner is whoever contacts first and best</b>.</p>
+      <div class="funnel rise">
+        <div class="fstep"><div class="fnum">47K</div><div class="flab">Historical base</div><div class="fdesc">Complete customer database</div></div>
+        <div class="fstep"><div class="fnum">21K</div><div class="flab">With phone data</div><div class="fdesc">Contactable universe</div></div>
+        <div class="fstep"><div class="fnum">4,700</div><div class="flab">Priority segment</div><div class="fdesc">Active usage · 6+ months tenure · secondary contact</div></div>
+      </div>
       <div class="chips rise">
-        <span class="chip">Base <b>ya segmentada</b> y trazable</span>
-        <span class="chip">Perfil <b>adulto mayor</b> · ritmo y calidez</span>
-        <span class="chip">Alta <b>desconfianza a llamadas</b> · el acento decide</span>
+        <span class="chip">Base <b>already segmented</b> and traceable</span>
+        <span class="chip"><b>Older-adult</b> profile · pacing and warmth matter</span>
+        <span class="chip"><b>Accent</b> decides the first three seconds</span>
       </div>
     </div>
   </section>
 
-  <!-- 3 · ECONOMÍA -->
-  <section class="slide" data-label="La economía del programa">
+  <!-- 3 · ECONOMICS -->
+  <section class="slide" data-label="Program economics">
     <div class="wrap">
-      <div class="eyebrow rise">La economía del programa</div>
-      <h2 class="rise">Cada reactivación tiene un <span class="g">valor conocido</span></h2>
+      <div class="eyebrow rise">The program economics</div>
+      <h2 class="rise">Every reactivation has a <span class="g">known value</span></h2>
       <table class="dtable rise">
-        <thead><tr><th>Concepto</th><th>Valor</th><th>Detalle</th></tr></thead>
+        <thead><tr><th>Concept</th><th>Value</th><th>Detail</th></tr></thead>
         <tbody>
-          <tr><td class="k">Pago por nueva inscripción</td><td class="v">US$39 / línea</td><td class="d">Una sola vez, al cumplir el año fuera del programa</td></tr>
-          <tr><td class="k">Pago mensual recurrente</td><td class="v">US$29 / línea / mes</td><td class="d">Sujeto a uso real del servicio (regla de 30 días)</td></tr>
-          <tr><td class="k">Permanencia mínima</td><td class="v">3 meses</td><td class="d">Pago trimestralizado al provider</td></tr>
-          <tr><td class="k">Ciclo de cobro</td><td class="v">T + 3 meses</td><td class="d">La inscripción de un mes se refleja un trimestre después</td></tr>
+          <tr><td class="k">Enrollment after annual cycle reset</td><td class="v">US$39 / line</td><td class="d">One-time, when a full year has passed since the previous enrollment</td></tr>
+          <tr><td class="k">Enrollment before annual cycle reset</td><td class="v">US$19 / line</td><td class="d">Applies to transfers, reactivations, or returns within the cycle</td></tr>
+          <tr><td class="k">Monthly recurring payment</td><td class="v">US$19 / line / month</td><td class="d">Subject to real service usage (30-day rule)</td></tr>
+          <tr><td class="k">Minimum permanence for success</td><td class="v">90 days active</td><td class="d">Full process, activation, valid usage, retention</td></tr>
+          <tr><td class="k">Provider payment cycle</td><td class="v">T + 3 months</td><td class="d">An enrollment in one month is paid a quarter later</td></tr>
         </tbody>
       </table>
-      <div class="callout rise">Con la economía compartida por Sequoia, cada reactivación vale <b>≈ US$126 en el primer trimestre</b> (US$39 + 3 × US$29) y <b>≈ US$29/mes</b> de ahí en adelante. Esta cifra es el ancla de todo el modelo.</div>
+      <div class="callout rise">Depending on segmentation by date and disconnection reason, the base is a mix of $19 and $39 enrollments. <b>90-day value per client sits between $76 and $96</b>. Extended to a 12-month relationship, <b>LTV per activated customer reaches $247 to $267</b>. This is the anchor for the entire commercial model.</div>
     </div>
   </section>
 
-  <!-- 4 · ENFOQUE -->
-  <section class="slide" data-label="Nuestro enfoque">
+  <!-- 4 · APPROACH -->
+  <section class="slide" data-label="Our approach">
     <div class="wrap">
-      <div class="eyebrow rise">Nuestro enfoque de recuperación</div>
-      <h2 class="rise">Recuperación end-to-end, <span class="g">no solo llamar</span></h2>
+      <div class="eyebrow rise">Recovery framework</div>
+      <h2 class="rise">End-to-end recovery, <span class="g">not just calling</span></h2>
       <div class="flow rise">
-        <div class="step"><div class="s">1</div><h4>Preparación de base</h4><p>Ingesta desde la plataforma de Sequoia, cruce contra DNC federal y exclusiones, y priorización con IA por probabilidad de reactivación.</p></div>
-        <div class="step"><div class="s">2</div><h4>SMS bilingüe</h4><p>Mensaje EN/ES según preferencia, con opt-out inmediato (TCPA). Calienta el contacto 24–48 h antes de la llamada.</p></div>
-        <div class="step"><div class="s">3</div><h4>Llamada outbound</h4><p>Hasta 3 intentos en distintas franjas, con two-party consent, talk track por segmento y ritmo pensado para adulto mayor.</p></div>
-        <div class="step"><div class="s">4</div><h4>Entrega en caliente</h4><p>Warm transfer directo al equipo interno de Sequoia dentro de su ventana operativa, con el contexto del contacto listo.</p></div>
+        <div class="step"><div class="s">1</div><h4>Base preparation</h4><p>Ingestion from Sequoia's platform, DNC federal cross-check, exclusion sync, and AI-driven prioritization by reactivation probability.</p></div>
+        <div class="step"><div class="s">2</div><h4>Bilingual SMS</h4><p>EN/ES per language preference, TCPA opt-out embedded. Warms the contact 24–48 hours before the first call attempt.</p></div>
+        <div class="step"><div class="s">3</div><h4>Outbound calls</h4><p>Up to 3 attempts across time slots, two-party consent captured, talk track by segment, pacing calibrated for older adults.</p></div>
+        <div class="step"><div class="s">4</div><h4>End-to-end enrollment</h4><p>Agents complete enrollment inside Sequoia's controlled portal. The customer never has to repeat their story.</p></div>
       </div>
       <div class="flowstrip rise">
-        <span class="tag">Capa de IA aplicada:</span>
-        <span>segmentación predictiva · copiloto de agente en vivo · <b>QA del 100%</b> de las llamadas · BI en tiempo real.</span>
+        <span class="tag">AI layer, applied end-to-end:</span>
+        <span>predictive segmentation · live agent copilot · <b>100% AI quality assurance</b> · real-time BI.</span>
       </div>
     </div>
   </section>
 
-  <!-- 5 · POR QUÉ INTELSA -->
-  <section class="slide" data-label="Por qué Intelsa">
+  <!-- 5 · AI LAYER -->
+  <section class="slide" data-label="The AI layer">
     <div class="wrap">
-      <div class="eyebrow rise">Diferenciadores</div>
-      <h2 class="rise">Por qué <span class="g">Intelsa</span></h2>
+      <div class="eyebrow rise">The AI layer</div>
+      <h2 class="rise">Not a feature.<br>The <span class="g">operating fabric</span>.</h2>
+      <p class="lead rise">Intelsa is a technology-first BPO. Every operation we run has AI woven into the workflow, not sitting as a demo alongside it.</p>
+      <div class="grid2 rise" style="margin-top:28px">
+        <div class="card"><h3><span class="n">01</span>Predictive segmentation</h3><p>A scoring model ranks the 4,700 priority records by reactivation likelihood, using tenure, disconnection reason, usage history, and language preference. Agents call the highest-probability contacts first, which compresses time to first activation and produces a cleaner signal for scale decisions.</p></div>
+        <div class="card"><h3><span class="n">02</span>Live agent copilot</h3><p>A knowledge-grounded assistant surfaces the right rebuttal, program rule, or eligibility criterion in real time during the call. Trained on Sequoia's product, LifeLine program mechanics, and the objection library we build together in the first two weeks of the pilot.</p></div>
+        <div class="card"><h3><span class="n">03</span>100% AI quality assurance</h3><p>Every recorded call is evaluated automatically against a compliance and quality rubric aligned with CPUC and CTIA standards. Human calibration runs weekly on a 5% sample. Sequoia gets both breadth (all calls scored) and depth (human context on edge cases).</p></div>
+        <div class="card"><h3><span class="n">04</span>Real-time BI dashboards</h3><p>Contact rates, conversion, funnel drop-off, script effectiveness, and cohort behavior visible to Sequoia in near-real-time. Your team can pivot the strategy inside the same operational week, not after a monthly review.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · WHY INTELSA -->
+  <section class="slide" data-label="Why Intelsa">
+    <div class="wrap">
+      <div class="eyebrow rise">Differentiators</div>
+      <h2 class="rise">Why <span class="g">Intelsa</span></h2>
       <div class="diff rise">
-        <div class="dcard"><h4>Nearshore</h4><p>Colombia opera en Hora del Pacífico: ventana 100% sincronizada con San Francisco. Cero desfase para los warm transfers.</p></div>
-        <div class="dcard"><h4>Acento neutralizado</h4><p>Reconocido en inglés y español. Determinante donde una llamada con acento no-nativo se cuelga en los primeros segundos por miedo a scams.</p></div>
-        <div class="dcard"><h4>Cultura de servicio</h4><p>Cercanía humana en lugar de eficiencia transaccional. Alineada con el perfil de adulto mayor de la base.</p></div>
-        <div class="dcard"><h4>Trayectoria + ISO</h4><p>11 años operando para EE. UU. y LATAM. ISO 27001 e ISO 9001:2015. Compliance-first desde el diseño, no como añadido.</p></div>
+        <div class="dcard"><h4>Nearshore, same time zone</h4><p>Colombia operates on Pacific Time. Ventana 100% synced with your team in San Francisco. Zero handoff delay for live coordination.</p></div>
+        <div class="dcard"><h4>Neutral bilingual accent</h4><p>Recognized in both English and Spanish. Decisive in a market where a call with a non-native accent is hung up in the first three seconds due to scam fears.</p></div>
+        <div class="dcard"><h4>Cultural closeness</h4><p>Human warmth over transactional efficiency. Aligned with the older-adult profile of the base and with what earns the trust needed to complete an enrollment.</p></div>
+        <div class="dcard"><h4>AI-first BPO + ISO certified</h4><p>Bootstrapped, technology-led BPO with 11 years of operating discipline. ISO 27001 and ISO 9001:2015 certified. Compliance-first from design, not as an add-on.</p></div>
       </div>
       <div class="casestrip rise">
-        <div class="cbig">~30%<small>conversión · migración móvil LATAM</small></div>
-        <div class="ct"><b>Caso de referencia — migración móvil (Grupo Éxito).</b> Base de <b>50.000+</b> clientes, compitiendo contra marcas más fuertes. Mismo patrón que Sequoia: marca menos reconocida, base grande, contexto competitivo y meta de reactivación explícita.</div>
+        <div class="cbig">~30%<small>conversion · mobile migration</small></div>
+        <div class="ct"><b>Reference case — Movil Éxito (Grupo Éxito).</b> Base of <b>50,000+</b> customers competing against Claro and Tigo (dominant carriers in the market). Same pattern as Sequoia: less recognized brand, large base, competitive context, explicit reactivation target.</div>
       </div>
     </div>
   </section>
 
-  <!-- 6 · DISEÑO DEL PILOTO -->
-  <section class="slide" data-label="Diseño del piloto">
+  <!-- 7 · PILOT DESIGN -->
+  <section class="slide" data-label="Pilot design">
     <div class="wrap">
-      <div class="eyebrow rise">Diseño operativo</div>
-      <h2 class="rise">Piloto controlado · <span class="g">2 meses</span></h2>
-      <p class="lead rise">Objetivo: <b>impactar 1.000 cuentas al mes</b> (2.000 en el piloto), con un modelo verificable y escalable a los 20.000. Meta mínima acordada de reactivación: <b>15%</b>; objetivo interno Intelsa: <b>20–25%</b>.</p>
+      <div class="eyebrow rise">Operational design</div>
+      <h2 class="rise">Controlled pilot · <span class="g">two configurations, one price</span></h2>
+      <p class="lead rise">Objective: work <b>1,000 records from the priority segment</b> with a verifiable model that scales to the full 4,700 and beyond. Sequoia's minimum reactivation target: <b>15%</b>. Intelsa's internal target: <b>20–25%</b>. Success is measured at 90 days of retained activation.</p>
       <div class="grid3 rise" style="margin-top:26px">
-        <div class="card"><h3>Parámetros</h3><p>Ventana 9:00 AM – 5:30 PM PT, L–V. Hasta 3 intentos por contacto, SMS previo bilingüe y warm transfer al equipo de Sequoia.</p></div>
-        <div class="card"><h3>Equipo recomendado</h3><p><b style="color:var(--pine)">2 agentes bilingües</b> formados como closers, con supervisión, QA y BI. Escalable por FTE según la meta de throughput.</p></div>
-        <div class="card"><h3>Gobierno</h3><p>Reportería diaria, sesión operativa semanal y ajustes de talk track dentro del sprint. Criterios GO / NO-GO para escalar.</p></div>
+        <div class="card"><h3>Parameters</h3><p>Operational window 9:00 AM – 5:30 PM PT, Monday to Friday. Up to 3 attempts per contact, bilingual SMS warm-up, end-to-end enrollment inside Sequoia's portal.</p></div>
+        <div class="card"><h3>Team recommendation</h3><p><b style="color:var(--pine)">2 bilingual closers</b> for one month, or <b style="color:var(--pine)">1 closer</b> across two months. Both options include supervision, QA, BI, and full tech stack.</p></div>
+        <div class="card"><h3>Governance</h3><p>Daily reporting, weekly operational session, in-sprint talk track adjustments. Clear GO / NO-GO criteria to decide the scaling phase.</p></div>
       </div>
-      <div class="callout rise">Sequoia no gestiona SSN ni el enrollment: eso queda 100% de su lado tras el warm transfer, lo que además <b>protege a Sequoia frente a la CPUC</b>.</div>
+      <div class="callout rise">Agents complete the enrollment inside <b>Sequoia's controlled portal</b> (address, SSN last four, eligibility program, activation). Rapport built by our agent carries through activation, eliminating the single largest drop-off point in reactivation campaigns.</div>
     </div>
   </section>
 
-  <!-- 7 · MODELO DE PRECIOS (HERO) -->
-  <section class="slide price slide-dark" data-label="Modelo de precios">
+  <!-- 8 · PRICING (HERO) -->
+  <section class="slide price slide-dark" data-label="Pricing model">
     <div class="wrap">
-      <div class="eyebrow rise">Modelo de precios · piloto controlado</div>
+      <div class="eyebrow rise">Pricing model · controlled pilot</div>
       <div class="pricegrid">
         <div class="pricebox rise">
-          <div class="bignum"><sup>US$</sup>2,200</div>
-          <div class="priceunit">por <b>agente bilingüe (FTE)</b> / mes</div>
-          <div class="pilotbadge">TARIFA DE PILOTO</div>
+          <div class="bignum"><sup>US$</sup>5,200</div>
+          <div class="priceunit">total pilot investment,<br><b>all-inclusive</b></div>
+          <div class="pilotbadge">CONTROLLED PILOT</div>
           <div class="pfacts">
-            <div class="pfact"><span class="lbl">Objetivo</span><b>Impactar <span class="hl">1.000 cuentas</span> / mes</b></div>
-            <div class="pfact"><span class="lbl">Duración</span><b>Piloto controlado · 2 meses</b></div>
-            <div class="pfact"><span class="lbl">Facturación</span><b>USD · exportación de servicios (sin IVA)</b></div>
+            <div class="pfact"><span class="lbl">Base</span><b>1,000 records from the <span class="hl">4,700 priority</span> segment</b></div>
+            <div class="pfact"><span class="lbl">Duration</span><b>Two configurations at the <span class="hl">same price</span></b></div>
+            <div class="pfact"><span class="lbl">Success</span><b>90 days active per reactivation</b></div>
+            <div class="pfact"><span class="lbl">Billing</span><b>USD · service export (no VAT)</b></div>
           </div>
         </div>
         <div class="pricebox rise">
-          <div class="phead">Configuración<br>recomendada</div>
+          <div class="phead">Same price,<br>your choice of speed</div>
           <table class="ptable">
-            <thead><tr><th>Equipo</th><th>Tarifa / FTE</th><th>Operación / mes</th><th>Piloto (2 meses)</th></tr></thead>
+            <thead><tr><th>Configuration</th><th>FTE fee</th><th>Duration</th><th>Total pilot</th></tr></thead>
             <tbody>
-              <tr><td>1 agente</td><td class="num">US$2,200</td><td class="num">US$2,200</td><td class="num">US$4,400</td></tr>
-              <tr class="hi"><td>2 agentes ✓</td><td class="num">US$2,200</td><td class="num">US$4,400</td><td class="num">US$8,800</td></tr>
-              <tr><td>3 agentes</td><td class="num">US$2,200</td><td class="num">US$6,600</td><td class="num">US$13,200</td></tr>
+              <tr><td>1 agent</td><td class="num">US$2,100</td><td class="num">2 months</td><td class="num">US$4,200</td></tr>
+              <tr class="hi"><td>2 agents ✓</td><td class="num">US$2,100</td><td class="num">1 month</td><td class="num">US$4,200</td></tr>
+              <tr><td colspan="3">One-time implementation</td><td class="num">US$1,000</td></tr>
             </tbody>
           </table>
-          <div class="pnote"><b>+ Implementación US$1,000</b> (única vez). Piloto con 1 agente: no incluye backup para ausencias; sí se reemplaza en caso de rotación o retiro.</div>
+          <div class="pnote"><b>Per-FTE fee already nets the $100 telephony credit</b> since Sequoia provides JustCall (licenses, numbers, dialing, recording, SMS). If the 1,000 records complete ahead of schedule, the assigned team remains available for callbacks, retention, or additional segments at no incremental cost within the pilot month.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 8 · LA TARIFA INCLUYE -->
-  <section class="slide" data-label="Todo incluido">
+  <!-- 9 · WHAT'S INCLUDED -->
+  <section class="slide" data-label="Included in the fee">
     <div class="wrap">
-      <div class="eyebrow rise">Qué incluye la tarifa por agente</div>
-      <h2 class="rise">Un precio, <span class="g">toda la operación</span></h2>
+      <div class="eyebrow rise">What the per-FTE fee includes</div>
+      <h2 class="rise">One price, <span class="g">the full operation</span></h2>
       <div class="checks rise">
-        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Agente bilingüe (EN/ES)</b> <span>con acento neutralizado, formado como closer.</span></div></div>
-        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Infraestructura de telecomunicaciones:</b> <span>dialer predictivo/progresivo, troncales SIP y grabación con two-party consent.</span></div></div>
-        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Entrega caliente de leads:</b> <span>warm transfer al equipo de Sequoia en la ventana 9:00 AM – 5:30 PM PT.</span></div></div>
-        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Motor de SMS bilingüe</b> <span>con gestión de opt-out automática (TCPA).</span></div></div>
-        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Copiloto de IA + QA del 100%</b> <span>de las llamadas grabadas (no muestreo).</span></div></div>
-        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>BI y reportería en tiempo real</b> <span>por cohorte, segmento, agente y horario; diaria y sesión semanal.</span></div></div>
-        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Puesto, herramientas y supervisión</b> <span>dedicada a la campaña.</span></div></div>
-        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Formación y compliance</b> <span>TCPA, DNC, two-party consent y exclusiones internas.</span></div></div>
+        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Bilingual closer (EN/ES)</b> <span>with neutralized accent, trained on Sequoia product, LifeLine rules and objection handling.</span></div></div>
+        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>JustCall integration:</b> <span>manual or progressive dialing, bilingual SMS delivery, native call recording (Sequoia-provided platform).</span></div></div>
+        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Custom CRM inside JustCall</b> <span>for full pipeline management, contact status, and next-best-action tagging.</span></div></div>
+        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>End-to-end enrollment</b> <span>inside Sequoia's controlled portal, so the agent who built rapport also closes the activation.</span></div></div>
+        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Live AI copilot + 100% QA</b> <span>on every recorded call (not sampling), with human calibration weekly.</span></div></div>
+        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Real-time BI dashboards</b> <span>by cohort, segment, agent, and time slot; daily reports and weekly operational session.</span></div></div>
+        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Dedicated workstation, tools, supervision</b> <span>and change management fully staffed for the campaign.</span></div></div>
+        <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div><div class="t"><b>Training and compliance</b> <span>on TCPA, DNC, California two-party consent, LifeLine rules and Sequoia internal exclusions.</span></div></div>
       </div>
     </div>
   </section>
 
-  <!-- 9 · ROI -->
-  <section class="slide" data-label="Economía verificable">
+  <!-- 10 · ROI -->
+  <section class="slide" data-label="Verifiable economics">
     <div class="wrap">
-      <div class="eyebrow rise">Economía verificable</div>
-      <h2 class="rise">Los números <span class="g">cierran</span></h2>
+      <div class="eyebrow rise">Verifiable economics</div>
+      <h2 class="rise">The numbers <span class="g">close</span></h2>
       <div class="roigrid rise">
-        <div class="roi"><div class="big">US$9,800</div><div class="lab"><b>Inversión total del piloto</b> · 2 agentes × 2 meses + implementación.</div></div>
-        <div class="roi"><div class="big o">≈ 4%</div><div class="lab">de reactivación (~78 cuentas) <b>recupera el 100%</b> de la inversión del piloto.</div></div>
-        <div class="roi"><div class="big">US$37,800</div><div class="lab">revenue del <b>primer trimestre</b> a la meta mínima del 15% (300 reactivaciones).</div></div>
-        <div class="roi"><div class="big o">~3.9×</div><div class="lab">retorno sobre la inversión del piloto en Q1, <b>más ≈ US$8,700/mes</b> recurrente.</div></div>
+        <div class="roi"><div class="big">US$5,200</div><div class="lab"><b>Total pilot investment</b> · both configurations, all-inclusive.</div></div>
+        <div class="roi"><div class="big o">6.1%</div><div class="lab"><b>Break-even</b> at 90 days · 60 activated customers, well below the 15% floor.</div></div>
+        <div class="roi"><div class="big">2.5×</div><div class="lab"><b>Expected Q1 ROI</b> at the 15% target, 50/50 enrollment mix.</div></div>
+        <div class="roi"><div class="big o">US$38K–$64K</div><div class="lab"><b>12-month LTV potential</b> depending on retention achieved.</div></div>
       </div>
-      <div class="roifoot rise">Cálculo ilustrativo con la economía compartida por Sequoia (US$39 inscripción + US$29/mes, permanencia mínima 3 meses → ≈ US$126 por reactivación en el primer trimestre). Los ingresos se materializan a T+3 meses. Es una proyección de referencia, no una garantía de resultados.</div>
+      <div class="rmatrix rise">
+        <table>
+          <thead>
+            <tr><th rowspan="2">Enrollment mix ($19 / $39)</th><th rowspan="2">Avg 90-day value</th><th class="grp" colspan="2">Retention 15% (150 active)</th><th class="grp" colspan="2">Retention 25% (250 active)</th></tr>
+            <tr><th class="grp">Revenue</th><th>ROI</th><th class="grp">Revenue</th><th>ROI</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="mix">100 / 0<span>worst case, all $19</span></td><td class="val">$76</td><td class="val">$11,400</td><td class="roi">2.2×</td><td class="val">$19,000</td><td class="roi">3.7×</td></tr>
+            <tr><td class="mix">70 / 30<span>$19 majority</span></td><td class="val">$82</td><td class="val">$12,300</td><td class="roi">2.4×</td><td class="val">$20,500</td><td class="roi">3.9×</td></tr>
+            <tr class="base"><td class="mix">50 / 50<span>base case</span></td><td class="val">$86</td><td class="val">$12,900</td><td class="roi">2.5×</td><td class="val">$21,500</td><td class="roi">4.1×</td></tr>
+            <tr><td class="mix">30 / 70<span>favorable case</span></td><td class="val">$90</td><td class="val">$13,500</td><td class="roi">2.6×</td><td class="val">$22,500</td><td class="roi">4.3×</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="roifoot rise">Success is measured at 90 days of retained activation per Sequoia's definition. Revenue shown reflects the first-quarter payment received per active customer. Twelve-month LTV extends this by the recurring $19/month across the customer relationship. Reference projection, not a guarantee of results.</div>
     </div>
   </section>
 
-  <!-- 10 · DESPUÉS DEL PILOTO -->
-  <section class="slide" data-label="Después del piloto">
+  <!-- 11 · AFTER THE PILOT -->
+  <section class="slide" data-label="Beyond the pilot">
     <div class="wrap">
-      <div class="eyebrow rise">Después del piloto</div>
-      <h2 class="rise">Del piloto al modelo <span class="g">por resultados</span></h2>
-      <p class="lead rise">Superado el piloto, la relación pasa a un <b>modelo basado en outcome</b>: Intelsa cobra por cuentas efectivamente activadas, no por horas. Nuestro costo queda alineado con el revenue real de Sequoia.</p>
+      <div class="eyebrow rise">Beyond the pilot</div>
+      <h2 class="rise">From pilot to <span class="g">outcome-based partnership</span></h2>
+      <p class="lead rise">The pilot is designed to earn the right to scale. Once we have statistically meaningful data on reactivation, retention, and cost per 90-day activation, the relationship transitions to an <b>outcome-based partnership</b>, similar in spirit to the MDP (Marketing Distribution Partner) relationships Sequoia already operates in the US market.</p>
       <div class="grid3 rise" style="margin-top:28px">
-        <div class="card"><h3>Pago por cuenta activada</h3><p>Se factura por cada cuenta reactivada y confirmada por Sequoia. Cero pago por actividad sin resultado.</p></div>
-        <div class="card"><h3>Permanencia mínima</h3><p>La activación cuenta solo si el usuario cumple la permanencia mínima del programa: calidad real, no cifras infladas.</p></div>
-        <div class="card"><h3>Política de chargebacks</h3><p>Si una cuenta no cumple la permanencia, se descuenta. El incentivo de Intelsa queda 100% atado a la calidad del resultado.</p></div>
+        <div class="card"><h3><span class="n">P1</span>Prove the model</h3><p>1,000 records, dedicated FTE billing, $5,200 total. Learn the base, calibrate the script, validate the retention math.</p></div>
+        <div class="card"><h3><span class="n">P2</span>Scale to the priority base</h3><p>Extend to the full 4,700 priority segment with performance-adjusted terms. Pricing transitions to pay-per-activation with 90-day chargebacks.</p></div>
+        <div class="card"><h3><span class="n">P3</span>Full outsourcing horizon</h3><p>Expand scope beyond outbound to include inbound support, customer success, and back-office. Your team focuses on strategy, product, and regulatory.</p></div>
       </div>
-      <div class="callout rise">Es la misma lógica del piloto llevada al precio: <b>solo cuenta lo verificable</b>. La tarifa por activación y la ventana de chargeback se definen con los datos reales del piloto.</div>
+      <div class="callout rise"><b>Intelsa is only paid when Sequoia is paid.</b> Every dollar we earn requires a customer who completed enrollment, passed regulatory verification, activated the line, and remained active for 90 days. The partnership only grows if the revenue does.</div>
     </div>
   </section>
 
-  <!-- 11 · STACK -->
-  <section class="slide" data-label="Stack tecnológico">
+  <!-- 12 · STACK -->
+  <section class="slide" data-label="Technology stack">
     <div class="wrap">
-      <div class="eyebrow rise">Stack tecnológico</div>
-      <h2 class="rise">Sequoia no necesita dialer ni CRM outbound:<br><span class="g">lo aporta Intelsa</span></h2>
+      <div class="eyebrow rise">Technology stack</div>
+      <h2 class="rise">JustCall as telephony,<br>Intelsa as the <span class="g">intelligence layer</span></h2>
       <div class="grid2 rise" style="margin-top:28px">
-        <div class="card"><h3>Dialer predictivo / progresivo</h3><p>Plataforma outbound con reglas de intentos y suspensión configurables, integrada con la base segmentada de Sequoia.</p></div>
-        <div class="card"><h3>Motor de SMS bilingüe</h3><p>Envío programado, templates aprobados y gestión de opt-out automática para calentar el contacto antes de la llamada.</p></div>
-        <div class="card"><h3>Grabación two-party consent</h3><p>Captura del consentimiento explícito al inicio de cada llamada y almacenamiento cifrado, con la retención que defina Sequoia.</p></div>
-        <div class="card"><h3>Copiloto de IA + BI</h3><p>Guías y alertas de compliance en vivo, más dashboards en tiempo real para pivotar la estrategia dentro de la misma semana.</p></div>
+        <div class="card"><h3>Provided by Sequoia (JustCall)</h3><p>Agent licenses, outbound numbers, dialing engine (manual or progressive, no pre-recorded voice), bilingual SMS delivery, native call recording, and connection into Sequoia's internal systems.</p></div>
+        <div class="card"><h3>Predictive segmentation model</h3><p>Ranks the 4,700 priority records by reactivation likelihood before the first dial, so the pilot converges faster and produces a clean signal for scale decisions.</p></div>
+        <div class="card"><h3>Custom CRM inside JustCall + BI</h3><p>Pipeline management inside JustCall with real-time dashboards streamed to Sequoia via API and webhook integration. Your data, always visible, always exportable.</p></div>
+        <div class="card"><h3>Live AI copilot + 100% QA</h3><p>Real-time guidance and compliance alerts during the call, plus automated quality assurance on every recording with weekly human calibration on a 5% sample.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- 11 · COMPLIANCE -->
-  <section class="slide" data-label="Cumplimiento y seguridad">
+  <!-- 13 · COMPLIANCE -->
+  <section class="slide" data-label="Compliance &amp; security">
     <div class="wrap">
-      <div class="eyebrow rise">Cumplimiento y seguridad</div>
-      <h2 class="rise">Compliance-first, <span class="g">por diseño</span></h2>
-      <div class="isoband rise"><span class="iso"><span class="d"></span>ISO 27001 — Seguridad de la información</span><span class="iso"><span class="d"></span>ISO 9001:2015 — Gestión de calidad</span></div>
+      <div class="eyebrow rise">Compliance &amp; security</div>
+      <h2 class="rise">Compliance-first, <span class="g">by design</span></h2>
+      <div class="isoband rise"><span class="iso"><span class="d"></span>ISO 27001 — Information security</span><span class="iso"><span class="d"></span>ISO 9001:2015 — Quality management</span></div>
       <div class="complist rise">
-        <div class="crow"><span class="tag">TCPA</span><span class="ctx">Reglas federales de consentimiento y horario para llamadas y SMS, como piso mínimo.</span></div>
-        <div class="crow"><span class="tag">Two-party</span><span class="ctx">California: grabación con <b>consentimiento explícito</b> al inicio de cada llamada.</span></div>
-        <div class="crow"><span class="tag">CPUC</span><span class="ctx">Alineación con los estándares que Sequoia mantiene como authorized LifeLine provider.</span></div>
-        <div class="crow"><span class="tag">DNC</span><span class="ctx">Cruce contra el Do Not Call Registry previo a la ingesta y monitoreo continuo.</span></div>
-        <div class="crow"><span class="tag">Sin SSN</span><span class="ctx">Intelsa <b>no recibe ni almacena SSN</b>: la gestión queda del lado de Sequoia post-transfer.</span></div>
-        <div class="crow"><span class="tag">DPA + NDA</span><span class="ctx">Acuerdo de confidencialidad y de tratamiento de datos firmados previo al arranque.</span></div>
+        <div class="crow"><span class="tag">TCPA</span><span class="ctx">Federal consent and time-window rules for calls and SMS, applied as the minimum floor.</span></div>
+        <div class="crow"><span class="tag">Two-party</span><span class="ctx">California: recording captured with <b>explicit consent</b> at the opening of every call.</span></div>
+        <div class="crow"><span class="tag">CPUC</span><span class="ctx">Aligned with the standards Sequoia already maintains as an authorized LifeLine provider.</span></div>
+        <div class="crow"><span class="tag">DNC</span><span class="ctx">Cross-check against the federal Do Not Call Registry prior to ingestion and monitored continuously.</span></div>
+        <div class="crow"><span class="tag">Anti-fraud</span><span class="ctx"><b>No monetary commissions</b> to agents per reactivation, per LifeLine rules. Incentives on adherence, quality, and verified 90-day activation.</span></div>
+        <div class="crow"><span class="tag">DPA + NDA</span><span class="ctx">Confidentiality and data-processing agreements signed before any base ingestion or platform access.</span></div>
       </div>
     </div>
   </section>
 
-  <!-- 12 · CRONOGRAMA -->
-  <section class="slide" data-label="Cronograma">
+  <!-- 14 · TIMELINE -->
+  <section class="slide" data-label="Implementation timeline">
     <div class="wrap">
-      <div class="eyebrow rise">Cronograma de implementación</div>
-      <h2 class="rise">De la firma al <span class="g">arranque</span></h2>
+      <div class="eyebrow rise">Implementation timeline</div>
+      <h2 class="rise">From signature to <span class="g">launch</span></h2>
       <div class="tl rise">
-        <div class="node"><div class="dot2"></div><div class="wk">Sem 1</div><div class="tt"><b>Kickoff y setup.</b> Acuerdos, dialer y SMS, definición del handoff.</div></div>
-        <div class="node"><div class="dot2"></div><div class="wk">Sem 2</div><div class="tt"><b>Integración.</b> Conexión con la plataforma de Sequoia y reglas de compliance.</div></div>
-        <div class="node"><div class="dot2"></div><div class="wk">Sem 3</div><div class="tt"><b>Talento.</b> Reclutamiento bilingüe y formación de negocio y compliance.</div></div>
-        <div class="node"><div class="dot2"></div><div class="wk">Sem 4</div><div class="tt"><b>Certificación.</b> Talk track, simulaciones y aprobación de cada agente.</div></div>
-        <div class="node"><div class="dot2"></div><div class="wk">Sem 5+</div><div class="tt"><b>Arranque.</b> SMS + llamadas + warm transfers en operación.</div></div>
+        <div class="node"><div class="dot2"></div><div class="wk">Week 1</div><div class="tt"><b>Kickoff and setup.</b> DPA and NDA signed, JustCall access provisioned, technical alignment.</div></div>
+        <div class="node"><div class="dot2"></div><div class="wk">Week 2</div><div class="tt"><b>Integration.</b> Base ingestion, CRM built inside JustCall, script v1, integration testing.</div></div>
+        <div class="node"><div class="dot2"></div><div class="wk">Week 3</div><div class="tt"><b>Talent.</b> Agent selection and Sequoia-led training on product and CPUC rules.</div></div>
+        <div class="node"><div class="dot2"></div><div class="wk">Week 4</div><div class="tt"><b>Certification.</b> Talk track training, role-play certification, tech dry run, GO / NO-GO.</div></div>
+        <div class="node"><div class="dot2"></div><div class="wk">Week 5+</div><div class="tt"><b>Launch.</b> SMS warm-up, outbound calls, end-to-end enrollments.</div></div>
       </div>
-      <div class="tlnote rise">El setup de Intelsa (4–5 semanas) puede correr <b>en paralelo</b> a los tramos finales de la revisión de la CPUC. El cronograma se activa contra un <b>“GO” formal</b> de Sequoia, con meta de arranque a finales de octubre de 2026.</div>
+      <div class="tlnote rise">Target launch: late October 2026. Weeks 1–4 of Intelsa setup can run <b>in parallel</b> with the final stages of Sequoia's CPUC regulatory review. The timeline activates against a formal <b>GO</b> from Sequoia, so the operational team is fully ready the day the reactivation window officially reopens.</div>
     </div>
   </section>
 
-  <!-- 13 · CIERRE -->
-  <section class="slide closing slide-dark" data-label="Próximos pasos">
+  <!-- 15 · CLOSING -->
+  <section class="slide closing slide-dark" data-label="Next steps">
     <div class="wrap">
-      <h2 class="rise">Queremos ser tu aliado<br>en esta recuperación.</h2>
-      <p class="cl-lead rise">Estamos listos para arrancar el proceso operativo y administrativo tan pronto recibamos tu confirmación.</p>
+      <h2 class="rise">Let's be your partner<br>in this recovery.</h2>
+      <p class="cl-lead rise">We are ready to start the operational and administrative process as soon as we receive your confirmation. This is more than a pilot for us: it is the entry point into a long-term partnership.</p>
       <div class="steps rise">
-        <span>Validación conjunta</span><span>Firma de LOI</span><span>Kickoff técnico</span><span>Acuerdos + arranque</span>
+        <span>Joint validation</span><span>Letter of intent</span><span>Technical kickoff</span><span>Agreements &amp; go-live</span>
       </div>
-      <div class="rise-together rise">Let’s rise up together!</div>
+      <div class="rise-together rise">Let's rise up together!</div>
       <div class="contact rise">
-        <div class="who"><b>Oscar Barrera</b><span>Growth Manager</span></div>
-        <div class="who"><b>Vanessa Restrepo Sánchez</b><span>Directora de Proyectos y Operaciones</span><a href="mailto:vanessarestrepo@intelsa.co">vanessarestrepo@intelsa.co</a> · <span>(+57) 350 575 77 65</span></div>
+        <div class="who"><b>David Echeverri</b><span>CEO, Intelsa BPO &amp; CX</span></div>
+        <div class="who"><b>Oscar Barrera</b><span>Growth Manager</span><a href="mailto:mdigital@intelsa.co">mdigital@intelsa.co</a></div>
+        <div class="who"><b>Vanessa Restrepo Sánchez</b><span>Director, Projects &amp; Operations</span><a href="mailto:vanessarestrepo@intelsa.co">vanessarestrepo@intelsa.co</a> · <span>(+57) 350 575 77 65</span></div>
       </div>
-      <div class="valid rise">Vigencia de la propuesta: 30 días calendario a partir de la fecha de envío.</div>
+      <div class="valid rise">Proposal valid for 30 calendar days from the date of delivery.</div>
     </div>
     <svg class="covermark" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="12" cy="88" r="11" fill="currentColor"/>
@@ -562,12 +623,12 @@
 </div>
 
 <div class="nav">
-  <button class="navbtn" id="prev" aria-label="Anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <button class="navbtn" id="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
   <div class="dots" id="dots"></div>
-  <span class="counter" id="counter">01 / 14</span>
-  <button class="navbtn" id="next" aria-label="Siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+  <span class="counter" id="counter">01 / 15</span>
+  <button class="navbtn" id="next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
 </div>
-<div class="hint">← → para navegar</div>
+<div class="hint">← → to navigate</div>
 
 <script>
 (function(){
@@ -581,7 +642,7 @@
 
   slides.forEach((s,idx)=>{
     const b=document.createElement('button');
-    b.className='dot';b.setAttribute('aria-label','Ir a '+(idx+1));
+    b.className='dot';b.setAttribute('aria-label','Go to '+(idx+1));
     b.addEventListener('click',()=>go(idx));
     dotsWrap.appendChild(b);
   });
