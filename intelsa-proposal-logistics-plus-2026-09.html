@@ -183,6 +183,11 @@
   .pfact b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:600}
   .pnote{margin-top:22px;font-size:12.5px;color:rgba(255,255,255,.62);line-height:1.55;border-left:2px solid var(--orange);padding-left:14px}
   .pnote b{color:#fff}
+  .startfee{display:flex;gap:20px;align-items:center;margin-top:22px;background:rgba(159,198,66,.12);border:1px solid rgba(159,198,66,.32);border-radius:16px;padding:18px 24px;flex-wrap:wrap}
+  .startfee .sfnum{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(30px,4vw,44px);color:#fff;line-height:1;letter-spacing:-.02em;white-space:nowrap}
+  .startfee .sfnum sup{font-size:.34em;font-weight:600;color:var(--lime);vertical-align:top;top:.5em;position:relative;margin-right:2px}
+  .startfee .sftext{font-size:14px;color:#eafaf0;line-height:1.5;flex:1;min-width:240px}
+  .startfee .sftext b{color:var(--lime)}
 
   /* Checklist */
   .checks{display:grid;grid-template-columns:1fr 1fr;gap:14px 30px;margin-top:26px}
@@ -449,8 +454,8 @@
       <div class="pricegrid">
         <div class="pricebox rise">
           <div class="rolekick">Operations &amp; Customer Service</div>
-          <div class="rangenum"><sup>US$</sup>3,200–3,500</div>
-          <div class="priceunit">estimated / month · <b>per seat</b></div>
+          <div class="rangenum"><sup>US$</sup>2,400</div>
+          <div class="priceunit">per month · <b>per seat</b></div>
           <div class="pilotbadge">RECOMMEND FIRST</div>
           <div class="pfacts">
             <div class="pfact"><span class="lbl">Scope</span><b>Shipment coordination + LATAM customer service</b></div>
@@ -459,15 +464,19 @@
         </div>
         <div class="pricebox rise">
           <div class="rolekick">Pricing Specialist</div>
-          <div class="rangenum"><sup>US$</sup>3,500–3,800</div>
-          <div class="priceunit">estimated / month · <b>per seat</b></div>
+          <div class="rangenum"><sup>US$</sup>2,666</div>
+          <div class="priceunit">per month · <b>per seat</b></div>
           <div class="pfacts">
             <div class="pfact"><span class="lbl">Scope</span><b>Carrier and airline rate negotiation + quoting</b></div>
             <div class="pfact"><span class="lbl">Overlap</span><b>Full U.S. business hours</b></div>
           </div>
         </div>
       </div>
-      <div class="pnote rise">These are <b>estimated ranges, not final prices.</b> The monthly fee for each seat is calculated from the compensation negotiated with the specific candidate you approve, so the exact figure is confirmed once finalists are selected. Billed in USD as a service export (no VAT).</div>
+      <div class="startfee rise">
+        <div class="sfnum"><sup>US$</sup>250</div>
+        <div class="sftext"><b>per role to start the search.</b> A one-time engagement fee, credited in full to the talent's first monthly invoice.</div>
+      </div>
+      <div class="pnote rise">Monthly fees are billed in USD as a service export (no VAT). The US$250 per-role engagement fee is the only upfront cost, and it is credited in full to the talent's first invoice, so it nets back to you once the specialist starts.</div>
     </div>
   </section>
 
