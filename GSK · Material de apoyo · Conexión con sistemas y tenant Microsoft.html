@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GSK · Material de apoyo · Conexión con sistemas y tenant Microsoft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#ff9345; --green:#a9d944; --dark:#414c4c;
+  --bg:#ffffff; --muted:#f7f7f7; --border:#e5e7e7; --gray:#8a9494;
+  --warn:#e8a33d; --risk:#c0392b; --radius:3px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#ffffff; --dark:#414c4c; }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',sans-serif;background:#eceeee;color:var(--dark);
+  -webkit-font-smoothing:antialiased;padding:28px 16px}
+.stage{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.slide{background:var(--bg);width:100%;aspect-ratio:16/9;padding:34px 40px;
+  display:flex;flex-direction:column;box-shadow:0 2px 14px rgba(0,0,0,.09);
+  border-radius:var(--radius);container-type:inline-size}
+.slide h1{font-size:3.7cqw;font-weight:700;letter-spacing:-.4px;line-height:1.1;
+  text-transform:uppercase;color:var(--dark)}
+.slide h1 em{font-style:normal;color:var(--orange)}
+.sub{font-size:1.42cqw;font-style:italic;color:var(--gray);margin:.7cqw 0 2.2cqw}
+
+table{width:100%;border-collapse:collapse;font-size:1.22cqw}
+thead th{background:var(--dark);color:#fff;font-weight:600;padding:1.0cqw 1.1cqw;
+  text-align:left;white-space:nowrap;font-size:1.12cqw}
+tbody td{padding:.85cqw 1.1cqw;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:nth-child(even) td{background:var(--muted)}
+td.b{font-weight:600}
+td.c{text-align:center}
+.yes{color:#5a7a1e;font-weight:600}
+.no{color:var(--risk);font-weight:600}
+.pend{color:var(--warn);font-weight:600}
+
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4cqw;flex:1;align-content:center}
+.mode{background:var(--muted);padding:1.6cqw 1.4cqw;border-top:4px solid var(--dark);
+  display:flex;flex-direction:column}
+.mode.m1{border-top-color:#2e7d32}
+.mode.m2{border-top-color:var(--green)}
+.mode.m3{border-top-color:var(--orange)}
+.mode.m4{border-top-color:var(--risk)}
+.mode .n{font-size:1.0cqw;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--gray);margin-bottom:.5cqw}
+.mode h3{font-size:1.5cqw;font-weight:600;line-height:1.2;margin-bottom:.8cqw}
+.mode p{font-size:1.14cqw;color:#5a6464;line-height:1.4;flex:1}
+.mode .tag{margin-top:1.0cqw;padding-top:.8cqw;border-top:1px solid #dfe3e3;
+  font-size:1.05cqw;font-weight:600}
+.mode.m1 .tag{color:#2e7d32}
+.mode.m2 .tag{color:#5a7a1e}
+.mode.m3 .tag{color:var(--orange)}
+.mode.m4 .tag{color:var(--risk)}
+
+.layers{display:flex;flex-direction:column;gap:.8cqw;flex:1;justify-content:center}
+.layer{display:grid;grid-template-columns:15cqw 1fr;gap:1.4cqw;align-items:center;
+  background:var(--muted);padding:1.15cqw 1.4cqw;border-left:4px solid var(--orange)}
+.layer:nth-child(2){border-left-color:var(--green)}
+.layer:nth-child(3){border-left-color:#7fa8c4}
+.layer:nth-child(4){border-left-color:var(--dark)}
+.layer:nth-child(5){border-left-color:var(--warn)}
+.layer:nth-child(6){border-left-color:#9b7fc4}
+.layer b{font-size:1.3cqw;font-weight:600;line-height:1.2}
+.layer p{font-size:1.14cqw;color:#5a6464;line-height:1.4}
+.layer p span{color:var(--risk);font-weight:600}
+
+.decisions{display:grid;grid-template-columns:1fr 1fr;gap:1.6cqw;flex:1;align-content:center}
+.dec{border:1px solid var(--border);border-top:4px solid var(--orange);padding:1.8cqw 1.6cqw;
+  display:flex;flex-direction:column}
+.dec:nth-child(2){border-top-color:var(--risk)}
+.dec .q{font-size:1.0cqw;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--gray);margin-bottom:.6cqw}
+.dec h3{font-size:1.7cqw;font-weight:600;line-height:1.2;margin-bottom:1.0cqw}
+.dec .said{background:var(--muted);padding:.9cqw 1.1cqw;font-size:1.12cqw;color:#5a6464;
+  line-height:1.4;margin-bottom:1.0cqw;border-left:3px solid var(--border)}
+.dec .said b{color:var(--dark)}
+.dec ul{list-style:none;flex:1}
+.dec li{font-size:1.14cqw;color:#5a6464;padding:.42cqw 0 .42cqw 1.5cqw;position:relative;line-height:1.4}
+.dec li::before{content:'';position:absolute;left:0;top:1.0cqw;width:.55cqw;height:.55cqw;
+  background:var(--orange)}
+.dec:nth-child(2) li::before{background:var(--risk)}
+
+.pos{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5cqw;flex:1;align-content:center}
+.pcard{background:var(--muted);padding:1.7cqw 1.5cqw;border-top:4px solid var(--orange)}
+.pcard:nth-child(2){border-top-color:var(--green)}
+.pcard:nth-child(3){border-top-color:var(--dark)}
+.pcard h3{font-size:1.5cqw;font-weight:600;line-height:1.25;margin-bottom:.9cqw}
+.pcard p{font-size:1.16cqw;color:#5a6464;line-height:1.45}
+
+.call{margin-top:auto;border-left:4px solid var(--orange);background:#fff5ec;
+  padding:1.3cqw 1.6cqw;font-size:1.26cqw;color:#7a5a3a;line-height:1.5}
+.call.g{border-left-color:var(--green);background:#f4f9e8;color:#4a5a2e}
+.call.d{border-left-color:var(--dark);background:var(--muted);color:#5a6464}
+.call strong{color:var(--dark)}
+
+.big{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5cqw;margin:2.0cqw 0}
+.bstat{background:var(--muted);padding:1.7cqw 1.5cqw;border-top:4px solid var(--orange)}
+.bstat b{display:block;font-size:2.9cqw;font-weight:700;letter-spacing:-1px;line-height:1}
+.bstat span{display:block;font-size:1.16cqw;color:#5a6464;margin-top:.7cqw;line-height:1.4}
+
+@media(max-width:700px){
+  .slide{aspect-ratio:auto;padding:26px 22px}
+  .modes,.pos{grid-template-columns:1fr 1fr}
+  .decisions{grid-template-columns:1fr}
+  .layer{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+
+<!-- 1 · EL PUNTO DE PARTIDA -->
+<div class="slide">
+  <h1>Lo primero que hay que <em>definir</em></h1>
+  <div class="sub">Material de apoyo · RFP GBLPR-4561 · sesión de retroalimentación</div>
+
+  <p style="font-size:1.45cqw;color:#5a6464;line-height:1.55;max-width:86%">
+    El alcance operativo del RFP está muy bien documentado: quince procesos, volúmenes, responsables y niveles de servicio.
+    Lo que no está definido es <strong style="color:var(--dark)">cómo se conecta el servicio con los sistemas donde ocurre el trabajo</strong>.
+    Y esa definición, más que el alcance funcional, determina cuánto se puede automatizar, cuánto cuesta y cuánto tarda.
+  </p>
+
+  <div class="big">
+    <div class="bstat"><b>8</b><span>sistemas de GSK involucrados en los quince procesos</span></div>
+    <div class="bstat"><b>4</b><span>formas posibles de conectarse, con esfuerzo muy distinto entre ellas</span></div>
+    <div class="bstat"><b>0</b><span>procesos con el modo de conexión definido en el pliego</span></div>
+  </div>
+
+  <div class="call">
+    <strong>Por qué importa para el replanteo.</strong> Dos proveedores pueden leer el mismo pliego, asumir modos de conexión distintos y entregar ofertas que difieren en varias veces su valor, sin que ninguno esté equivocado. Definir el modo de conexión por proceso hace que las ofertas sean comparables y que el presupuesto sea predecible.
+  </div>
+</div>
+
+<!-- 2 · LAS CUATRO FORMAS -->
+<div class="slide">
+  <h1>Las cuatro formas de <em>conectarse</em></h1>
+  <div class="sub">Cada modo cambia el esfuerzo operativo, el tiempo de implementación y lo que GSK debe habilitar</div>
+
+  <div class="modes">
+    <div class="mode m1">
+      <div class="n">Modo 1</div>
+      <h3>Integración por servicio</h3>
+      <p>El sistema expone una interfaz que permite leer y escribir sin intervención humana. Requiere habilitación de TI corporativa y, en algunos casos, desarrollo del lado de GSK.</p>
+      <div class="tag">Automatización alta · habilitación exigente</div>
+    </div>
+    <div class="mode m2">
+      <div class="n">Modo 2</div>
+      <h3>Exportación programada</h3>
+      <p>El sistema entrega reportes periódicos que alimentan la plataforma. No escribe en el sistema origen, pero resuelve verificaciones, cruces y control de duplicados.</p>
+      <div class="tag">Automatización media-alta · baja fricción</div>
+    </div>
+    <div class="mode m3">
+      <div class="n">Modo 3</div>
+      <h3>Operación asistida</h3>
+      <p>Una persona con usuario nominal de GSK opera la interfaz, apoyada por la plataforma que prepara los datos, valida y deja evidencia. Es el modelo que habilitan las respuestas actuales.</p>
+      <div class="tag">Automatización parcial · sin habilitación de TI</div>
+    </div>
+    <div class="mode m4">
+      <div class="n">Modo 4</div>
+      <h3>Operación manual</h3>
+      <p>Sin apoyo de plataforma ni validación automática. La carga recae íntegramente en la persona y la trazabilidad depende de registros llevados a mano.</p>
+      <div class="tag">Sin automatización · situación actual</div>
+    </div>
+  </div>
+
+  <div class="call d">
+    <strong>La diferencia no es de matiz.</strong> Un mismo proceso puede requerir entre tres y diez veces más esfuerzo operativo según el modo que se habilite. Por eso el modo de conexión debería ser parte de los términos de referencia, no una suposición de cada oferente.
+  </div>
+</div>
+
+<!-- 3 · DÓNDE ESTÁ HOY CADA SISTEMA -->
+<div class="slide">
+  <h1>Dónde está hoy <em>cada sistema</em></h1>
+  <div class="sub">Según las respuestas al cuestionario técnico · ningún sistema expone integración por servicio</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Sistema</th><th>Procesos</th><th>Acceso con usuario nominal</th>
+        <th>Exportación a Excel</th><th>Notificación por correo</th><th>Modo viable hoy</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="b">Ariba</td><td>P1_01 · P2_01 · P4_01 · P4_02 · P6_01</td>
+        <td class="c yes">Sí</td><td class="c yes">Sí</td><td class="c pend">Por precisar</td><td class="b">Modos 2 y 3</td></tr>
+      <tr><td class="b">SAP Fiori</td><td>P1_02 · P3_07</td>
+        <td class="c yes">Sí</td><td class="c yes">Sí</td><td class="c">—</td><td class="b">Modos 2 y 3</td></tr>
+      <tr><td class="b">Portal GID</td><td>P3_07</td>
+        <td class="c yes">Sí</td><td class="c">—</td><td class="c">—</td><td class="b">Modo 3</td></tr>
+      <tr><td class="b">Veeva</td><td>P3_02</td>
+        <td class="c yes">Sí</td><td class="c">—</td><td class="c">—</td><td class="b">Modo 3</td></tr>
+      <tr><td class="b">iNeed</td><td>P1_03</td>
+        <td class="c yes">Sí</td><td class="c">—</td><td class="c yes">Sí, tareas</td><td class="b">Modo 3</td></tr>
+      <tr><td class="b">Oro</td><td>P1_03</td>
+        <td class="c pend">Por precisar</td><td class="c">—</td><td class="c">—</td><td class="b pend">Por definir</td></tr>
+      <tr><td class="b">ALAMANO</td><td>P5_01</td>
+        <td class="c yes">Sí</td><td class="c yes">Sí</td><td class="c">—</td><td class="b">Modos 2 y 3</td></tr>
+      <tr><td class="b">Adobe Sign</td><td>P6_01</td>
+        <td class="c yes">Sí</td><td class="c">—</td><td class="c yes">Sí, al originador</td><td class="b">Modo 3</td></tr>
+      <tr><td class="b">Microsoft 365</td><td>Los quince procesos</td>
+        <td class="c yes">Sí</td><td class="c yes">Nativa</td><td class="c yes">Power Automate</td><td class="b yes">Automatización nativa</td></tr>
+    </tbody>
+  </table>
+
+  <div class="call">
+    <strong>La consecuencia de este cuadro.</strong> Como ningún sistema corporativo expone integración por servicio, toda la capacidad de automatización del proyecto descansa sobre dos pilares: lo que Power Automate puede hacer dentro del tenant de Microsoft, y la lectura automática de documentos. Si cualquiera de los dos se restringe, el proyecto deja de ser un hub automatizado y se convierte en una mesa de trabajo asistida.
+  </div>
+</div>
+
+<!-- 4 · EL TENANT -->
+<div class="slide">
+  <h1>Qué se necesita del <em>tenant de Microsoft</em></h1>
+  <div class="sub">Las seis capas que debe cubrir el ecosistema de GSK para sostener un servicio como el planteado</div>
+
+  <div class="layers">
+    <div class="layer">
+      <b>Identidad y puesto</b>
+      <p>Usuario nominal de GSK con MFA, con acceso a los sistemas de cada proceso. Equipo entregado por GSK y navegador estándar. Sin esto no hay operación posible, en ningún modelo.</p>
+    </div>
+    <div class="layer">
+      <b>Microsoft 365</b>
+      <p>Correo y Teams para la radicación y las notificaciones. SharePoint y OneDrive como repositorio documental del expediente de cada caso, dentro del tenant de GSK.</p>
+    </div>
+    <div class="layer">
+      <b>Power Platform</b>
+      <p>Power Automate con conectores premium para orquestar correo, archivos y estados. Power Apps o Dataverse si la gestión de casos se monta sobre esa capa. Power BI para la vista de indicadores.</p>
+    </div>
+    <div class="layer">
+      <b>Azure</b>
+      <p>Suscripción con permisos de despliegue para la capa de orquestación, base de datos de casos, gestión de secretos y observabilidad. Es donde vive la plataforma si los datos deben permanecer en GSK.</p>
+    </div>
+    <div class="layer">
+      <b>Servicios de IA</b>
+      <p>Lectura y extracción documental con Azure AI Document Intelligence y validación con Azure OpenAI, desplegados dentro de la suscripción. <span>Es la capa cuya admisibilidad aún no está resuelta.</span></p>
+    </div>
+    <div class="layer">
+      <b>Gobierno de datos</b>
+      <p>Políticas de prevención de pérdida de datos, residencia geográfica, retención y compartición externa. Definen qué se puede automatizar y dónde puede residir cada dato.</p>
+    </div>
+  </div>
+
+  <div class="call d">
+    <strong>Una observación práctica.</strong> Buena parte de estas capas ya existe en GSK y está pagada. La pregunta que conviene resolver con Microsoft o su canal autorizado no es qué comprar, sino qué cubre hoy el acuerdo vigente y qué habría que incorporar. Esa respuesta cambia el costo total del proyecto y hoy nadie la tiene.
+  </div>
+</div>
+
+<!-- 5 · LAS DOS DECISIONES -->
+<div class="slide">
+  <h1>Las dos decisiones que <em>definen el alcance</em></h1>
+  <div class="sub">Ambas son de GSK y ninguna depende del proveedor que se elija</div>
+
+  <div class="decisions">
+    <div class="dec">
+      <div class="q">Decisión 1</div>
+      <h3>Dónde residen los datos y la plataforma</h3>
+      <div class="said">GSK indicó que los datos y documentos operativos <b>deben permanecer en infraestructura de GSK</b>.</div>
+      <ul>
+        <li>La plataforma se despliega dentro de la suscripción Azure y el tenant de GSK</li>
+        <li>GSK conserva la propiedad de la plataforma y de los datos, sin dependencia del proveedor</li>
+        <li>Las licencias y el consumo pasan a ser costo directo de GSK, no del contrato de servicio</li>
+        <li>Queda por definir la región, ya que la política de residencia geográfica debe revisarse</li>
+      </ul>
+    </div>
+    <div class="dec">
+      <div class="q">Decisión 2</div>
+      <h3>Qué inteligencia artificial es admisible y sobre qué información</h3>
+      <div class="said">GSK indicó que se permite el uso <b>solo con herramientas licenciadas y solo sobre información pública</b>.</div>
+      <ul>
+        <li>Los documentos del alcance (facturas, contratos, datos de terceros) no son información pública</li>
+        <li>Desplegar el servicio de IA dentro de la suscripción de GSK, sin retención de datos, evita que la información salga del perímetro</li>
+        <li>Si esa alternativa no es admisible, la validación documental vuelve a ser enteramente manual</li>
+        <li>Es la decisión de mayor impacto sobre el esfuerzo operativo y, por lo tanto, sobre el costo</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="call">
+    <strong>Nuestra recomendación para el replanteo.</strong> Resolver estas dos decisiones antes de reabrir el proceso, y dejarlas escritas en los términos de referencia junto con el modo de conexión esperado por proceso. Con eso, las ofertas se vuelven comparables entre sí y el presupuesto deja de depender de los supuestos que cada proveedor haga por su cuenta.
+  </div>
+</div>
+
+<!-- 6 · POSICIONAMIENTO -->
+<div class="slide">
+  <h1>En qué podemos <em>aportar</em></h1>
+  <div class="sub">Mientras el alcance se redefine</div>
+
+  <div class="pos">
+    <div class="pcard">
+      <h3>El levantamiento técnico ya está hecho</h3>
+      <p>Las treinta y dos preguntas del cuestionario y las respuestas de GSK conforman un mapa de restricciones que aplica a cualquier proveedor. Podemos consolidarlo y entregarlo como insumo del replanteo, sin condición comercial.</p>
+    </div>
+    <div class="pcard">
+      <h3>Operamos dentro del ecosistema de GSK</h3>
+      <p>El diseño no exige que GSK adopte una plataforma externa ni que ceda datos a un tercero. Todo corre sobre el tenant y la suscripción de GSK, que conserva la propiedad. Intelsa construye, opera y entrega.</p>
+    </div>
+    <div class="pcard">
+      <h3>La adopción puede ser gradual</h3>
+      <p>El modelo por olas permite empezar por un grupo de procesos, medir resultados con una línea base real y ampliar solo si los resultados lo justifican. GSK no asume la inversión completa de entrada.</p>
+    </div>
+  </div>
+
+  <div class="call g">
+    <strong>Quedamos a disposición.</strong> Si en el replanteo resulta útil contrastar hipótesis de alcance, revisar el mapa de conexiones por proceso o coordinar la conversación con Microsoft sobre lo que cubre el acuerdo vigente, podemos acompañarlos. Preferimos que el problema quede bien definido, aunque el alcance resultante no corresponda a lo que hacemos.
+  </div>
+</div>
+
+</div>
+</body>
+</html>
