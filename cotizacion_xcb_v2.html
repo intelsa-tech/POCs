@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotización · Campaña Actualización Documental XCB de Colombia</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --orange: #ff9345;
+    --green: #a9d944;
+    --dark: #414c4c;
+    --dark-70: #414c4cb3;
+    --dark-40: #414c4c66;
+    --bg: #ffffff;
+    --bg-soft: #faf8f5;
+    --line: #ececec;
+    --line-strong: #d9d9d9;
+    --radius: 3px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    font-weight: 400;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 56px 56px;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 32px;
+    border-bottom: 2px solid var(--dark);
+    margin-bottom: 56px;
+}
+
+.brand-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logo-mark {
+    width: 38px;
+    height: 38px;
+    background: var(--orange);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.brand-info .name {
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.2px;
+}
+
+.brand-info .tagline {
+    font-size: 11px;
+    color: var(--dark-70);
+    margin-top: 2px;
+}
+
+.doc-ref {
+    text-align: right;
+    font-size: 11px;
+    color: var(--dark-70);
+    line-height: 1.8;
+}
+
+.doc-ref strong { color: var(--dark); font-weight: 600; }
+
+/* HERO */
+.hero { margin-bottom: 56px; }
+
+.eyebrow {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--orange);
+}
+
+.hero h1 {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 20px;
+    max-width: 780px;
+}
+
+.hero h1 .highlight { color: var(--orange); }
+
+.hero-intro {
+    font-size: 14px;
+    color: var(--dark-70);
+    max-width: 740px;
+    line-height: 1.7;
+}
+
+/* CLIENT INFO */
+.client-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    padding: 28px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    margin-bottom: 56px;
+}
+
+.info-group .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--dark-70);
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.info-group .value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dark);
+    line-height: 1.5;
+}
+
+/* SECTIONS */
+section { margin-bottom: 64px; }
+
+.section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+}
+
+.section-number {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--orange);
+    letter-spacing: 1.2px;
+    min-width: 24px;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+.section-lead {
+    font-size: 14px;
+    color: var(--dark-70);
+    max-width: 780px;
+    margin-bottom: 28px;
+    line-height: 1.7;
+}
+
+/* DOC MATRIX */
+.doc-matrix {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.doc-type {
+    padding: 20px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--orange);
+}
+
+.doc-type .type-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+}
+
+.doc-type .type-name {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.doc-type .doc-count {
+    font-size: 11px;
+    color: var(--orange);
+    font-weight: 600;
+}
+
+.doc-type .type-category {
+    font-size: 10px;
+    color: var(--dark-70);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+/* SCOPE */
+.scope-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.scope-card {
+    padding: 24px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--orange);
+}
+
+.scope-card.green { border-left-color: var(--green); }
+
+.scope-card h4 {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.scope-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.scope-card li {
+    padding: 7px 0 7px 18px;
+    position: relative;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line);
+    line-height: 1.5;
+}
+
+.scope-card li:last-child { border-bottom: none; }
+
+.scope-card li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 8px;
+    height: 2px;
+    background: var(--orange);
+}
+
+.scope-card.green li::before { background: var(--green); }
+
+/* OPTIONS */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.option-card {
+    position: relative;
+    padding: 32px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+}
+
+.option-card.recommended {
+    border: 2px solid var(--orange);
+    background: linear-gradient(180deg, rgba(255,147,69,0.04) 0%, rgba(255,147,69,0) 50%);
+}
+
+.option-badge {
+    position: absolute;
+    top: -12px;
+    left: 24px;
+    background: var(--orange);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 4px 12px;
+    border-radius: var(--radius);
+}
+
+.option-name {
+    font-size: 11px;
+    color: var(--dark-70);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 8px;
+}
+
+.option-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    letter-spacing: -0.3px;
+    line-height: 1.25;
+}
+
+.option-desc {
+    font-size: 12px;
+    color: var(--dark-70);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    min-height: 60px;
+}
+
+/* OPTION A - Fijo */
+.price-fixed {
+    padding: 24px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.price-fixed .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--dark-70);
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.price-fixed .value {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--dark);
+    line-height: 1;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+}
+
+.price-fixed .note {
+    font-size: 11px;
+    color: var(--dark-70);
+}
+
+/* OPTION B - Híbrido */
+.price-hybrid {
+    padding: 24px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+}
+
+.hybrid-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line-strong);
+}
+
+.hybrid-row:last-child { border-bottom: none; padding-bottom: 0; }
+.hybrid-row:first-child { padding-top: 0; }
+
+.hybrid-row .component {
+    font-size: 12px;
+    color: var(--dark);
+    font-weight: 500;
+}
+
+.hybrid-row .component small {
+    display: block;
+    font-size: 10px;
+    color: var(--dark-70);
+    font-weight: 400;
+    margin-top: 2px;
+}
+
+.hybrid-row .amount {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark);
+    white-space: nowrap;
+}
+
+.hybrid-row .amount .unit {
+    font-size: 10px;
+    color: var(--dark-70);
+    font-weight: 500;
+    margin-left: 2px;
+}
+
+/* Scenarios */
+.scenarios-table {
+    margin-top: 16px;
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    overflow: hidden;
+}
+
+.scenarios-table-header {
+    padding: 10px 14px;
+    background: var(--dark);
+    color: #fff;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 500;
+}
+
+.scenario-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 11px;
+    align-items: center;
+}
+
+.scenario-row:last-child { border-bottom: none; }
+
+.scenario-row.highlighted {
+    background: rgba(169, 217, 68, 0.15);
+    font-weight: 600;
+}
+
+.scenario-row .scen-label { color: var(--dark); font-weight: 500; }
+.scenario-row .scen-reg { color: var(--dark-70); text-align: center; }
+.scenario-row .scen-total { text-align: right; font-weight: 600; color: var(--dark); }
+
+.scenario-row.highlighted .scen-total { color: var(--orange); }
+
+.option-fit {
+    font-size: 11px;
+    color: var(--dark-70);
+    line-height: 1.6;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px dashed var(--line-strong);
+}
+
+.option-fit strong { color: var(--dark); font-weight: 600; }
+
+/* INCLUDES */
+.includes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.includes-table thead th {
+    text-align: left;
+    padding: 14px 18px;
+    background: var(--dark);
+    color: #fff;
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.includes-table thead th:first-child { border-top-left-radius: var(--radius); }
+.includes-table thead th:last-child { border-top-right-radius: var(--radius); }
+
+.includes-table tbody td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+}
+
+.includes-table tbody tr:last-child td { border-bottom: none; }
+
+.includes-table td:first-child {
+    font-weight: 600;
+    width: 32%;
+}
+
+/* TIMELINE */
+.timeline-wrap { margin: 32px 0 16px; }
+
+.phase-row {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    gap: 24px;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.phase-row:last-child { border-bottom: none; }
+
+.phase-week {
+    font-size: 11px;
+    color: var(--orange);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.phase-content h5 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.phase-content p {
+    font-size: 12px;
+    color: var(--dark-70);
+    line-height: 1.5;
+}
+
+.phase-bar {
+    width: 140px;
+    height: 8px;
+    background: var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.phase-fill {
+    height: 100%;
+    background: var(--orange);
+    border-radius: var(--radius);
+}
+
+.phase-fill.light { background: var(--green); }
+
+/* SLA */
+.sla-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.sla-card {
+    padding: 24px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+}
+
+.sla-metric {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--orange);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.sla-name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.sla-desc {
+    font-size: 11px;
+    color: var(--dark-70);
+    line-height: 1.5;
+}
+
+/* CONDITIONS */
+.conditions-list {
+    list-style: none;
+    padding: 0;
+}
+
+.conditions-list li {
+    padding: 14px 20px 14px 44px;
+    position: relative;
+    font-size: 13px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.conditions-list li strong { color: var(--dark); font-weight: 600; }
+
+.conditions-list li::before {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background: var(--orange);
+    border-radius: 50%;
+}
+
+/* CTA */
+.cta-block {
+    padding: 40px;
+    background: var(--dark);
+    color: #fff;
+    border-radius: var(--radius);
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.cta-block h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    line-height: 1.3;
+    color: #fff;
+}
+
+.cta-block p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.7;
+}
+
+.cta-contact {
+    background: rgba(255,255,255,0.08);
+    padding: 24px;
+    border-radius: var(--radius);
+    border-left: 3px solid var(--orange);
+}
+
+.cta-contact .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.cta-contact .name {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #fff;
+}
+
+.cta-contact .role {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 14px;
+}
+
+.cta-contact .detail {
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+}
+
+.cta-contact .detail a {
+    color: var(--orange);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* FOOTER */
+.footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--dark-70);
+}
+
+@media (max-width: 768px) {
+    .container { padding: 24px 20px; }
+    .hero h1 { font-size: 26px; }
+    .client-info { grid-template-columns: 1fr; gap: 20px; }
+    .doc-matrix { grid-template-columns: 1fr; }
+    .scope-grid { grid-template-columns: 1fr; }
+    .options-grid { grid-template-columns: 1fr; }
+    .sla-grid { grid-template-columns: 1fr; }
+    .cta-block { grid-template-columns: 1fr; padding: 24px; }
+    .phase-row { grid-template-columns: 1fr; gap: 10px; }
+    .phase-bar { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="brand-block">
+            <div class="logo-mark">I</div>
+            <div class="brand-info">
+                <div class="name">INTELSA BPO &amp; CX</div>
+                <div class="tagline">Contact center · BPO · Transformación digital</div>
+            </div>
+        </div>
+        <div class="doc-ref">
+            <div><strong>Cotización</strong> No. PE0411-001</div>
+            <div><strong>Preparada para:</strong> XCB de Colombia</div>
+            <div><strong>Fecha:</strong> 4 de noviembre, 2026</div>
+            <div><strong>Validez:</strong> 30 días calendario</div>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="eyebrow">Propuesta comercial</div>
+        <h1>Campaña de <span class="highlight">actualización documental</span> para 851 clientes activos, lista para tu certificación OEA.</h1>
+        <p class="hero-intro">En Intelsa te ayudamos a cerrar la recopilación documental de tu base de clientes activos con un equipo dedicado que gestiona contacto, seguimiento, validación y cargue directo en tu SharePoint. Barremos la base completa antes de finales de diciembre de 2026, con una arquitectura pensada para llegar con holgura y calidad.</p>
+    </div>
+
+    <!-- CLIENT INFO -->
+    <div class="client-info">
+        <div class="info-group">
+            <div class="label">Cliente</div>
+            <div class="value">XCB de Colombia<br>(Grupo Intcomex)</div>
+        </div>
+        <div class="info-group">
+            <div class="label">Contacto</div>
+            <div class="value">Geraldine Herrera<br>Jefa Administrativa</div>
+        </div>
+        <div class="info-group">
+            <div class="label">Objetivo</div>
+            <div class="value">Certificación OEA ante la DIAN</div>
+        </div>
+        <div class="info-group">
+            <div class="label">Base a gestionar</div>
+            <div class="value">851 clientes activos</div>
+        </div>
+        <div class="info-group">
+            <div class="label">Ventana de ejecución</div>
+            <div class="value">Noviembre a diciembre 2026</div>
+        </div>
+        <div class="info-group">
+            <div class="label">Entrega final</div>
+            <div class="value">Documentación cargada en SharePoint XCB</div>
+        </div>
+    </div>
+
+    <!-- SECTION 01: MATRIZ DOCUMENTAL -->
+    <section>
+        <div class="section-header">
+            <div class="section-number">01</div>
+            <h2 class="section-title">Matriz documental por tipo de cliente</h2>
+        </div>
+        <p class="section-lead">El equipo trabaja con cuatro paquetes documentales diferenciados según tipo de operación y naturaleza jurídica del cliente. El agente aplica la ruta correcta desde el primer contacto para que la solicitud sea precisa y evitar fricción.</p>
+
+        <div class="doc-matrix">
+            <div class="doc-type">
+                <div class="type-header">
+                    <div>
+                        <div class="type-category">Crédito</div>
+                        <div class="type-name">Persona Jurídica</div>
+                    </div>
+                    <div class="doc-count">9 docs</div>
+                </div>
+                <div style="font-size:11px; color:var(--dark-70); line-height:1.6;">BD Beneficiarios Finales, Folio con documentos, RUT, RUB o equivalente, Cámara de Comercio (no mayor a 1 mes), RUES, Formato de conocimiento y SAGRILAFT, Fotocopia representante legal, Estados financieros (2 últimos años).</div>
+            </div>
+
+            <div class="doc-type">
+                <div class="type-header">
+                    <div>
+                        <div class="type-category">Crédito</div>
+                        <div class="type-name">Persona Natural</div>
+                    </div>
+                    <div class="doc-count">7 docs</div>
+                </div>
+                <div style="font-size:11px; color:var(--dark-70); line-height:1.6;">BD Beneficiarios Finales, Folio con documentos, RUT, Cámara de Comercio (no mayor a 1 mes), RUES, Formato de conocimiento y SAGRILAFT, Estados financieros (2 últimos años).</div>
+            </div>
+
+            <div class="doc-type">
+                <div class="type-header">
+                    <div>
+                        <div class="type-category">Contado</div>
+                        <div class="type-name">Persona Jurídica</div>
+                    </div>
+                    <div class="doc-count">8 docs</div>
+                </div>
+                <div style="font-size:11px; color:var(--dark-70); line-height:1.6;">BD Beneficiarios Finales, Folio con documentos, RUT, RUB o equivalente, Cámara de Comercio (no mayor a 1 mes), RUES, Formato de conocimiento y SAGRILAFT, Fotocopia representante legal.</div>
+            </div>
+
+            <div class="doc-type">
+                <div class="type-header">
+                    <div>
+                        <div class="type-category">Contado</div>
+                        <div class="type-name">Persona Natural</div>
+                    </div>
+                    <div class="doc-count">6 docs</div>
+                </div>
+                <div style="font-size:11px; color:var(--dark-70); line-height:1.6;">BD Beneficiarios Finales, Folio con documentos, RUT, Cámara de Comercio (no mayor a 1 mes), RUES, Formato de conocimiento y SAGRILAFT.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 02: SCOPE -->
+    <section>
+        <div class="section-header">
+            <div class="section-number">02</div>
+            <h2 class="section-title">Qué hacemos y qué queda de tu lado</h2>
+        </div>
+        <p class="section-lead">Operamos la campaña de punta a punta. Tu equipo de cumplimiento se concentra en validar y radicar; nosotros nos encargamos de todo el movimiento entre XCB y tus clientes, incluyendo el cargue directo en tu SharePoint.</p>
+
+        <div class="scope-grid">
+            <div class="scope-card">
+                <h4>Lo que hacemos en Intelsa</h4>
+                <ul>
+                    <li>Contacto saliente multicanal a tus 851 clientes</li>
+                    <li>Aplicación del paquete documental correcto según tipo (crédito/contado · jurídica/natural)</li>
+                    <li>Envío de checklist personalizado por canal preferido del cliente</li>
+                    <li>Seguimiento activo hasta recepción efectiva</li>
+                    <li>Validación de completitud, legibilidad y vigencia</li>
+                    <li><strong>Cargue directo en tu SharePoint</strong>, una carpeta por cliente con estructura acordada</li>
+                    <li>Comunicación del incentivo dentro del guion de contacto</li>
+                    <li>Tablero de avance en línea y reporte ejecutivo semanal</li>
+                </ul>
+            </div>
+            <div class="scope-card green">
+                <h4>Lo que queda del lado de XCB</h4>
+                <ul>
+                    <li>Entrega de la base con contactos completos al inicio</li>
+                    <li>Habilitación de accesos a correos corporativos de XCB y al SharePoint destino durante el tiempo de operación, para la gestión documental</li>
+                    <li>Validación técnica y regulatoria de los documentos recibidos</li>
+                    <li>Administración y entrega del incentivo al cliente ganador</li>
+                    <li>Validación en listas restrictivas (SAGRILAFT)</li>
+                    <li>Radicación ante la DIAN</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 03: OPTIONS -->
+    <section>
+        <div class="section-header">
+            <div class="section-number">03</div>
+            <h2 class="section-title">Dos modelos para que elijas el que mejor te acomode</h2>
+        </div>
+        <p class="section-lead">Mismo alcance, misma calidad operativa. La diferencia está en cómo prefieres estructurar la inversión: una tarifa fija cerrada o un modelo que alinea el pago al resultado concreto de cada registro cargado en tu SharePoint.</p>
+
+        <div class="options-grid">
+            <!-- OPTION A - FIJO -->
+            <div class="option-card">
+                <div class="option-name">Opción A · Tarifa fija</div>
+                <div class="option-title">Fee único por campaña</div>
+                <div class="option-desc">Inversión cerrada y predecible desde el primer día. Tú sabes exactamente cuánto cuesta la campaña completa, sin variables ni sorpresas. Ideal si tu área financiera prefiere presupuestar de un solo lado.</div>
+
+                <div class="price-fixed">
+                    <div class="label">Inversión total</div>
+                    <div class="value">$ 19.900.000</div>
+                    <div class="note">COP + IVA · Facturación en dos cortes</div>
+                </div>
+
+                <div class="option-fit">
+                    <strong>Cómo se factura:</strong> 50% a firma de orden de compra ($9.950.000) y 50% contra entrega final ($9.950.000). Un solo ítem facturable: "Campaña integral de actualización documental XCB".
+                </div>
+            </div>
+
+            <!-- OPTION B - HYBRID -->
+            <div class="option-card recommended">
+                <div class="option-badge">Recomendada</div>
+                <div class="option-name">Opción B · Fee base + éxito</div>
+                <div class="option-title">Fee base más variable por registro cargado</div>
+                <div class="option-desc">Un componente fijo que garantiza el arranque y el equipo, y un variable que pagas únicamente por cada cliente con su documentación 100% validada y cargada en tu SharePoint. Alinea nuestros incentivos con los tuyos.</div>
+
+                <div class="price-hybrid">
+                    <div class="hybrid-row">
+                        <div class="component">
+                            Fee base de operación
+                            <small>Setup, equipo, infraestructura (único pago)</small>
+                        </div>
+                        <div class="amount">$ 8.000.000</div>
+                    </div>
+                    <div class="hybrid-row">
+                        <div class="component">
+                            Por registro completo
+                            <small>Cargado y validado en SharePoint</small>
+                        </div>
+                        <div class="amount">$ 22.000<span class="unit">/u</span></div>
+                    </div>
+                </div>
+
+                <div class="scenarios-table">
+                    <div class="scenarios-table-header">Proyección de inversión total</div>
+                    <div class="scenario-row">
+                        <div class="scen-label">60% de recopilación</div>
+                        <div class="scen-reg">510 registros</div>
+                        <div class="scen-total">$ 19.220.000</div>
+                    </div>
+                    <div class="scenario-row highlighted">
+                        <div class="scen-label">85% de recopilación</div>
+                        <div class="scen-reg">723 registros</div>
+                        <div class="scen-total">$ 23.906.000</div>
+                    </div>
+                    <div class="scenario-row">
+                        <div class="scen-label">100% recopilación</div>
+                        <div class="scen-reg">851 registros</div>
+                        <div class="scen-total">$ 26.722.000</div>
+                    </div>
+                </div>
+
+                <div class="option-fit">
+                    <strong>Cómo se factura:</strong> Fee base al inicio de la campaña. Variable al cierre, contra reporte de registros efectivamente cargados en SharePoint y validados por tu equipo. Pagas más únicamente si logramos más resultados.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 04: INCLUDES -->
+    <section>
+        <div class="section-header">
+            <div class="section-number">04</div>
+            <h2 class="section-title">Qué cubre la inversión en ambas opciones</h2>
+        </div>
+        <p class="section-lead">No hay cobros adicionales por setup, infraestructura, telefonía ni integración durante la ejecución.</p>
+
+        <table class="includes-table">
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Equipo dedicado</td>
+                    <td>Agentes B2B con perfil para gestión documental corporativa y experiencia previa en recopilación de documentación regulatoria.</td>
+                </tr>
+                <tr>
+                    <td>Equipo de soporte</td>
+                    <td>Analista de backoffice para validación y cargue en SharePoint, Team Lead para coordinación con tu equipo, analista de calidad para auditoría de interacciones.</td>
+                </tr>
+                <tr>
+                    <td>Canales de contacto</td>
+                    <td>Voz saliente, correo electrónico y WhatsApp Business, articulados en 3 intentos de contacto por registro, adaptados al tipo documental del cliente.</td>
+                </tr>
+                <tr>
+                    <td>Infraestructura</td>
+                    <td>Marcador predictivo, telefonía IP, CRM de gestión, repositorio temporal seguro, integración con tu SharePoint.</td>
+                </tr>
+                <tr>
+                    <td>Setup y arranque</td>
+                    <td>Capacitación del equipo, afinación del guion por tipo de cliente, piloto de 50 clientes para calibrar antes de escalar.</td>
+                </tr>
+                <tr>
+                    <td>Gobierno y reportería</td>
+                    <td>Tablero en línea de avance, reporte ejecutivo semanal, comité quincenal con tu equipo y el oficial de cumplimiento.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- SECTION 05: TIMELINE -->
+    <section>
+        <div class="section-header">
+            <div class="section-number">05</div>
+            <h2 class="section-title">Cómo se vería la ejecución</h2>
+        </div>
+        <p class="section-lead">Cronograma asumiendo firma de orden de compra la semana del 10 de noviembre. El arranque efectivo requiere cinco días hábiles de ramp-up una vez recibida la base.</p>
+
+        <div class="timeline-wrap">
+            <div class="phase-row">
+                <div class="phase-week">Semana 0<br><span style="color:var(--dark-70); font-weight:400; text-transform:none; font-size:10px; letter-spacing:0;">10 - 14 nov</span></div>
+                <div class="phase-content">
+                    <h5>Arranque y setup</h5>
+                    <p>Recepción de base, afinación de guion por cada uno de los 4 tipos documentales, capacitación del equipo, integración con SharePoint, piloto de 50 clientes.</p>
+                </div>
+                <div class="phase-bar"><div class="phase-fill light" style="width:25%"></div></div>
+            </div>
+            <div class="phase-row">
+                <div class="phase-week">Semanas 1-2<br><span style="color:var(--dark-70); font-weight:400; text-transform:none; font-size:10px; letter-spacing:0;">17 - 28 nov</span></div>
+                <div class="phase-content">
+                    <h5>Primera ola de contacto</h5>
+                    <p>Contacto inicial a los 851 clientes, envío de checklist documental diferenciado por tipo. Inicio de validación y cargue en SharePoint.</p>
+                </div>
+                <div class="phase-bar"><div class="phase-fill" style="width:60%"></div></div>
+            </div>
+            <div class="phase-row">
+                <div class="phase-week">Semanas 3-4<br><span style="color:var(--dark-70); font-weight:400; text-transform:none; font-size:10px; letter-spacing:0;">1 - 12 dic</span></div>
+                <div class="phase-content">
+                    <h5>Seguimiento activo</h5>
+                    <p>Segundos y terceros toques, recepción continua, validación y cargue incremental en SharePoint por cliente y tipo.</p>
+                </div>
+                <div class="phase-bar"><div class="phase-fill" style="width:100%"></div></div>
+            </div>
+            <div class="phase-row">
+                <div class="phase-week">Semanas 5-6<br><span style="color:var(--dark-70); font-weight:400; text-transform:none; font-size:10px; letter-spacing:0;">15 - 26 dic</span></div>
+                <div class="phase-content">
+                    <h5>Cierre y consolidación</h5>
+                    <p>Reproceso de documentos incompletos, cierre de clientes esquivos, entrega final del SharePoint estructurado y reporte consolidado.</p>
+                </div>
+                <div class="phase-bar"><div class="phase-fill" style="width:85%"></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 06: CONDITIONS -->
+    <section>
+        <div class="section-header">
+            <div class="section-number">06</div>
+            <h2 class="section-title">Condiciones comerciales</h2>
+        </div>
+
+        <ul class="conditions-list">
+            <li><strong>Impuestos:</strong> los valores de ambas opciones no incluyen IVA (19%).</li>
+            <li><strong>Facturación Opción A:</strong> 50% a firma de orden de compra y 50% contra entrega final.</li>
+            <li><strong>Facturación Opción B:</strong> fee base al inicio de la campaña; variable al cierre, contra reporte de registros cargados en SharePoint y validados por tu equipo.</li>
+            <li><strong>Definición de "registro completo":</strong> cliente con la totalidad de documentos de su categoría (6 a 9 según tipo) cargados en la carpeta correspondiente de tu SharePoint, validados en completitud, legibilidad y vigencia por nuestro backoffice.</li>
+            <li><strong>Insumos requeridos:</strong> base de datos con contactos completos (nombre, cargo, teléfono y correo) entregada antes del inicio de la Semana 0. Acceso de edición al SharePoint destino y habilitación de correos corporativos de XCB para el equipo Intelsa durante el tiempo de la operación.</li>
+                <li><strong>Mecánica de contacto:</strong> cada registro recibe hasta 3 intentos de contacto efectivos antes de ser marcado como no contactable. Los intentos se distribuyen entre voz, correo y WhatsApp según el perfil del cliente.</li>
+            <li><strong>Confidencialidad:</strong> operación cubierta por acuerdo de confidencialidad bilateral que firmamos junto con el contrato.</li>
+            <li><strong>Validez de la cotización:</strong> 30 días calendario a partir de la fecha de emisión.</li>
+        </ul>
+    </section>
+
+    <!-- CTA -->
+    <section>
+        <div class="cta-block">
+            <div>
+                <h3>Estamos listos para arrancar la semana del 10 de noviembre.</h3>
+                <p>Con la fecha objetivo de diciembre encima, cada semana cuenta. Si eliges la Opción A o la B, el siguiente paso es agendar 15 minutos con Alby para presentarle el plan y recibir la orden de compra. Mientras tanto, dejamos el equipo y la infraestructura reservados para ti.</p>
+            </div>
+            <div class="cta-contact">
+                <div class="label">Tu contacto en Intelsa</div>
+                <div class="name">Oscar Camilo Barrera</div>
+                <div class="role">Growth Manager</div>
+                <div class="detail">
+                    <a href="mailto:oscar.barrera@intelsa.co">oscar.barrera@intelsa.co</a><br>
+                    intelsa.co
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div>Intelsa BPO &amp; CX · Cotización PE0411-001 · Confidencial</div>
+        <div>Medellín, Colombia · Noviembre 2026</div>
+    </div>
+
+</div>
+
+</body>
+</html>
