@@ -468,6 +468,150 @@ section { margin-bottom: 64px; }
 
 .option-fit strong { color: var(--dark); font-weight: 600; }
 
+/* STRATEGY */
+.strategy-canvas {
+    padding: 36px 32px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    margin-bottom: 32px;
+    overflow-x: auto;
+}
+
+.strategy-levers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 36px;
+}
+
+.lever-card {
+    padding: 22px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    border-top: 3px solid var(--orange);
+}
+
+.lever-card h5 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
+}
+
+.lever-card p {
+    font-size: 12px;
+    color: var(--dark-70);
+    line-height: 1.6;
+}
+
+/* INCENTIVE */
+.incentive-recommendation {
+    padding: 36px;
+    background: linear-gradient(135deg, rgba(255,147,69,0.06) 0%, rgba(169,217,68,0.06) 100%);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 36px;
+    align-items: center;
+}
+
+.incentive-text .label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--orange);
+    margin-bottom: 12px;
+}
+
+.incentive-text h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+}
+
+.incentive-text p {
+    font-size: 13px;
+    color: var(--dark-70);
+    line-height: 1.7;
+    margin-bottom: 16px;
+}
+
+.incentive-text .admin-note {
+    display: inline-block;
+    padding: 8px 14px;
+    background: var(--dark);
+    color: #fff;
+    border-radius: var(--radius);
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+.incentive-text .admin-note .accent {
+    color: var(--green);
+    font-weight: 600;
+}
+
+.incentive-mock {
+    background: #fff;
+    padding: 24px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+}
+
+.incentive-mock .mock-header {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--dark-70);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.incentive-mock .mock-title {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: 18px;
+}
+
+.incentive-mock .mock-title .accent { color: var(--orange); }
+
+.prize-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+}
+
+.prize-row:last-of-type { border-bottom: 1px solid var(--line); }
+
+.prize-row .prize-name { font-weight: 500; }
+
+.prize-row .prize-tag {
+    font-size: 10px;
+    padding: 3px 9px;
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    color: var(--dark-70);
+    font-weight: 500;
+}
+
+.mock-footnote {
+    margin-top: 14px;
+    font-size: 10px;
+    color: var(--dark-70);
+    text-align: center;
+    line-height: 1.5;
+}
+
 /* INCLUDES */
 .includes-table {
     width: 100%;
@@ -705,6 +849,9 @@ section { margin-bottom: 64px; }
     .cta-block { grid-template-columns: 1fr; padding: 24px; }
     .phase-row { grid-template-columns: 1fr; gap: 10px; }
     .phase-bar { width: 100%; }
+    .strategy-levers { grid-template-columns: 1fr; }
+    .incentive-recommendation { grid-template-columns: 1fr; padding: 24px; gap: 24px; }
+    .strategy-canvas { padding: 20px 12px; }
 }
 </style>
 </head>
@@ -722,7 +869,7 @@ section { margin-bottom: 64px; }
             </div>
         </div>
         <div class="doc-ref">
-            <div><strong>Cotización</strong> No. PE0411-001</div>
+            <div><strong>Cotización</strong> No. PE0611-316</div>
             <div><strong>Preparada para:</strong> XCB de Colombia</div>
             <div><strong>Fecha:</strong> 4 de noviembre, 2026</div>
             <div><strong>Validez:</strong> 30 días calendario</div>
@@ -819,10 +966,136 @@ section { margin-bottom: 64px; }
         </div>
     </section>
 
-    <!-- SECTION 02: SCOPE -->
+    <!-- SECTION 02: STRATEGY -->
     <section>
         <div class="section-header">
             <div class="section-number">02</div>
+            <h2 class="section-title">La estrategia que proponemos para cerrar antes de diciembre</h2>
+        </div>
+        <p class="section-lead">Cada registro requiere varios toques por canales distintos; esperar que un cliente devuelva una llamada al primer intento no funciona. Diseñamos un ciclo de 10 a 14 días por registro con 3 intentos de contacto efectivos (voz), correo electrónico para formalizar la solicitud, WhatsApp como canal de baja fricción, y backoffice que valida y carga directamente en tu SharePoint. Las olas de contacto corren en paralelo durante las 6 semanas para barrer los 851 registros a tiempo.</p>
+
+        <!-- Flow diagram -->
+        <div class="strategy-canvas">
+            <svg viewBox="0 0 1000 290" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
+                <!-- Connector line -->
+                <line x1="100" y1="80" x2="900" y2="80" stroke="#d9d9d9" stroke-width="2" stroke-dasharray="5,5"/>
+
+                <!-- Stage 1 -->
+                <g>
+                    <circle cx="100" cy="80" r="34" fill="#ff9345"/>
+                    <text x="100" y="87" text-anchor="middle" font-family="Poppins" font-size="18" font-weight="600" fill="#fff">01</text>
+                    <text x="100" y="140" text-anchor="middle" font-family="Poppins" font-size="12" font-weight="600" fill="#414c4c">Contacto inicial</text>
+                    <text x="100" y="156" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Día 1</text>
+                    <rect x="55" y="170" width="90" height="22" rx="3" fill="#a9d944"/>
+                    <text x="100" y="185" text-anchor="middle" font-family="Poppins" font-size="10" font-weight="600" fill="#414c4c">Voz + Correo</text>
+                    <text x="100" y="215" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Presentación y envío</text>
+                    <text x="100" y="229" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">de checklist por tipo</text>
+                </g>
+
+                <!-- Stage 2 -->
+                <g>
+                    <circle cx="300" cy="80" r="34" fill="#ff9345"/>
+                    <text x="300" y="87" text-anchor="middle" font-family="Poppins" font-size="18" font-weight="600" fill="#fff">02</text>
+                    <text x="300" y="140" text-anchor="middle" font-family="Poppins" font-size="12" font-weight="600" fill="#414c4c">Primera rellamada</text>
+                    <text x="300" y="156" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Día 3 a 4</text>
+                    <rect x="247" y="170" width="106" height="22" rx="3" fill="#a9d944"/>
+                    <text x="300" y="185" text-anchor="middle" font-family="Poppins" font-size="10" font-weight="600" fill="#414c4c">Voz + WhatsApp</text>
+                    <text x="300" y="215" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Recordatorio y</text>
+                    <text x="300" y="229" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">resolución de dudas</text>
+                </g>
+
+                <!-- Stage 3 -->
+                <g>
+                    <circle cx="500" cy="80" r="34" fill="#ff9345"/>
+                    <text x="500" y="87" text-anchor="middle" font-family="Poppins" font-size="18" font-weight="600" fill="#fff">03</text>
+                    <text x="500" y="140" text-anchor="middle" font-family="Poppins" font-size="12" font-weight="600" fill="#414c4c">Segunda rellamada</text>
+                    <text x="500" y="156" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Día 6 a 7</text>
+                    <rect x="455" y="170" width="90" height="22" rx="3" fill="#a9d944"/>
+                    <text x="500" y="185" text-anchor="middle" font-family="Poppins" font-size="10" font-weight="600" fill="#414c4c">Voz + Correo</text>
+                    <text x="500" y="215" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Último intento de</text>
+                    <text x="500" y="229" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">contacto efectivo</text>
+                </g>
+
+                <!-- Stage 4 -->
+                <g>
+                    <circle cx="700" cy="80" r="34" fill="#414c4c"/>
+                    <text x="700" y="87" text-anchor="middle" font-family="Poppins" font-size="18" font-weight="600" fill="#fff">04</text>
+                    <text x="700" y="140" text-anchor="middle" font-family="Poppins" font-size="12" font-weight="600" fill="#414c4c">Validación</text>
+                    <text x="700" y="156" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Día 9 a 10</text>
+                    <rect x="660" y="170" width="80" height="22" rx="3" fill="#a9d944"/>
+                    <text x="700" y="185" text-anchor="middle" font-family="Poppins" font-size="10" font-weight="600" fill="#414c4c">Backoffice</text>
+                    <text x="700" y="215" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Completitud, legibilidad</text>
+                    <text x="700" y="229" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">y vigencia por tipo</text>
+                </g>
+
+                <!-- Stage 5 -->
+                <g>
+                    <circle cx="900" cy="80" r="34" fill="#a9d944"/>
+                    <text x="900" y="87" text-anchor="middle" font-family="Poppins" font-size="18" font-weight="600" fill="#414c4c">05</text>
+                    <text x="900" y="140" text-anchor="middle" font-family="Poppins" font-size="12" font-weight="600" fill="#414c4c">Cargue en SharePoint</text>
+                    <text x="900" y="156" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Día 12 a 14</text>
+                    <rect x="855" y="170" width="90" height="22" rx="3" fill="#a9d944"/>
+                    <text x="900" y="185" text-anchor="middle" font-family="Poppins" font-size="10" font-weight="600" fill="#414c4c">SharePoint XCB</text>
+                    <text x="900" y="215" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">Carpeta por cliente</text>
+                    <text x="900" y="229" text-anchor="middle" font-family="Poppins" font-size="10" fill="#414c4cb3">con estructura acordada</text>
+                </g>
+
+                <!-- Bottom legend -->
+                <g font-family="Poppins">
+                    <rect x="340" y="260" width="320" height="22" rx="3" fill="#fff" stroke="#d9d9d9" stroke-width="1"/>
+                    <text x="500" y="275" text-anchor="middle" font-size="10" fill="#414c4c" font-weight="500">Ciclo completo por registro: 10 a 14 días calendario</text>
+                </g>
+            </svg>
+        </div>
+
+        <!-- Levers -->
+        <div class="strategy-levers">
+            <div class="lever-card">
+                <h5>Multicanal real</h5>
+                <p>El contacto no depende solo de la llamada. Si el cliente no responde la voz, el correo con el checklist y el WhatsApp con recordatorio llegan en paralelo. Reduce la fricción propia del canal telefónico en B2B.</p>
+            </div>
+            <div class="lever-card">
+                <h5>Recurrencia inteligente</h5>
+                <p>Tres intentos de contacto efectivos espaciados en el ciclo. Ni menos (perdemos cliente) ni más (saturamos). Después del tercer intento el registro pasa a seguimiento por correo y WhatsApp sin llamada.</p>
+            </div>
+            <div class="lever-card">
+                <h5>Backoffice continuo</h5>
+                <p>Validamos y cargamos en tu SharePoint cliente por cliente, no en lote al final. Esto te da visibilidad semanal del avance real y permite corregir rumbo si algún tipo documental se atasca.</p>
+            </div>
+        </div>
+
+        <!-- Incentive recommendation -->
+        <div class="incentive-recommendation">
+            <div class="incentive-text">
+                <div class="label">Nuestra recomendación</div>
+                <h4>Activa un incentivo interno para elevar la tasa de recopilación de forma material.</h4>
+                <p>Te sugerimos que XCB gestione internamente un presupuesto para rifar un premio de alto valor percibido (un computador o un celular) entre los clientes que completen la entrega de documentación dentro del plazo. Es el impulso que diferencia una campaña con tasa aceptable de una campaña con cierre total. En campañas B2B equivalentes, incentivos de este tipo elevan la recopilación efectiva entre 20 y 35 puntos porcentuales.</p>
+                <p>Nosotros comunicamos el beneficio en cada toque del flujo (llamada, correo y WhatsApp) y validamos elegibilidad al cierre. La mecánica, la compra del premio y la entrega al ganador quedan 100% administradas por ti.</p>
+                <div class="admin-note">Mecánica <span class="accent">administrada por XCB</span>, comunicada por Intelsa</div>
+            </div>
+
+            <div class="incentive-mock">
+                <div class="mock-header">Comunicación al cliente</div>
+                <div class="mock-title">Entrega tu documentación antes del <span class="accent">20 de diciembre</span> y participa en la rifa.</div>
+
+                <div class="prize-row">
+                    <span class="prize-name">Gran premio</span>
+                    <span class="prize-tag">PC portátil</span>
+                </div>
+                <div class="prize-row">
+                    <span class="prize-name">Segundo premio</span>
+                    <span class="prize-tag">Smartphone</span>
+                </div>
+
+                <div class="mock-footnote">Premios referenciales a elección de XCB según catálogo interno</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 03: SCOPE -->
+    <section>
+        <div class="section-header">
+            <div class="section-number">03</div>
             <h2 class="section-title">Qué hacemos y qué queda de tu lado</h2>
         </div>
         <p class="section-lead">Operamos la campaña de punta a punta. Tu equipo de cumplimiento se concentra en validar y radicar; nosotros nos encargamos de todo el movimiento entre XCB y tus clientes, incluyendo el cargue directo en tu SharePoint.</p>
@@ -855,10 +1128,10 @@ section { margin-bottom: 64px; }
         </div>
     </section>
 
-    <!-- SECTION 03: OPTIONS -->
+    <!-- SECTION 04: OPTIONS -->
     <section>
         <div class="section-header">
-            <div class="section-number">03</div>
+            <div class="section-number">04</div>
             <h2 class="section-title">Dos modelos para que elijas el que mejor te acomode</h2>
         </div>
         <p class="section-lead">Mismo alcance, misma calidad operativa. La diferencia está en cómo prefieres estructurar la inversión: una tarifa fija cerrada o un modelo que alinea el pago al resultado concreto de cada registro cargado en tu SharePoint.</p>
@@ -931,10 +1204,10 @@ section { margin-bottom: 64px; }
         </div>
     </section>
 
-    <!-- SECTION 04: INCLUDES -->
+    <!-- SECTION 05: INCLUDES -->
     <section>
         <div class="section-header">
-            <div class="section-number">04</div>
+            <div class="section-number">05</div>
             <h2 class="section-title">Qué cubre la inversión en ambas opciones</h2>
         </div>
         <p class="section-lead">No hay cobros adicionales por setup, infraestructura, telefonía ni integración durante la ejecución.</p>
@@ -975,10 +1248,10 @@ section { margin-bottom: 64px; }
         </table>
     </section>
 
-    <!-- SECTION 05: TIMELINE -->
+    <!-- SECTION 06: TIMELINE -->
     <section>
         <div class="section-header">
-            <div class="section-number">05</div>
+            <div class="section-number">06</div>
             <h2 class="section-title">Cómo se vería la ejecución</h2>
         </div>
         <p class="section-lead">Cronograma asumiendo firma de orden de compra la semana del 10 de noviembre. El arranque efectivo requiere cinco días hábiles de ramp-up una vez recibida la base.</p>
@@ -1019,10 +1292,10 @@ section { margin-bottom: 64px; }
         </div>
     </section>
 
-    <!-- SECTION 06: CONDITIONS -->
+    <!-- SECTION 07: CONDITIONS -->
     <section>
         <div class="section-header">
-            <div class="section-number">06</div>
+            <div class="section-number">07</div>
             <h2 class="section-title">Condiciones comerciales</h2>
         </div>
 
@@ -1059,7 +1332,7 @@ section { margin-bottom: 64px; }
 
     <!-- FOOTER -->
     <div class="footer">
-        <div>Intelsa BPO &amp; CX · Cotización PE0411-001 · Confidencial</div>
+        <div>Intelsa BPO &amp; CX · Cotización PE0611-316 · Confidencial</div>
         <div>Medellín, Colombia · Noviembre 2026</div>
     </div>
 
