@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Propuesta · SPARTAN Flow CRM + Trueno para Gerenciar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#ff9345; --green:#a9d944; --dark:#414c4c; --dark-70:#414c4cb3; --dark-40:#414c4c66;
+  --bg:#ffffff; --bg-soft:#faf8f5; --line:#ececec; --line-strong:#d9d9d9; --radius:3px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--dark);font-weight:400;line-height:1.6;font-size:14px}
+.container{max-width:960px;margin:0 auto;padding:56px}
+strong{font-weight:600}
+
+/* HEADER */
+.header{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:32px;border-bottom:2px solid var(--dark);margin-bottom:56px}
+.brand-block{display:flex;align-items:center;gap:14px}
+.logo{display:block;height:50px;width:auto}
+.logo-mark{width:38px;height:38px;background:var(--orange);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;flex-shrink:0}
+.brand-info .name{font-weight:600;font-size:15px;letter-spacing:.2px}
+.brand-info .tagline{font-size:11px;color:var(--dark-70);margin-top:2px}
+.doc-ref{text-align:right;font-size:11px;color:var(--dark-70);line-height:1.8}
+.doc-ref strong{color:var(--dark)}
+
+/* HERO */
+.hero{margin-bottom:56px}
+.eyebrow{display:inline-block;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--orange);margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--orange)}
+.hero h1{font-size:36px;font-weight:600;line-height:1.2;letter-spacing:-.5px;margin-bottom:20px;max-width:780px}
+.hero h1 .highlight{color:var(--orange)}
+.hero-intro{font-size:14px;color:var(--dark-70);max-width:740px;line-height:1.7}
+
+/* CLIENT INFO */
+.client-info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;padding:28px;background:var(--bg-soft);border-radius:var(--radius);margin-bottom:56px}
+.info-group .label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--dark-70);font-weight:500;margin-bottom:6px}
+.info-group .value{font-size:14px;font-weight:500;line-height:1.5}
+
+/* SECTIONS */
+section{margin-bottom:64px}
+.section-header{display:flex;align-items:baseline;gap:20px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.section-number{font-size:10px;font-weight:600;color:var(--orange);letter-spacing:1.2px;min-width:24px}
+.section-title{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.section-lead{font-size:14px;color:var(--dark-70);max-width:780px;margin-bottom:28px;line-height:1.7}
+
+/* KPI */
+.sla-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.sla-card{padding:22px;background:var(--bg-soft);border-radius:var(--radius);border:1px solid var(--line)}
+.sla-metric{font-size:32px;font-weight:600;color:var(--orange);line-height:1;margin-bottom:8px}
+.sla-name{font-size:13px;font-weight:600;margin-bottom:6px}
+.sla-desc{font-size:11px;color:var(--dark-70);line-height:1.5}
+
+/* NEEDS / MATRIX */
+.doc-matrix{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.doc-matrix.three{grid-template-columns:repeat(3,1fr)}
+.doc-type{padding:20px;background:var(--bg-soft);border-radius:var(--radius);border-left:3px solid var(--orange)}
+.doc-type.green{border-left-color:var(--green)}
+.doc-type.gray{border-left-color:var(--dark-40)}
+.doc-type .type-header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.doc-type .type-name{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+.doc-type .doc-count{font-size:11px;color:var(--orange);font-weight:600;white-space:nowrap}
+.doc-type.green .doc-count{color:#6ba368}
+.doc-type.gray .doc-count{color:var(--dark-70)}
+.doc-type .type-category{font-size:10px;color:var(--dark-70);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:500}
+.doc-type p{font-size:13px;color:var(--dark-70);line-height:1.6}
+
+/* JOURNEY FLOW */
+.strategy-canvas{padding:32px;background:var(--bg-soft);border-radius:var(--radius);margin-bottom:32px}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.flow-step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px 14px;position:relative}
+.flow-step .n{font-size:10px;font-weight:600;color:var(--orange);letter-spacing:1.2px}
+.flow-step h5{font-size:13px;font-weight:600;margin:4px 0 6px}
+.flow-step .ch{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--dark);font-weight:600;margin-bottom:4px}
+.flow-step p{font-size:11px;color:var(--dark-70);line-height:1.45}
+.flow-step.end{border-top:3px solid var(--green)}
+.flow-step:not(.end){border-top:3px solid var(--orange)}
+.flow-caption{text-align:center;font-size:11px;color:var(--dark-70);margin-top:18px}
+.flow-caption strong{color:var(--dark)}
+.strategy-levers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}
+.lever-card{padding:22px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);border-top:3px solid var(--orange)}
+.lever-card h5{font-size:13px;font-weight:600;margin-bottom:10px;letter-spacing:-.2px}
+.lever-card p{font-size:12px;color:var(--dark-70);line-height:1.6}
+
+/* RECOMMENDATION */
+.incentive-recommendation{padding:36px;background:linear-gradient(135deg,rgba(255,147,69,.06) 0%,rgba(169,217,68,.06) 100%);border-radius:var(--radius);border:1px solid var(--line);display:grid;grid-template-columns:1.3fr 1fr;gap:36px;align-items:center}
+.incentive-text .label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--orange);margin-bottom:12px}
+.incentive-text h4{font-size:20px;font-weight:600;margin-bottom:14px;line-height:1.3;letter-spacing:-.3px}
+.incentive-text p{font-size:13px;color:var(--dark-70);line-height:1.7;margin-bottom:16px}
+.incentive-text .admin-note{display:inline-block;padding:8px 14px;background:var(--dark);color:#fff;border-radius:var(--radius);font-size:11px;font-weight:500}
+.incentive-text .admin-note .accent{color:var(--green);font-weight:600}
+.incentive-mock{background:#fff;padding:22px;border-radius:var(--radius);border:1px solid var(--line)}
+.mock-header{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--dark-70);margin-bottom:12px;font-weight:500}
+.bubble{font-size:12px;line-height:1.5;padding:9px 12px;border-radius:var(--radius);margin-bottom:8px;max-width:88%}
+.bubble.in{background:var(--bg-soft);border:1px solid var(--line)}
+.bubble.out{background:rgba(255,147,69,.12);margin-left:auto}
+.handoff{font-size:11px;font-weight:600;color:#fff;background:var(--dark);border-radius:var(--radius);padding:8px 12px;margin-top:10px}
+.handoff .accent{color:var(--green)}
+.mock-footnote{margin-top:12px;font-size:10px;color:var(--dark-70);text-align:center;line-height:1.5}
+
+/* TRY TRUENO */
+.try-block{margin-top:28px;padding:32px;border:2px solid var(--orange);border-radius:var(--radius);background:#fff}
+.try-head .label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--orange);margin-bottom:8px}
+.try-head h4{font-size:20px;font-weight:600;letter-spacing:-.3px;margin-bottom:8px}
+.try-head p{font-size:13px;color:var(--dark-70);margin-bottom:22px}
+.try-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+.try-card{padding:22px;background:var(--bg-soft);border-radius:var(--radius);border-left:3px solid var(--green)}
+.try-card p{font-size:13px;color:var(--dark-70);line-height:1.6;margin-bottom:14px}
+.try-kicker{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.try-wa{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:start}
+.qr{width:150px;height:150px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:6px;image-rendering:pixelated}
+.try-btn{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:600;font-size:13px;padding:10px 18px;border-radius:var(--radius);margin-bottom:14px}
+.try-btn:hover{background:#e67d2d}
+.try-small{font-size:11px !important;margin-bottom:0 !important}
+.try-small code{font-family:inherit;font-weight:600;color:var(--dark);background:#fff;padding:1px 4px;border-radius:var(--radius)}
+
+/* FLOATING CTA */
+.float-cta{position:fixed;right:20px;bottom:20px;z-index:50;display:flex;align-items:center;gap:8px;background:var(--dark);color:#fff;text-decoration:none;font-weight:600;font-size:13px;padding:12px 18px;border-radius:var(--radius);box-shadow:0 6px 20px rgba(65,76,76,.25)}
+.float-cta .dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.float-cta:hover{background:#2f3838}
+
+/* SCOPE */
+.scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.scope-card{padding:24px;background:var(--bg-soft);border-radius:var(--radius);border-left:3px solid var(--orange)}
+.scope-card.green{border-left-color:var(--green)}
+.scope-card h4{font-size:12px;font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
+.scope-card ul{list-style:none;padding:0}
+.scope-card li{padding:7px 0 7px 18px;position:relative;font-size:13px;border-bottom:1px solid var(--line);line-height:1.5}
+.scope-card li:last-child{border-bottom:none}
+.scope-card li::before{content:"";position:absolute;left:0;top:16px;width:8px;height:2px;background:var(--orange)}
+.scope-card.green li::before{background:var(--green)}
+
+/* OPTIONS */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.option-card{position:relative;padding:32px;border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column}
+.option-card.recommended{border:2px solid var(--orange);background:linear-gradient(180deg,rgba(255,147,69,.04) 0%,rgba(255,147,69,0) 50%)}
+.option-badge{position:absolute;top:-12px;left:24px;background:var(--orange);color:#fff;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;padding:4px 12px;border-radius:var(--radius)}
+.option-name{font-size:11px;color:var(--dark-70);font-weight:500;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
+.option-title{font-size:22px;font-weight:600;margin-bottom:14px;letter-spacing:-.3px;line-height:1.25}
+.option-desc{font-size:12px;color:var(--dark-70);line-height:1.6;margin-bottom:20px;min-height:60px}
+.price-hybrid{padding:24px;background:var(--bg-soft);border-radius:var(--radius);margin-bottom:20px}
+.hybrid-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line-strong)}
+.hybrid-row:last-child{border-bottom:none;padding-bottom:0}
+.hybrid-row:first-child{padding-top:0}
+.hybrid-row .component{font-size:12px;font-weight:500}
+.hybrid-row .component small{display:block;font-size:10px;color:var(--dark-70);font-weight:400;margin-top:2px}
+.hybrid-row .amount{font-size:18px;font-weight:600;white-space:nowrap}
+.hybrid-row .amount .unit{font-size:10px;color:var(--dark-70);font-weight:500;margin-left:2px}
+.hybrid-row.total .amount{color:var(--orange)}
+.option-includes{list-style:none;margin-bottom:20px}
+.option-includes li{font-size:12px;padding:5px 0 5px 16px;position:relative;line-height:1.5}
+.option-includes li::before{content:"";position:absolute;left:0;top:13px;width:7px;height:2px;background:var(--orange)}
+.option-fit{font-size:11px;color:var(--dark-70);line-height:1.6;margin-top:auto;padding-top:16px;border-top:1px dashed var(--line-strong)}
+.option-fit strong{color:var(--dark)}
+
+/* SCENARIOS */
+.scenarios-table{margin-top:28px;background:#fff;border-radius:var(--radius);border:1px solid var(--line);overflow:hidden}
+.scenarios-table-header{padding:10px 14px;background:var(--dark);color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.8px;font-weight:500}
+.scenario-row{display:grid;grid-template-columns:1.2fr 1fr .6fr;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);font-size:12px;align-items:center}
+.scenario-row:last-child{border-bottom:none}
+.scenario-row .scen-label{font-weight:500}
+.scenario-row .scen-reg{color:var(--dark-70);text-align:center}
+.scenario-row .scen-total{text-align:right;font-weight:600}
+.scen-note{font-size:11px;color:var(--dark-70);margin-top:10px}
+
+/* TABLE */
+.includes-table{width:100%;border-collapse:collapse;font-size:13px}
+.includes-table thead th{text-align:left;padding:14px 18px;background:var(--dark);color:#fff;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.includes-table thead th:first-child{border-top-left-radius:var(--radius)}
+.includes-table thead th:last-child{border-top-right-radius:var(--radius)}
+.includes-table tbody td{padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:top}
+.includes-table tbody tr:last-child td{border-bottom:none}
+.includes-table td:first-child{font-weight:600;width:32%}
+
+.compare thead th span{display:block;font-size:13px;text-transform:none;letter-spacing:0;font-weight:600;margin-top:2px}
+.compare thead th.col-a{background:var(--orange)}
+.compare thead th.col-b{background:#5a6666;border-left:3px solid #fff}
+.compare tbody td:nth-child(2){background:rgba(255,147,69,.06)}
+.compare tbody td:nth-child(3){border-left:3px solid #fff;background:var(--bg-soft)}
+
+/* TIMELINE */
+.timeline-wrap{margin:8px 0 16px}
+.phase-row{display:grid;grid-template-columns:120px 1fr;gap:24px;align-items:center;padding:18px 0;border-bottom:1px solid var(--line)}
+.phase-row:last-child{border-bottom:none}
+.phase-week{font-size:11px;color:var(--orange);font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.phase-content h5{font-size:14px;font-weight:600;margin-bottom:4px}
+.phase-content p{font-size:12px;color:var(--dark-70);line-height:1.5}
+
+/* HITOS */
+.hitos{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.hito{display:flex;flex-direction:column;padding:16px 16px 14px;background:var(--bg-soft);border-radius:var(--radius);border-top:3px solid var(--orange)}
+.hito-body{display:flex;flex-direction:column;flex:1}
+.hito-body ul{flex:1}
+.hito.start{border-top-color:var(--dark-40)}
+.hito.end{border-top-color:var(--green)}
+.hito-tag{font-size:10px;font-weight:600;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.hito.start .hito-tag{color:var(--dark-70)}
+.hito.end .hito-tag{color:#6ba368}
+.hito-body h5{font-size:14px;font-weight:600;margin-bottom:8px;line-height:1.3}
+.hito-body ul{list-style:none;padding:0;margin-bottom:10px}
+.hito-body li{font-size:12px;padding:2px 0 2px 14px;position:relative;line-height:1.45;color:var(--dark)}
+.hito-body li::before{content:"";position:absolute;left:0;top:10px;width:7px;height:2px;background:var(--orange)}
+.hito-deliv{font-size:11px;line-height:1.45;color:var(--dark-70);padding-top:8px;border-top:1px dashed var(--line-strong)}
+.hito-deliv strong{color:var(--dark)}
+
+/* CONDITIONS */
+.conditions-list{list-style:none;padding:0}
+.conditions-list li{padding:14px 20px 14px 44px;position:relative;font-size:13px;background:var(--bg-soft);border-radius:var(--radius);margin-bottom:10px;line-height:1.6}
+.conditions-list li::before{content:"";position:absolute;left:20px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:var(--orange);border-radius:50%}
+
+/* CTA */
+.cta-block{padding:40px;background:var(--dark);color:#fff;border-radius:var(--radius);display:grid;grid-template-columns:1.5fr 1fr;gap:40px;align-items:center}
+.cta-block h3{font-size:22px;font-weight:600;margin-bottom:14px;line-height:1.3;color:#fff}
+.cta-block p{font-size:13px;color:rgba(255,255,255,.75);line-height:1.7}
+.cta-steps{list-style:none;margin-top:16px;counter-reset:s}
+.cta-steps li{font-size:12px;color:rgba(255,255,255,.85);padding:4px 0 4px 26px;position:relative;counter-increment:s}
+.cta-steps li::before{content:counter(s);position:absolute;left:0;top:5px;width:18px;height:18px;border-radius:var(--radius);background:var(--orange);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.cta-contact{background:rgba(255,255,255,.08);padding:24px;border-radius:var(--radius);border-left:3px solid var(--orange)}
+.cta-contact .label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.6);margin-bottom:10px;font-weight:500}
+.cta-contact .name{font-size:15px;font-weight:600;margin-bottom:4px;color:#fff}
+.cta-contact .role{font-size:11px;color:rgba(255,255,255,.7);margin-bottom:14px}
+.cta-contact .detail{font-size:12px;color:rgba(255,255,255,.85);line-height:1.6}
+.cta-contact .detail a{color:var(--orange);text-decoration:none;font-weight:600}
+.cta-contact .name{margin-bottom:12px}
+.wa-btn{display:inline-block;margin-top:16px;background:var(--orange);color:#fff;text-decoration:none;font-weight:600;font-size:13px;padding:10px 18px;border-radius:var(--radius)}
+.wa-btn:hover{background:#e67d2d}
+@media print{.wa-btn{display:none}}
+
+/* FOOTER */
+.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;font-size:10px;color:var(--dark-70)}
+
+@media (max-width:900px){
+  .sla-grid{grid-template-columns:repeat(2,1fr)}
+  .hitos{grid-template-columns:repeat(2,1fr)}
+  .flow{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:768px){
+  .container{padding:24px 20px}
+  .header{flex-direction:column}
+  .doc-ref{text-align:left}
+  .hero h1{font-size:26px}
+  .client-info,.doc-matrix,.doc-matrix.three,.scope-grid,.options-grid,.strategy-levers,.sla-grid{grid-template-columns:1fr;gap:16px}
+  .incentive-recommendation{grid-template-columns:1fr;padding:24px;gap:24px}
+  .cta-block{grid-template-columns:1fr;padding:24px}
+  .phase-row{grid-template-columns:1fr;gap:6px}
+  .strategy-canvas{padding:16px}
+  .flow{grid-template-columns:1fr}
+  .scenario-row{grid-template-columns:1fr;gap:2px}
+  .scenario-row .scen-reg,.scenario-row .scen-total{text-align:left}
+  .includes-table td:first-child{width:auto}
+  .includes-table{font-size:12px}
+  .includes-table thead th,.includes-table tbody td{padding:10px 8px}
+  .includes-table thead th{letter-spacing:.4px;font-size:10px}
+  .footer{flex-direction:column}
+  .try-block{padding:20px}
+  .hitos{grid-template-columns:1fr}
+  .try-grid,.try-wa{grid-template-columns:1fr}
+  .float-cta{right:12px;bottom:12px;font-size:12px;padding:10px 14px}
+}
+@media print{
+  .container{padding:24px}
+  section{break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .float-cta{display:none}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<header class="header">
+  <div class="brand-block">
+    <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWkAAABjCAYAAABZl/GcAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFxEAABcRAcom8z8AAC5ySURBVHhe7Z0JfFxV2f9b3P4uvK64K4pV2mTupCXN3HMnaQfaJnPP85xJKDTy/nHfEBXXV1ERjAsIWNrOkkALKuhf8QWV1/V1QURBNi0g0DYzk7SBtrQsWjahLG3m/3lO7g2Tk5nMuZOZZNqe7+fzfKCZO885d/vdM+c+53nmzDEYDAaDwWAwGAwGg8FgMBgMBoPBcFARcd0mOx4/Nsr5iTbACW0ASyOu+0Z1O4PBYDDMICTEDsC3okI82Z5IFHzr6O4uOIjbGOenq98xGAyGsvRtanp+cjB0aipv/Tg1FP52Kmd9pX+o5Z2pvMUyw0db6Wxofv/QonnSNjW9RP2+4VlIoBlA1hPkSRYVotDR01NgAGt6e3ufo37/UCOC2OIADDGAuzRskwNwB+vqeoXqxzBG2/Llr2Scr3Y4/5nD+RUV7EoH4EetsdirVD+GBuPCbeH4JfctKlw40lIY8G1bCdvaUkjnrD+kc9aZqVz488m89ekLhprfpPo7lGGIvyYRVsVZNdomwvm56vcPNdoTCdZx/PGFaCKhZY4Q+5yVK1+t+jGM0S7Emx0hNrX39Ew6diVNiKccgCNVP4YGI5VvTqzfsbCQzocrGgn5hnsXSlu/o4X+lk9mwzclB0M/X7PFYsk7Q6/ZsLH1RWobhwIRAGSI+1VBLmU0oo4K8Uh7PN6s+jmUIJFuL/Oro5QxgH1OZ6cR6TIs7ul5E/3qkA+0EsdvkgE8RcKu+jE0GJl8s9AVadVo1H3RPS2FC+9uKWSGWwrJfGg0lQ/9OJlt/lB/rmmh2tbBjIO4Pojg0LZMiKTq51DCiHRtMSJ9kDIdkZ5kQ+HCRfcsLFx878JCMhfekRy0fp3e0nzCho2vO6hH17Genpc5AA87Qky+EcqYNy1yqerrUMKIdG0xIn2QUlORLjKax75o+8JCZjhcSOWtXetyoU9lBo+21PYPBjoQX+7Q/J56E0xhJE424hWqr0MJI9K1xYj0QUq9RLrYaCpk/c6FhfRQaGcyF7oktampSe3HgUzEdf+DIe6mueZJN0IZo5F0FPF7qq9DCSPStcWI9EHKTIi0b2Nz2AsLqZz1VDLfvCF198Ej1gzx7CCCQzcS4/xs1c+hhBHp2mJE+iBlJkXaN5oCoeiQgW3WvcnB5vNW7w6/WO3XgYaDGI8K8bTOaNrb5l/RFSter/o5lDAiXVuMSB+kzIZI+0bz1hQZks5ZI5l8+MRLR478P2r/DiQY4upyC1l8kwItxDO2EB9Qv3+oYUS6thiRPkiZTZH2TYr1PS1Pp3KhX6zevOCADq63vVA8WgruxUOPmydIT9mc/1dTb+/z1e8eahiRri1GpA9SGkGkyTJDYflyMTMc3rEu1/T+Ndvf+EK1rwcCsVjsuW2u+y4GcBO9TGQAtKrrCQZwTwTg6sUAUfU7hypGpGuLEemDlORwCL7jLQunqYcJNtJS6N/aIgVUFdV6WT+F7t3TUkjmrB+cP3j04Wp/DxT6+voOi3R1tVAGPBuxmyUS89RtDnWMSNcWI9IHKanb5h2RyocuTeWsjamcdUcqH77TsztSOSufzIUf6acXfTsXFjbsXCinJmZCtKm9VC58YzLb1KH22XBwYES6thiRPgQ5b+NRL00NNh+X2tL0iXQ+dFYyb60mIU8Ph2kOeTwZE0VrqCJbC5MvFYesvamh8HvUvhkOfIxI1xYj0gYJJVFKbgmHktkFy1PZ0O9S2dDWzHD4yQ27Fhb6t04W2ula/zb5QHiKsu6pfTHUhpgQr2JdXfOirvs21ejvlAJT/U4tOBhEOtzZ+eKWZcvesHj58qPoeEU6O99KfaR3E+q29abRRFq+n1m+/JV0TPzryV627DWtra3PU7c11Jl1Q+GTkjlrTSpv7aZpCppXplWGquBWazTdQiP39HDo7AaOqZ5LNyelfqQLX8cY4htaTzllVi5YunEY4mdsxK8xxM2lolFkRAotugH4hw1wJuP8tGh3d83eExyIIr3YdRdRdE4U8XQb4Hyb86ttzh9wAPbR8bI532e77lYG8GMG8FUq8tDG+ckzIUyNINJUjYgBfCEK8BUH4DKb87uoHf96YpxvY4g/sAG+EnHdz9uua6YzZ5IL7gzNT221ViWz1m2ZbeHHKaWpKrjVGs2DD4y07E/nw5ecPxitmVDUinmu+wIH4IcOwHZKZK9hVKXlZhtggeqrHDbAuxnA32XkSGW7g3F+avH3aWRzDI1mOP+5A7CVlqaTSFZagEM3vbft/qgQdzHEc2uRLD6oSDuIo4zzjQzgxhL7O242wK0RgM+r7VVDb2/v82nRkQNwjoN4swOwk46FNDp23sNtwvHywi3pc7n8X4i9DOA2BvA/HcuXvyMWi9VlPcBsiTSNlm3Oz2KIGx3Ef/rHRz74lb6ox8ZBpAfcLRHE0+mamoViGHMpQRqjX0N0fyH+kSHeyBBv8M73LWR0r9Lf5GcAf2zjXMRisddSSgjV4QFDMmstT+fDV1x4d8soRYnU4mUj+aBl5ety1k83ZN8xbZGoJXTjOUJcq5vE3hOnBx3XXaT6Kkc74pfp4i4uy1XOlq5cWWgX4hz/uzSSi3CechCf9kfNk25aDZP+qe/0MOL8E/RwmthLfaoQ6Un7WcqWjN38F6ntBcUBiDKA/uJfFdM6bt73GcA1ba67fE6NBWmmRfqYePx1ba77RQbwmL9/QTJBkhUfVwawl3F+RrS7e0ZW4rZ2dUXoYc4Atsnz6vVFx2Tf6b8At9qu+/Eg93FDsWFj6/NIrJPZ8HU0X33h3TUYWdOIeltLIZUP/awvP69hnmJSpAGu1RUd76K8vw1AO+82/cTWFQk5SgGQIk0jHUeIH1ZaDRnEqB/kz+Z8fbViU41I6xjdRAxxQG1PlxW9vS+1AS6KCnGfTqWdoOaNvh9mAD+t5fTRTIp0WzzuOIg31fL4+ILNAHKLu7rqtZ5gLhWJjlAJMSF2yUGV5j1VyuR9MHav7YxwfqlX3m2u2mjD01eYc1g6Gz4pPRQepvSlJLSTxDeI0Yh6O43Ore+m8vOqHsnVkoYUacSvz4nFnss4/xOVVFK3qYXR/sqyYYgvV/tbiUYU6cWu20ajI2+aYpLvmpn3kGMAgxGAHrUf1TBTIu3Q6BNRFlqe5LMG5vl9ygY4p5YPsUgi8VaaC2eIozrTfEHM/3XMAPbYAF+quVCvGzn6Lenh5vb+zQuaz9vY+tI1N7IX9m1sfRHl0qDRsLp9tazOht+ayYXWDlDExsj0XizKOeptlPej+Qy1ndmgEUWacf5N23Uv0u1TtSb9c35F0KXujSbSbfH4qVHE+7VFrgYmrwPEvRHOT1P7E5SZEGk7Hv8U9Vn3OpyOURs255fVYp5avvAFGKrlyL+c0fGnX0lB3jdNybqh5mPTWWt/Km89ncpZe1P58GPpfPhRabnmB5KD1j/SOeuM9HALpoZajjv3TivwiEll7Zb52L/Vum26y9EpPpuEet2Wpo+obcw0jSbSZDbAE5TMSf17PUyOCjnfMGfOHO0bqpFE2o7Hz5QRGroCV0OTooe43wb4otqvINRbpJnrxqg2Z5BrcDpG7dC5pCm1aYQ0HmZzzh3Eh+pxrZUz773NfRHOl6kdCkwqH07QSkIamUobnmhymfb2sQK06SHrmXTeuj6ZC1+SzFsnT2eUvXo4/OpU1voVvQikpeeqAOsazXX3bws/uS4bOl5tYyZpRJEOsm1NTIhCJB7/v2q/y9EoIm1z/umgL7xqbf7o1Oa86gFHPUWaMfZCJsR19ZriKGtj54UeYCeofdKBcf7haCLxiPYxqaF5I+o9UYDj1H4FIkiCJT+6Qm4/Jtj3pfLNmbXZ5vZq8mz0bWp6fnrQOnPg7vDD9DBQ29M1WvnYPxLevjo/e0UEGlGkZ9roooxwnm/p6XmZ2vdSNIJI25yf6Ajx70Y4rl4fHmKIK9R+6lBPkW4HOEHbb43Nu1f2LEYMqf2aiijA+2luezbPrdf2v9vi8bjaP22CiHSxkWDTCFiOhEesp9PZ8G9SQ6F3qv41mLtu0OrObA3/Sy4DL9GWjlFSpv7h8C9U5zPFgSrS/gjON/XzoCZ/nrqu1s/22RbpiOu+0UHcVq340PHyQ7JUq/ZYen25vZr427qKdCLxp6Dnyj8+1B/fqjk2tD3NJdsAP1T7VQ7HdZdHhdijfSzqaF4f/sU6O9vVfmpRrUhPMEozukNOmexL5a2bU9mwSy8f1bamIp1rigxsa9lNo+JJ/jWN+pAaCq1Vfc8EB5JI+xd9NJEYdQAeYQD3OpxTWtXH6SaaTqie93P4ep2l5LMp0vQyigH8vpr2pdiMFRK+nyH+XS52APijw/kvGcD13r9zjhAyikD9fiWToY1CfF/tcyXqJdL2ihULGOd3a/v1zkFUiH8xzv/mcH4VE+JiElnGOS0GybcnEqMVr2UaONA1irjN4fzTXnhbRZyurvkOwINB+ltv8x++Ha57hNrfitREpD2j0TVFbQyMtOxL56xfJrOhsNreVKzdYh0zsLVlN42KVd861j8sR9NPpAab6xVjWZYDQqS91V6M861Uk5EBfJRGHIxzKwqw0OFcMMTTmOsm6Wd3tMowJWoj4rpM7b9KNSJdPCorZ94b/CkXsziu+8FoCf9TmRwZjr0QutMB+KKN2Fou8iAG8Fr6uc0AfuIIsT+IYMhrA/HRiOt2qX6nol4i7QjxiSBREdS+jfgXxnnJkWMbwGspzYCDeG/JOe5nC2Q82Oa659D2qo+y9PY+x0b8ddDryjf1WippVdwTZN61s07tckVqKdLFRi8j+7eGH1iXs84MEsucvqu5ZWBreFe1I2r5vSErt26kRWtetFY0ukjL7wE8HHXdj1FCJdV3MSQ8tOrL5vxyGg0Gfakmpzw4P0v1q1KNSDOALAkRA9g0heUpd4Tano9c5o24RVvMvOMnR4YAn9WdcydkuoBEYpkDMBLk3MmHKeLPjwywhLxeIk0Pbl2R9q6zodYVK16q+lGhEDWGmC3ur3c9PGIjfof2p9xDsBw08NDef6Xf8pgDbGecX0d5VyKIS5Yivt0+/vgFkXgcbc7X2mPLxO+T/QxwPv02oonEkwxxpdrvKamXSJPRnLWMHBm2fp0ZtCy17XKsyTW3DGwL76h2hSJFo6Ty4fEl0TNBI4u0vGiFyNMqMdXnVNANYnP+NUeIJ4NckN6+jaj+VIKKdK0SLNmIpwRpl44fA3jA7uy0VV+6UOItB+AXJUeOZYyOo93V1ar6KkcdRfoz2iI9NtX0TdVHOSjBEokynQ+5vwA/tAGqOs40xRZFHAp6j8hzArCTIZ7eFotVHLXLFYuuewETYk+Q8ynbGtvPa3QeYuPUU6R9o5eLFAmSzi44SW2/HOu2hJx0PvxwNeF5sprMsEXTHtMLfQlAo4q0J9C7y/301GAuxakGuRi9Pu5QHanMlkjTKj9dIZP7IsSe6Qi0j51IvIbm63WPJfXRBvil6qcc9RJpm/PPBRJpgE+qPqaCIZ5nA9xmIx4bdEFUMRRKqXtsffOmIH64qKsrcOUkmu6ifmsf76I2KXZb9VeWmRBpMlkggKYicqGPqn0oRypnnZIZCo9Wk5yJlp9nhsM/v7IQ7OdStTSkSI/NbT7DEN+l+gpCSyz2MhoZ67Yt9w1xV6y39yWqr2JmQ6Qdzpc5iI9p7cvYNqMMoJqopZK0cb5YrmrUaN+b/xzSfWFWL5GmKZ6AIn2T6mMq2KpVLww6rVGCw6JC3BZEpOW1x/m0Ag3oemQA/619zJ+99/+m+irLTIk0GS2OufDulqfWZUNf1RHPvkLsuemh5u/SlInqS8cGRlpGB0ZaZmSRSyOKtHfhbFb9VAONpoLsmwPweKV439kQaQawRjd6RUaJuO6fqk0gVQ4boF9XTOQUAOdaBS/qJtIB5qTJoogUNZShLHmqr3phx+PdVPBZ9/7wHibfq0Web5pmYQDaC328Pj5A6VFVXyXJbA2Li3fLUedEq2L0qmPkWxaazVvpvntbX6T2R+XKK+c8JzNs/VYm/S/hbyqj72SGw7dQPhLVb61pRJGWL/AA3q36qQb6ecYAngzSPnPdz6h+iplpkaalxTbilQHaHKWf4Kqf6bK4q+tNNoDWcn0v0dNXVR+lqJtIA3xIV4B88669f9kAn2JCxFSftSYqRJ/ug8SbAtR6uanLItcNO0Js1z32dA0y112j+inJBVvmvyM1KAvQPpbOWw+lctbD6az1SDof3kcjbDKZyKiECFZrYwthwqPJXGidztLyVD68qH/Euj9wP8YKBVDl8fepPmtNQ4o05Z5GbFH9VENTV9crKOG+7s1K27W57vmqn2JmWqSpejvlPtY5hrRNhPP7aapH9TNd5MMC4Ec6x1KO5hF/3SpExQFNvUSaxMwR4nad/qomhVOIf8o4coDzKbG/t1CnZlniyJ8D8Gfd/aZrLiJEzeumUkSIbh9krhshvqv6KAtNK1CYnG/fefDow5P50LuTudBPkjnrivSwlbt418KxkWmNRthjS8xbCsmsdbran1KszS84lfJ0BG1fCvuQtTlV59zTDSfSY/4fi8bjR6t+qoXEQnf/5I0Qj6dVH8XMtEjTy1NdoaGbzQb4fQSxN4K4yvtvTYyqejiI39Hddzkqdd2Kaw7qJdIEQ7xc99ipRtcs7aucYkB80uZ8r835t+m4LgoYcVQKlkjMk9dGibZVk/cdYs5ZubLq66gclFaVFtHoRELJc8T5rRQOqvqpivMHraNTeVkW67uprLWPhG+6qUbJMpQcaYSSI+lFfWSGwn+sZqHLWOx0s1Yb1dJoIi37AXAV9Uv1Uy2BRdp1k6qPYmZapG0hOoK05y+qqIdpC2mDiDS17wA8rXv9TWl+CS1KpwvwIOP8Zwygj5I40QtAte1KRLu7j9bdZ29kX5PSaqVwAkRCSQ1w3dpOBdHLvguy73hVOmt9K5238hSPPN0E/hQu1781/NTa3HxU21MZyC5sywxZj1BhWtXPVOYJ+w2qv1rSaCLt5ZM+V/UxHQ50kaYXmUHaaxSjm56matT9UamnSBORePzLtT5+46NsIfYzzh+zAa6iCJwgyf4p1lp3n73+a72IrQYHsVd3btx7YCxXfdSM/s0LjkxmQ2dTHmq56GQaYi1H5Tlr87rbj6w4/0e5OeTDoYSfckYvK9ND1lNrcqFgK30C0Igi7ZfPqhUHukjT8dMd5TSSyT5r1NCrt0jTfLINcE2QcxbInq13OMpc96cdnL9D7UMpIpqrDP17znHdNtVHrZBRJpr3KB1Hm/NO1UdNobJYyeGFb0/mrGsog50UwxIiqWMU10zTKZVC89bc2PSKdC68Pegil/W0TH2bNWU+h+lgRHqiNaJIO4hnH6giTQsn1P1RqbdIE/Qi1XbdK6NCPK0rRtUYXReM8/t18pM7AF/S2Wfv3G+s5UtLlWg87jCAh3TuU3ntcy5UH3Wh//6ml1COjv6tLf+uNufGeCXwoaZu1b9Kaij0uaCx3eQ/lbcev2Co+U2qv1pgRHqiNaJIUzmxA1WkWTx+jLo/KjMh0kS4s/PFNsDH2TQrz1cyuR8AT1cSasb5l3X2WR7HIItIqoDm7hnADp1jIh9ErptQfdSVtZsXrBgYabm/WqGWVcCz1lBmy/wp01zSVEsmZw0HDcmj0X4yHzpV9VcLjEhPtAYV6S8fqCLdCNMdKpSEnwH8mLLVUUiZdrsBTPocS3laNq1BoJE0wK01WN1YFpmLBECrxNisiDSRGQwtzmwN3V9tAn8aISdz1nmqX5VUNnRO0NH0mEhbt6i+aoER6YnWiCJNPy2DtNco1gjRHVNBc7wR1+1jALfR8aX2pWleq5XME9c/l8vrQSXHdPbZv+dYV1dE9VErHM6Pb9fc71kTaYLyQvdvC99XzYh6bK7Zeoh8qH6LSeWb3zawNbw7SNmtsW2t3UHzXOtgRHqiNaJIBw7B8wRitm3J8ccXOhKJitfsbIm0T6sQr6LcJA7naUoXS9VIaIQthVvzui1ndBwinJ+htklEhXB091kKI+KUK2GnQ1SIk3SjO7RFutDb+5zRdPt7R9PRdYWB9q+NXthxxuhAx8cLaWe+um0QUvn5bGCb9UDQKQkyeomY3tbcr/pUSWWtq4I+CNaT75z1BdXXdDEiPdEaUaSDLGYhsxH3OgDXRRGvcRD/NCsGcK23Wu9IdX9UZlukVSIrVjBahWdzfhkJtj/KruaFo7xOhLi21Eu/oHHSthBfUn3UiLmUD0T3GtMX6XM7Xj66IfaXwmXLCoVLji0UvnNsYf+FS0f3pzt2FgaW3F5It39pdO0xryv0BS+p3j/U/J5qIj7oO/0j4Yf7R5qmzO2aGQk5UtBL+ChnJNKpfOjSQmHyyZ4ORqQnWiOKtJ1IhG2AR3WPIeP88UUrVrz+6Gj0cFoaPVsWi8Uom2DF67XRRLqI57Rx/g4mRIKmLWglrK6QlbBVqvMOxKMYwN4S204yee7pxV6tVvoV0Xb88ZRo6VHdh5C2SI9m2l45mum4vrA+Vij0L3nWLlpakH9bHyuMDix5bHSg44LR/lignKt9fXMOywyFLl0fMK6ZjOaPU7nQlDf52i3HvC6Zs3JBpjzoAUD5SS7MWUep/qaDEemJ1ogiTTkzqJxVkDbtrq66rlStJQ0s0hOgKRHbdb8ftEq7HAV3d39E9dcUi72EAfxBV/i983+K6me62ADn6PbB74eeSK9hrxjt77hukkgX28CSQuHiWGF//5KdowNL31soFCo+1X3Oyc87Ip0P3xr0RaJX/fvGSpEemZHwNymviPr9qYxC/Qa2Lqo4xxcEI9ITrRFFmnACpip1EP9azVLl2WA2RJoKGdiuG1jw6CVgG2KcAewJck1T6J/qi3CEOFN3LpiODwPYWlVR2DK0dnVFooj36e4LWW1Fenx0HZMj7P3pjstG1y7RzhWbGbJ6M8Ph0aCrEmXprXz4RNVfMal86F2pvLUvyLQKrXBMDYW+rPqaDkakJ1qjinQE4Dimm/T/2VHX11U/06VViDfTizb179NhJkWarnfKM00VeGhEXO3yZgfg87qjTylqAH2qD8JLpas9Mqc2GcBvKOZb9RUUKspAD3Pt4+73oS4i7dv6WGFfpv2WRy9o1brI+q6NPTczbP0+6Gjai2veoPorpm/j616UGQ5vDpLwSaYvzYYCVY+ohBHpiaYj0lTLLsiFzQD228uWvUb1ExQqVqvd7th52qNT/VyXSGfnW2UmNoDrvCXK2r9Mp2JGRLqv7zBbCBLEm9oTiX10PdK5jgpxZbkQualgiJEg1xRDLBtQQDHQuoJPJu+RROKnc2LB37f5UFFiB/EK3X0otvqKNNklscL+TPsNo0lb66bJ5EOd6ay1P0iqUX+VYKU0o6mcdWOQB8BYVrxwVvUzHYxITzQdkWacWzT60X3RQvte7uduEBzED+ruh2yXbnyAnbTyrRohKkYuAEEcpvNDgiKvA84HdBIoVaKuIt3Xdxg9qBjANX4Wu0nHiPNPqF+rRITOhWZ/PZE+W/Xhw4T4sPa+e+ZNkfw2UkXeddt1gR74uv1Xrf4iTbaehLrjysKVTRUv3EJhzmGZreHfyBC4EsJZyjyRfmZttrnsaiMilWv6ZJBQP4rFTuXDu5ObF75d9VUtRqQnmo5I2z09b6G5Qd19ou2iicROevGk+goClXVyEAPdXF4f9zucX1bFaH5uH41AEVdHhdiutiuPqRC7GMA3hEZy/3LUS6RpWoYBJB3ER9W+jxudGyGecAC+qDuF4JWdGtY9/3JO2nU/pvrx6UB8uYO4RXv/PfP26b4owAUMkUpalXsHMZdKqdnx+FtsxMud7u49Qdua0O6MiDTZRUsL+zJOr+q3FOty4fem8+FAo2l6yZfMhi5XfRWTyjc1BUm4JNvPWftrWbHFiPRE0xFpeitvc/7bsjd+CZP7D/C4DfB+x3WXt8XjzdHu7tfTzUVGohMFWLh4+fIpo3faEN8nRbdEG+XMe0iMOpw/YbvuryKu20XpT+mmVW/s1lNOeR7l22Dx+ApaPOEAPBxNJPaXO3/+tAHjfHMb5ydTJEqxPx1qLdJSjDj/iM35o7Tf5fpevA/eS7lhFo+/c7HrxiiEsNgnVZihKY4IwIcYwLZKPouNrmnG+YeL/akwzk+msme6v8588/vucE7X1lAE8TTKUEdz3Z51Ms7PtgEecAAe9R6sk/wEsRkV6f0XLbn3qbXtzapvlU/m570gPdSyJ8hLPjnyHgr/RvVVTPru8FuDjKSl3x0LC6lB6xuqr2oxIj3RdESacBDTum/lffMFzRP3HQzxNoZ4uzSATSSINPJT21IJsj8TzLuh6bsyrSbnWxji/3MQL6GKK/RfhkiJ7P8p+xlgxZ3ctzGh+0nQhPC1FumI665qTySe1vbn2fgDB2CfDXD1hOMC8Duq1h5Y5MYezk9XyhpHeTkinF9d1Xn1xXqKYg/+5+r3qjF5jGZEpMkoPC/dsU71XYpUNnRZkPljuW0ufEdmcFHZ4HMqRJDKhbJBRtMb7iXxr5wjRBcj0hONttMRafqJr+uzlPkjoGKT9eMQB9S2VI5x3bc5iPcEFSHVqA/UZrEFEeZSRkvBo4h/C1JjsdYiTTDEn2v7K2H0wFGPSyBx9v2MrVa8Wu1fKVpXrHhzLc5rvW1mRXpgCc1N730yubTiHG8m3ywotE4VzXI2NjViFdZtDh2v+ipmXd7KBJnvpj6kcuGKIqKLEemJpivSdmen7QihHSurY3IkqiHShAOwVLbfQDe09wth12KNzHfF1EOkj6GXu3Ruanh+qjHv18VH1f6Vw0GMO4lEQ51X1WZWpMk2xAr7+js+pfpXWbdlvpPKWXuDTHnQYpWBofB7VV/FpLKhLwYRf5rrTuXCv1hz4xuprtq0MSI90XRFmqBpilreTEFEmrBd990O4uO6x7ae5h2Hh+2ursAVO+oh0kQbwKdoWme2hNo7n1t0KqYXwzg/jSE+0wjntZTNvEhftLQw2t8xqPpXSeUXHpHMhm8KMuVB4rsuZ01aDlpMJm99Wk5hlPh+KaMwvFTe+sfaLfO1F+VMhRHpiRZIpIU4WdevjgUVaUK+iBSCXu5N8jdTJttOJPYwgHeq/dOhXiJNOACZWp4jXZP7Qr90qqwqHgH4AkWd6N43M2mzI9KZju2F/rYpkyIRqaz1fSpnpQpnOZMv+bKhr6p+igkq0jIML2fdu2ZTU6B8JOUwIj3Rgog0hU5FE4nrdX1XsmpEmqBIjKgQu2vVjyBGfY4KQeWiKhZkLkc9RToajR5uc365tu8amHet722rENExJX19h9FDj0IcZ+O8TmUzL9Jk60mo2ysut07nwxuCT02EprzpMsPWpy8OINJjiZbCe9LZ0LRSsvoYkZ5oQUSaaHPd5VEhHqmFCFQr0kRbItHMEP/kieYk37U2aoPasjm/PegctEo9RZqI9fS8jAGsIf/abVRp3vG/L+K6H1T7UQ2yrBXi7TJvSx3Pa5BrZnZE+pJj6QXiuWobKumh8IYgo16ZES9v/ayvUD52ND3UclqQSi1SpLPWE2sGLUv1VQ1GpCdaUJEmKOSLfpoGiZsuZdMRaSLa3X14hOYzAe6j/aiHINF5lFEoAI9R7cUqFshMot4i7WNz/gEHUf7i0L0edU0+AITYH+H8VoqBV9ueDpQMimKdGecyBLCWfad+tycSo3TNMIDH1c9Lmb5IU6rS/iV/rZVIj2qIdCpvpYJEYlAMdDJn3bBmOyv7ki+VDb0zldNPtCRXM2at/anNC6Y1evExIj3RqhFpggG4DOCe6dxE0xVpH0rmxBDPszm/i/rjj66r6pf3PTlyHgsRfIABXBxx3Sa13WqZKZEmKB+z7boZWqnX3tNT/XHx7gUpcmMPrbsinH+CrVpV9l6fLl46gosdxIf866yavk84n5zfzTg/j3w7iDfrDDS0RbrQ1/T80fVLf1649Ljx/NFVGxUO2LCkYuxxOhvuu3jXosKF97TIUXIlo+iO/m3h66aKxEgNWT0X3tPyJIm/+v1SRsUC+reGn1lzV3PgNfulkCItxLUdFN+qxO2WMk/sHtQpMOrjCPElf2RXyZasXEnCUFORjgrxa939o+3aXDej+tBhMeJRjuueQw8xWj02Ie5Y42aSx1aIC1W/1UKJ/2kRhcM5LVChPslsa2r8L92Yvk34bOyh8QwlaqKf3DbAu0mca10QlQTXEWKTFM0S52SSCVG1SHsc1irEfEarBznfRPvnIO4r3v8Jx8X7t/8Z9cFBfFIeF4D/JcHylmXXHVrR6U2BnGYDDDLEh+laK+6f2vfi8+l459MGuI2igyhpFvl1Vq58dbsQf1/i5WaZyigWngohqH0ryTP9zqrR/o7fjWbabx7NdNxUlaXbby5kOjaOpjverfpXWTdoHZ3KWf+dzll/S+fCN01peevmdM66PpVd0KP6KaZvU9Pzk3nrW6l8+O+TfCiWkj7DN6WyoW/2399EVS+mzTzXfYED8EMHYLsDMKRh2xzOb7YBFqi+yhHl/CMOwEgJX5OMAeyyOf8v1cd0cAAuoaoWalsljfOdbfH4maqPIFAyI2/a4Xu0Uo0B0OhzvyqCys1Doxpa6VbTB1QRc2m0ZCOexQC+6wBcJlcbAvzSQbyJRlEOIlUfoSralzoA36fVj7YQJ9VzdEgsoZwkAL+hUd2k8zH5+hh2ON+yqLu77CKxoNA0EUXJRDgfoP327CpHiOvouNBcv/w34qU2wGU252vpRWmtH1bVQHlEaAQf4XyDPGeIP2CIv3cAbnEQr6dfkfQ3+RnnA4zz98Z6eydpB70EZ4jfcxBv9a6Hqex2qi6u+ihLYUPr80ZXO68eTXUcUbWtYa9Q/ZZjw8bW560ePurVqfy8I6Yy2ua8jUdNWP9fjr7CnMPU75ezNZuatPuqydyI676RygTZiG+vZLRdJJF4q+u6L1AdlYMuAF3/i7u7j6ZyPqqP6UA5MnTbp+1qmVSdBO6YePwYytfhACCNQFSTf0dcEYnHl9DoV/VRT2hkRvtLFnFdytpYk/SjQaA+0MhY9xyxRGLedNJ0ajJXJj7q7Hw1lQGjRFPqBo0KY+yFcsqrq+sVAY7TYf7++tdDOaNtpptV0WAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBcJASiz03aF3CAw3KvWHybxgMhprjuG4bA/gDA7iGAfyRzAH4s4N4Vriz88Xj21GCoaJtxrcDOJ8SCU30OpbkKQLQI30j3sAQ/8YQ/xLh/MuUYEndfioiYwmzbnAA/toWj8fVz2VqVs5/yzi/XH0YUBFayrxnI45ngrQ5/5zs07P7cg1D/EME4KNUdab4+1PResopz2sDeL9NPii7H8BNlEueAXyyuB8M4LMM4EYb4EfFx4oyOzqIG22A88nXuGODwWDwceJxlDmxe3oKS1euHDfKRU0pRVtXrJCZJ0kI6W+UT5nyH/vb0fcYQJZ1dY3XCKVMhRHOLyO/tC3lNPfNS4x/u43YOqEjZfDys19NecllW4iDqhC3x+PNUcQnqS2b83TxZ9FEYiB24olU2OD749snEhdT34v3w++bDTCs0zfKBMkA/odyYRfvH/mkVLm26/6VLVsmc2KTv/bu7sdoH/wyYG2dnUvpu+3d3aMO4imqf4PBYJCwri5X5t5G3EVi0c45Z5yf6gA8LKv6IK6i7UikSXQZwD4aPTuIcZnkH/FuKUyIa8Z9cr5aJvMXgkTvkigiULEE23U/HkV8hMSKCXFdi8aola1a9YaoEKOyog0VTRDiSUqoX7wN5WJ3AGQBBgfxiQjny/zPqLq5FG/E7/h/o2osJMyUzzrqul3UN2+0K8ukOYibHYAjxxsoAeUG947PPgbwDUqPS8fO4fws6oPcR4DxghO0jfwb4rD3q+T3VBCAIV4z0bPBYDAUQSIdJZEGoBHqeHUW+rcULNeVRRPGRRrxmXaAE/ztbIAvSfEE2EVTBVSZJIp4vxyJA/T5241vL0QHlQwj4XQQKxaXZa77VfJvA+xgAHdQnyKcX1q8jS/S40KOuJ1yutNnZUX6hBNodP35Yj9UXcYGGJLiCfCF4s+KaeN8sSfmT1PSf/Vz23X/0wb4ipdPXEKi7yBm5b5w/oAjxFiFHs5rUlvVYDAcpPgjaQdgZwTgPSSiVMmHAewl0WNCxGi7ciLNOD9DCiPnu736nmfKaQnOtxwTj79uQmMeEde9gkaVNsAvK83FRoW4QZaA4/wDNucnSXFF/EPxNr5IU7UeB/Fxbwpmg/wMMa0r0kQb5x/x9ufu1tbWkn2jKQtvFL1Z/WwqGOL76JeIXw8xAnCBuo3BYDBMgERailtRgdzxeoycb2wV4lW0XfF0B+P8XEeI5REhPkriTiIYTSRW03ZRxNUkgOrccDFUnsqrUbkv5vkvhc15J0N8jB4iNoDt2RNyNIr4n+PbkUhz/gTVJ7QBMlEh/kn9JzF1EL8dRKRprtmrobmnXLQG4/x3dIxoykL9rBIMYKuclwfY9kZWvqC2wWAwSORIGoBE4yGaP6aq6FSzkcRQvkhD/Dpt5xW3lbUjaRQpXwh6L/OogOvi5cuPou2iQlxAAsgQL6cID7U9gkRevlwDuL9UZIgPQzzDE9P/9cvLMc5/Rn+LAnzW345EmnG+1wGQ89GM89O90fQ/bc6vln3UFGma8pAPo6lF+lLv18IN6mdT0ea6yxnAY/IBSAVsEd+lbmMwGAwTGJ+TRsxRrU3/7zbnJ5IQRROJQfq3P5KmSto254M24l8Y5zfTdEfTqlXjdUKZ676LRuaMqn/H48f4fx//nOoFIv6ZXtxNVSRYFnIF+Ic33/0ovaB0EKm48+NePx7xa2eOj6QB9lKIHj0cHCGu9Ua7smCxrkjbABd5ov6rcvUpIwDHeXPq95Sa0qGIGPXFI0W8RBF/JadJhPg3Hcco4o6o676teDuDwWCYQLFI2z09b/H/biOeUkqk1TlplXmu+wIHccibs/1z8YsxEk+b86vkSzeK0kCcFPPs04HYSgItp2DGQtWkjf8NsdAGsJC2LRZpm3Mu/4bY6gixS87/aoi0rEiP+BkH8SEZmQLQ43+mQi8lHSG2yF8anN9SXGh5oeseYXN+Ob2ApDnoOV7BXSbEyTQP7wixm8IeHSHy8mHA+foJzg0Gg6EYb7pjlAE8LYUFYDONlGnqQP6kR/wBbVcs0g5ir+qnGKrSHhXiIS/k7J8R173T5vx2BjBMwkZ/j3ov9spBUy9e3HI2CrCQrB2xhcSbHihevPUvvG0nibT8O+LHSKBLibR8iAA86ADkHIC8A7Atmkg848Vary03ivZZjHiKnL8f87Pd5vwf3j7uaE8kRmX/XPd9tG3b8uWvpDlob2roEvqbk0gI+RAU4uFSvzgMBoNBEvEWs0jx7OkZt2gisd8GuMpfgUci7cU+U3TCSaoflSjiEoZ4R7FP+YJRCBK0s8rNVxO0WKW9p2czTYkwIU5VP492d3fHaF5aiE3zIpH/iMbjR0cRn4oKsbeNc+FvR9EZDsBV3hz5eNheuxAXL6X59KJ99vo2QvPg4w1VIOK6H3IQ7/Tn5n1zEB9gnJ/sb0fx0jJCBXGEYqTpb029vS9hiH+U+5FIXB3t7j58gnODwWAgWmKxl1HURMR1mW/0b5qmKBYOmsZoi8cd+oxGhhO9lIYEqU0IhyGupNF3O+edLfH4+JRKOWj+lkaXjPP24lhjH1oEQ59RvDL1kV4qtnZ1RVoRI+oCGYpOsV23owNRvtgkFiMe5fl+dp8RW4vjxHWxly17zWIhYrToh4z+v3jaiEbkEddtol8X/stVn+iKFa+nfrCurkjQpfIGg8FgMBgMBoPBYDAYDAaDwWAw1JL/D+plBe8XsPpSAAAAAElFTkSuQmCC" alt="Intelsa BPO and CX" width="181" height="50">
+  </div>
+  <div class="doc-ref">
+    <strong>Propuesta:</strong> SPARTAN Flow CRM + Trueno<br>
+    <strong>Preparada para:</strong> Gerenciar S.A.S. y empresas del grupo<br>
+    <strong>Fecha:</strong> Noviembre de 2026<br>
+    <strong>Validez:</strong> 30 días calendario
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">Propuesta comercial</div>
+  <h1>Una sola plataforma para que <span class="highlight">todo el grupo</span> opere, decida y crezca con la misma información, en 360°.</h1>
+  <p class="hero-intro">SPARTAN Flow CRM es una plataforma inmobiliaria multiempresa, diseñada alrededor de la operación real de Gerenciar y sus constructoras, integrada con SINCO y otros ERP, y potenciada por los agentes de inteligencia artificial de Trueno. Clientes, proyectos, inventario, equipos comerciales, cartera, posventa y resultados en un solo lugar, con reportería e insights para cada miembro del grupo: desde el asesor hasta la dirección.</p>
+</div>
+
+<!-- CLIENT INFO -->
+<div class="client-info">
+  <div class="info-group"><div class="label">Cliente</div><div class="value">Gerenciar S.A.S.<br>(comercializadora del grupo)</div></div>
+  <div class="info-group"><div class="label">Constructoras</div><div class="value">Linares, Las Camelias, Montevilla y Villanova</div></div>
+  <div class="info-group"><div class="label">Objetivo</div><div class="value">Visión 360° del negocio para cada miembro del grupo</div></div>
+  <div class="info-group"><div class="label">Usuarios incluidos</div><div class="value">Hasta 40 usuarios</div></div>
+  <div class="info-group"><div class="label">Capa de IA</div><div class="value">Trueno, atención y calificación 24/7</div></div>
+</div>
+
+<!-- 01 NECESIDADES -->
+<section>
+  <div class="section-header"><span class="section-number">01</span><h2 class="section-title">Lo que Gerenciar necesita resolver</h2></div>
+  <p class="section-lead">Gerenciar opera como un grupo empresarial, no como una sola constructora. Hoy la información de clientes, proyectos, ventas, cartera y servicio se fragmenta entre sociedades y herramientas, y cada área ve solo una parte del negocio. SPARTAN reúne todo en una sola fuente: un cliente existe una sola vez dentro del grupo, y cada sociedad, área y persona ve la información y los indicadores que le corresponden.</p>
+  <div class="doc-matrix">
+    <div class="doc-type"><div class="type-category">Identidad</div><div class="type-header"><span class="type-name">Cliente único del grupo</span></div><p>Una sola identidad por persona en todas las sociedades, con reglas de deduplicación configurables y ficha 360°.</p></div>
+    <div class="doc-type"><div class="type-category">Estructura</div><div class="type-header"><span class="type-name">Multiempresa y multiproyecto</span></div><p>Comercializadora y constructoras en un mismo sistema, cada una con su información, sus permisos y sus proyectos.</p></div>
+    <div class="doc-type"><div class="type-category">Visibilidad</div><div class="type-header"><span class="type-name">Reporting e insights para decidir</span></div><p>Indicadores por cliente, proyecto, sociedad, asesor y etapa, consolidados para el grupo, con alertas de cuellos de botella y anomalías.</p></div>
+    <div class="doc-type"><div class="type-category">Finanzas</div><div class="type-header"><span class="type-name">Cotizaciones y cartera bajo control</span></div><p>Planes de pago por proyecto, cuotas vencidas, cartera por edades y estado de cuenta sincronizado con SINCO.</p></div>
+    <div class="doc-type"><div class="type-category">Cierre</div><div class="type-header"><span class="type-name">Escrituración, entregas y posventa</span></div><p>Seguimiento documental, entregas agendadas, PQR, garantías, SLA y encuestas por etapa.</p></div>
+    <div class="doc-type"><div class="type-category">Captación</div><div class="type-header"><span class="type-name">Marketing y atención con IA</span></div><p>Origen de cada lead, seguimiento automatizado y atención omnicanal con Trueno.</p></div>
+  </div>
+</section>
+
+<!-- 02 VISIÓN 360 -->
+<section>
+  <div class="section-header"><span class="section-number">02</span><h2 class="section-title">Una vista 360° para cada miembro del grupo</h2></div>
+  <p class="section-lead">SPARTAN no es solo un CRM de clientes. Cada persona entra y ve su parte del negocio, con los indicadores que necesita para actuar; la dirección ve el consolidado del grupo. Misma fuente de información, distinta vista según el rol.</p>
+  <div class="strategy-levers">
+    <div class="lever-card"><h5>Dirección del grupo</h5><p>Consolidado de todas las sociedades: ventas, recaudo, cartera, rentabilidad por empresa, flujo de caja proyectado y decisiones pendientes.</p></div>
+    <div class="lever-card"><h5>Cada constructora</h5><p>Sus proyectos, inventario y disponibilidad, ventas y separaciones, avance de escrituración y entregas, y su cartera.</p></div>
+    <div class="lever-card"><h5>Gerencia comercial</h5><p>Embudo por proyecto, fuente y asesor; conversión entre etapas; journeys en riesgo y cumplimiento de SLA del equipo.</p></div>
+    <div class="lever-card"><h5>Asesores</h5><p>Su agenda, tareas, visitas y clientes asignados, con la ficha 360° y el historial completo de cada conversación.</p></div>
+    <div class="lever-card"><h5>Cartera y finanzas</h5><p>Planes de pago, cuotas vencidas, cartera por edades y estado de cuenta, sincronizados con SINCO.</p></div>
+    <div class="lever-card"><h5>Servicio, posventa y marketing</h5><p>PQR y garantías con SLA, satisfacción CSAT y NPS por etapa, y el rendimiento de cada campaña y fuente de leads.</p></div>
+  </div>
+  <div class="doc-matrix">
+    <div class="doc-type green"><div class="type-category">Reporting</div><div class="type-header"><span class="type-name">Tableros y reportes</span></div><p>Tablero gerencial, embudo comercial, analítica del journey por etapa, rentabilidad y flujo de caja, con reportes exportables por empresa y consolidados.</p></div>
+    <div class="doc-type green"><div class="type-category">Insights</div><div class="type-header"><span class="type-name">Alertas que llegan antes que el problema</span></div><p>Cuellos de botella del journey, anomalías, tendencias y comparadores entre proyectos, sociedades y periodos, para actuar a tiempo.</p></div>
+  </div>
+  <div class="doc-type" style="margin-top:16px"><div class="type-category">Incluido · Conector MCP para Claude</div><div class="type-header"><span class="type-name">Pregúntale a SPARTAN y a Trueno en lenguaje natural</span></div><p>Con el conector MCP de <strong>SPARTAN</strong> y <strong>Trueno</strong> para Claude, cada usuario pregunta en una conversación, por ejemplo «¿cuántas separaciones tuvo Linares este mes?», y recibe la respuesta según sus permisos. Detalle en el módulo 08 · IA e integraciones.</p></div>
+</section>
+
+<!-- 03 JOURNEY -->
+<section>
+  <div class="section-header"><span class="section-number">03</span><h2 class="section-title">El recorrido del cliente, de punta a punta</h2></div>
+  <p class="section-lead">Cada etapa es configurable y exige sus requisitos antes de avanzar: ningún proceso continúa si falta un documento obligatorio. Un mismo cliente puede tener varios journeys abiertos, uno por cada oportunidad, sin duplicarse.</p>
+  <div class="strategy-canvas">
+    <div class="flow">
+      <div class="flow-step"><div class="n">01</div><h5>Contacto</h5><div class="ch">Formularios · Leads</div><p>Captación con control de duplicados y consentimiento.</p></div>
+      <div class="flow-step"><div class="n">02</div><h5>Perfilamiento</h5><div class="ch">Scoring · Asignación</div><p>Calificación, fuente y asesor asignado por reglas.</p></div>
+      <div class="flow-step"><div class="n">03</div><h5>Oportunidad</h5><div class="ch">Clientes · Embudo</div><p>Interés real en un proyecto y una unidad.</p></div>
+      <div class="flow-step"><div class="n">04</div><h5>Visita</h5><div class="ch">Visitas · Tareas</div><p>Agenda y resultado en sala de ventas.</p></div>
+      <div class="flow-step"><div class="n">05</div><h5>Cotización</h5><div class="ch">Inventario</div><p>Versionada, con precio tomado del inventario.</p></div>
+      <div class="flow-step"><div class="n">06</div><h5>Separación</h5><div class="ch">Disponibilidad</div><p>Unidad separada sin doble reserva.</p></div>
+      <div class="flow-step"><div class="n">07</div><h5>Promesa</h5><div class="ch">Documentos</div><p>Promesa de compraventa con checklist.</p></div>
+      <div class="flow-step"><div class="n">08</div><h5>Escrituración</h5><div class="ch">Trámites · Cartera</div><p>Control de trámites y requisitos.</p></div>
+      <div class="flow-step"><div class="n">09</div><h5>Entrega</h5><div class="ch">Entregas</div><p>Programación y gestión de la entrega.</p></div>
+      <div class="flow-step end"><div class="n">10</div><h5>Posventa</h5><div class="ch">PQR · Encuestas</div><p>Garantías, satisfacción y fidelización.</p></div>
+    </div>
+    <div class="flow-caption"><strong>10 etapas · 1 cliente único · 5 sociedades</strong> en el mismo recorrido</div>
+  </div>
+
+  <div class="strategy-levers">
+    <div class="lever-card"><h5>Hecha para un grupo, no para una empresa</h5><p>Los proyectos e inventarios pertenecen a cada constructora; las oportunidades las gestiona la comercializadora; la gerencia ve el consolidado. Cada quien ve lo que le corresponde.</p></div>
+    <div class="lever-card"><h5>Configurable sin depender del proveedor</h5><p>Campos, pipelines, journeys, roles y menús se ajustan desde la administración. Los cambios se hacen en borrador, se publican y quedan en auditoría.</p></div>
+    <div class="lever-card"><h5>Se integra con SINCO y otros ERP</h5><p>SPARTAN se conecta con SINCO y con otros ERP para sincronizar clientes, inventario, disponibilidad, plan de pagos, cartera y estado de cuenta. El alcance de cada integración depende del tipo de conexión y de las capacidades que ofrezca cada sistema.</p></div>
+  </div>
+
+  <div class="incentive-recommendation">
+    <div class="incentive-text">
+      <div class="label">Nuestra recomendación</div>
+      <h4>Activa Trueno desde el Hito 2 para que ningún lead espere respuesta.</h4>
+      <p>Trueno responde al instante por WhatsApp, califica por presupuesto, ciudad y proyecto de interés, agenda la visita y le entrega al asesor el cliente con el resumen de la conversación. Todo queda registrado en SPARTAN.</p>
+      <p>La IA nunca inventa precios, disponibilidad ni estados de cuenta: esa información viene siempre de SPARTAN y SINCO.</p>
+      <div class="admin-note">Incluye <span class="accent">5.000 conversaciones al mes</span> en el plan base</div>
+    </div>
+    <div class="incentive-mock" aria-label="Ejemplo ilustrativo de conversación">
+      <div class="mock-header">WhatsApp · Ejemplo ilustrativo</div>
+      <div class="bubble in">Hola, vi el proyecto en Instagram. ¿Tienen apartamentos de 3 habitaciones?</div>
+      <div class="bubble out">¡Hola! Con gusto te ayudo. ¿En qué ciudad buscas y qué presupuesto aproximado manejas?</div>
+      <div class="bubble in">Para vivir con mi familia, cerca de colegios.</div>
+      <div class="bubble out">Tengo opciones que encajan. ¿Te agendo una visita a la sala de ventas este sábado?</div>
+      <div class="handoff">Lead calificado · <span class="accent">Visita agendada</span> · Asignado a asesor con resumen</div>
+      <div class="mock-footnote">Conversación de ejemplo. Los proyectos, precios y disponibilidad reales salen del inventario oficial.</div>
+    </div>
+  </div>
+
+  <div class="try-block" id="probar-trueno">
+    <div class="try-head">
+      <div class="label">Pruébalo ahora</div>
+      <h4>Habla con el agente de Trueno para Gerenciar</h4>
+      <p>Un agente de demostración configurado para Gerenciar. Escríbele por WhatsApp o pruébalo en chat web y por llamada de voz.</p>
+    </div>
+    <div class="try-grid">
+      <div class="try-card">
+        <div class="try-kicker">WhatsApp</div>
+        <div class="try-wa">
+          <img class="qr" src="data:image/png;base64,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" alt="Código QR para abrir el chat de WhatsApp de la demo de Trueno" width="220" height="220">
+          <div>
+            <p>Escanea el código con tu celular, o ábrelo directamente, y envía el mensaje tal como aparece.</p>
+            <a class="try-btn" href="https://wa.me/14159085485?text=Hola%2C%20quiero%20probar%20a%20Gerenciar%20%7C%20Demo%20comercial%20%23UARAEZTD" target="_blank" rel="noopener">Abrir en WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <div class="try-card">
+        <div class="try-kicker">Chat web y llamada</div>
+        <p>Abre el chat web del agente para conversar por escrito o usa el botón <strong>Llamar</strong> para hablar con él por voz desde el navegador.</p>
+        <a class="try-btn" href="https://app.trueno.ai/chat/dc032c8636a3dd1780c5755f28ceadfa440c120c017264b1d516295a67a9de60" target="_blank" rel="noopener">Abrir chat y llamada</a>
+        <p class="try-small">El entrenamiento del agente con la información real de Gerenciar y su setup están incluidos en la implementación.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ALCANCE -->
+<section>
+  <div class="section-header"><span class="section-number">04</span><h2 class="section-title">Qué incluye la plataforma</h2></div>
+  <p class="section-lead">Ocho módulos que cubren la operación completa del grupo, desde la captación del primer lead hasta la reportería gerencial y la operación con inteligencia artificial.</p>
+  <div class="scope-grid">
+    <div class="scope-card"><h4>01 · CRM comercial</h4><ul>
+      <li>Leads, clientes, contactos y oportunidades</li>
+      <li>Cliente único y trazabilidad multiproyecto</li>
+      <li>Control de duplicados</li>
+      <li>SLA, semáforos y tipificaciones</li>
+      <li>Tareas, visitas, recordatorios y cadencias</li>
+      <li>Consentimiento de datos y auditoría</li>
+    </ul></div>
+    <div class="scope-card"><h4>02 · Proyectos e inventario</h4><ul>
+      <li>Proyectos y constructoras propietarias</li>
+      <li>Unidades: disponible, en negociación, reservada, separada, vendida o bloqueada</li>
+      <li>Disponibilidad y mapa por torre y piso</li>
+      <li>Cotizaciones versionadas desde el inventario</li>
+      <li>Relación cliente → oportunidad → proyecto → unidad</li>
+    </ul></div>
+    <div class="scope-card"><h4>03 · Cierre y cartera</h4><ul>
+      <li>Separaciones, promesas y gestión documental</li>
+      <li>Escrituración y entregas con checklist</li>
+      <li>Plan de pagos, estado de cuenta y cartera por edades</li>
+      <li>Seguimiento de requisitos y responsables</li>
+    </ul></div>
+    <div class="scope-card"><h4>04 · Posventa y servicio</h4><ul>
+      <li>Casos, PQR, solicitudes, quejas, reclamos y garantías</li>
+      <li>SLA, alertas y seguimiento</li>
+      <li>Encuestas CSAT y NPS</li>
+      <li>Fidelización y referidos</li>
+      <li>Historial completo conectado al cliente</li>
+    </ul></div>
+    <div class="scope-card"><h4>05 · Marketing y captación</h4><ul>
+      <li>Formularios públicos, fuentes, canales y campañas</li>
+      <li>Segmentos y automatizaciones</li>
+      <li>Consentimiento de marketing</li>
+      <li>Fuente de cada lead, desde la campaña hasta la oportunidad</li>
+      <li>Meta Lead Ads y otros canales según alcance técnico</li>
+    </ul></div>
+    <div class="scope-card"><h4>06 · Gerencia y analítica</h4><ul>
+      <li>Tablero ejecutivo y embudo comercial</li>
+      <li>Analítica del journey y ciclo de compra</li>
+      <li>Alertas y detección de anomalías</li>
+      <li>Rentabilidad por empresa y flujo de caja proyectado</li>
+      <li>Reportes y KPIs consolidados del grupo</li>
+    </ul></div>
+    <div class="scope-card"><h4>07 · Administración y configuración</h4><ul>
+      <li>Empresas, grupos, roles y permisos</li>
+      <li>Aislamiento de información por empresa</li>
+      <li>Campos personalizados</li>
+      <li>Pipelines y etapas configurables</li>
+      <li>Configuración de SLA, scoring y reglas de asignación</li>
+      <li>Journey Builder y automatizaciones configurables</li>
+    </ul></div>
+    <div class="scope-card green"><h4>08 · IA e integraciones</h4><ul>
+      <li>Trueno integrado como agente de IA para atención, calificación y seguimiento</li>
+      <li>Paso de la IA al asesor con el contexto de la conversación</li>
+      <li>Registro automático en SPARTAN de cada conversación, calificación y cita</li>
+      <li>Conector MCP de SPARTAN y Trueno para Claude, con los permisos y el nivel de información de cada usuario</li>
+      <li>Integraciones con SINCO, otros ERP, WhatsApp, correo y telefonía, según el tipo de integración y la capacidad de cada sistema</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 04 ESTADO -->
+<section>
+  <div class="section-header"><span class="section-number">05</span><h2 class="section-title">En qué punto está cada parte</h2></div>
+  <p class="section-lead">SPARTAN ya se puede ver funcionando con datos de ejemplo. Para operar con los datos reales de Gerenciar hay un trabajo de puesta en producción que forma parte de esta propuesta. Preferimos decirlo claro desde el inicio.</p>
+  <div class="doc-matrix three">
+    <div class="doc-type green"><div class="type-category">Demostrada</div><div class="type-header"><span class="type-name">Se lleva a producción</span></div><p>Leads y deduplicación, cliente único y ficha 360°, embudo y journey, cotizaciones e inventario, separaciones a entregas, PQR y encuestas, cartera, tableros y configuración.</p></div>
+    <div class="doc-type"><div class="type-category">Por completar</div><div class="type-header"><span class="type-name">Se desarrolla en la implementación</span></div><p>Backend, base de datos y autenticación; planes de pago con intereses y flexibilidad; acuerdos de pago; alta de proyectos desde pantalla; garantías, radicados y adjuntos; notificaciones y reportes a medida.</p></div>
+    <div class="doc-type gray"><div class="type-category">A evaluar</div><div class="type-header"><span class="type-name">Se define en el levantamiento</span></div><p>Integración con SINCO, ERP y Adpro; leads de Meta y Google; WhatsApp, correo, telefonía y firma; migración de clientes, negocios y documentos.</p></div>
+  </div>
+</section>
+
+<!-- 05 TRUENO + DIVISIÓN -->
+<section>
+  <div class="section-header"><span class="section-number">06</span><h2 class="section-title">Qué hacemos y qué queda de tu lado</h2></div>
+  <p class="section-lead">Intelsa implementa, pone en producción y evoluciona la plataforma. Gerenciar aporta la infraestructura, los accesos y las decisiones de negocio que hacen que SPARTAN refleje su operación real.</p>
+  <div class="scope-grid">
+    <div class="scope-card"><h4>Lo que hacemos en Intelsa</h4><ul>
+      <li><strong>2 Forward Deployed Engineers durante 2 semanas</strong> acompañando la implementación junto al equipo de Gerenciar</li>
+      <li>Levantamiento técnico y funcional por sociedad</li>
+      <li>Backend, base de datos y seguridad multiempresa productivos</li>
+      <li>Parametrización de empresas, proyectos, pipelines y journeys</li>
+      <li>Integración con SINCO y otros ERP por los endpoints disponibles</li>
+      <li>Integración de la plataforma con Trueno y WhatsApp</li>
+      <li>Entrenamiento del agente de IA y setup de Trueno</li>
+      <li>Conector MCP de SPARTAN y Trueno para Claude</li>
+      <li>Migración de las fuentes de datos acordadas</li>
+      <li>Pruebas, UAT, capacitación y salida a producción</li>
+      <li>Mantenimiento, soporte y evolución según la modalidad</li>
+    </ul></div>
+    <div class="scope-card green"><h4>Lo que queda del lado de Gerenciar</h4><ul>
+      <li>Infraestructura: servidores, base de datos, almacenamiento y backups</li>
+      <li>Accesos técnicos a SINCO y demás sistemas a integrar</li>
+      <li>Entrega de los datos a migrar con calidad acordada</li>
+      <li>Validación de procesos y pruebas de aceptación</li>
+      <li>Desarrollos que deba hacer SINCO si un endpoint no existe</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 06 INVERSIÓN -->
+<section>
+  <div class="section-header"><span class="section-number">07</span><h2 class="section-title">Dos modelos para que elijas el que mejor te acomode</h2></div>
+  <p class="section-lead">Gerenciar elige <strong>una</strong> de estas dos opciones. Ambas tienen el mismo alcance funcional y la misma calidad de implementación; la diferencia está en quién mantiene y evoluciona el producto, y en si Gerenciar recibe o no el código fuente.</p>
+  <div class="options-grid">
+    <div class="option-card recommended">
+      <div class="option-badge">Recomendada</div>
+      <div class="option-name">Opción A · SPARTAN Managed</div>
+      <div class="option-title">Implementación + licencia mensual</div>
+      <div class="option-desc">Intelsa mantiene, corrige y evoluciona la plataforma. Gerenciar se concentra en vender y operar, y recibe las mejoras estándar del producto.</div>
+      <div class="price-hybrid">
+        <div class="hybrid-row"><div class="component">Implementación<small>Pago único</small></div><div class="amount">$ 50.000.000</div></div>
+        <div class="hybrid-row"><div class="component">Licencia SPARTAN<small>Hasta 40 usuarios</small></div><div class="amount">$ 5.900.000<span class="unit">/mes</span></div></div>
+        <div class="hybrid-row"><div class="component">Trueno<small>5.000 conversaciones incluidas</small></div><div class="amount">$ 3.200.000<span class="unit">/mes</span></div></div>
+        <div class="hybrid-row total"><div class="component">Recurrente total<small>Conversación adicional: $600</small></div><div class="amount">$ 9.100.000<span class="unit">/mes</span></div></div>
+      </div>
+      <ul class="option-includes">
+        <li>Despliegue con 2 Forward Deployed Engineers durante 2 semanas de acompañamiento en la implementación</li>
+        <li>Empresas actuales del grupo y proyectos dentro del alcance acordado</li>
+        <li>Mantenimiento correctivo, parches y actualizaciones estándar</li>
+        <li>Soporte de aplicación y evolución estándar del producto</li>
+        <li>Entrenamiento del agente de IA y setup de Trueno, incluidos en la implementación</li>
+        <li>Conector MCP de SPARTAN y Trueno para trabajar desde Claude</li>
+        <li>Licencia de uso mientras esté vigente el servicio</li>
+      </ul>
+      <div class="option-fit"><strong>Ideal si</strong> Gerenciar prefiere delegar en Intelsa el mantenimiento y la evolución del producto. Valores en COP + IVA.<br><strong>Cómo se factura:</strong> implementación a la firma del contrato; licencia y Trueno mes a mes. Pago a 30 días.</div>
+    </div>
+
+    <div class="option-card">
+      <div class="option-name">Opción B · SPARTAN Enterprise Source</div>
+      <div class="option-title">Implementación + código fuente</div>
+      <div class="option-desc">Licencia perpetua no exclusiva del código de la versión implementada. Gerenciar puede operarla con su propio equipo o con un tercero, con o sin Intelsa.</div>
+      <div class="price-hybrid">
+        <div class="hybrid-row"><div class="component">Implementación + licencia perpetua<small>Pago único, incluye código fuente</small></div><div class="amount">$ 150.000.000</div></div>
+        <div class="hybrid-row"><div class="component">Mantenimiento SPARTAN<small>Opcional</small></div><div class="amount">$ 2.500.000<span class="unit">/mes</span></div></div>
+        <div class="hybrid-row"><div class="component">Trueno<small>5.000 conversaciones incluidas</small></div><div class="amount">$ 3.200.000<span class="unit">/mes</span></div></div>
+        <div class="hybrid-row total"><div class="component">Recurrente con mantenimiento<small>Sin mantenimiento: solo Trueno, si se activa</small></div><div class="amount">$ 5.700.000<span class="unit">/mes</span></div></div>
+      </div>
+      <ul class="option-includes">
+        <li>Despliegue con 2 Forward Deployed Engineers durante 2 semanas de acompañamiento en la implementación</li>
+        <li>Repositorio de la versión implementada y modelo de base de datos</li>
+        <li>Documentación técnica acordada y scripts de despliegue</li>
+        <li>Uso perpetuo interno y derecho a modificarlo para uso interno</li>
+        <li>Operación con equipo propio o de un tercero</li>
+        <li>Entrenamiento del agente de IA y setup de Trueno, incluidos en la implementación</li>
+        <li>Conector MCP de SPARTAN y Trueno para trabajar desde Claude</li>
+      </ul>
+      <div class="option-fit"><strong>Ideal si</strong> Gerenciar prioriza autonomía y control sobre el código. Valores en COP + IVA.<br><strong>Cómo se factura:</strong> pago único a la firma del contrato; mantenimiento y Trueno mes a mes. Pago a 30 días.</div>
+    </div>
+  </div>
+
+  <div class="scenarios-table">
+    <div class="scenarios-table-header">Inversión acumulada a 24 meses · COP antes de IVA</div>
+    <div class="scenario-row"><span class="scen-label">A · Managed con Trueno</span><span class="scen-reg">$50M + $9,1M × 24</span><span class="scen-total">$ 268.400.000</span></div>
+    <div class="scenario-row"><span class="scen-label">B · Source con mantenimiento y Trueno</span><span class="scen-reg">$150M + $5,7M × 24</span><span class="scen-total">$ 286.800.000</span></div>
+    <div class="scenario-row"><span class="scen-label">B · Source sin mantenimiento ni Trueno</span><span class="scen-reg">Pago único</span><span class="scen-total">$ 150.000.000</span></div>
+  </div>
+  <p class="scen-note">No incluye consumos de terceros, infraestructura de Gerenciar ni conversaciones Trueno adicionales.</p>
+</section>
+
+<!-- 07 COMPARACIÓN -->
+<section>
+  <div class="section-header"><span class="section-number">08</span><h2 class="section-title">Opción A u opción B: compara y elige una</h2></div>
+  <p class="section-lead">Las dos opciones son <strong>alternativas excluyentes</strong>: Gerenciar contrata solo una. Esta tabla muestra qué recibe y cuánto paga en cada caso.</p>
+  <table class="includes-table compare">
+    <thead><tr><th>Concepto</th><th class="col-a">Si eliges la opción A<br><span>SPARTAN Managed</span></th><th class="col-b">Si eliges la opción B<br><span>SPARTAN Enterprise Source</span></th></tr></thead>
+    <tbody>
+      <tr><td>Pago inicial</td><td>$50M implementación</td><td>$150M implementación + licencia perpetua</td></tr>
+      <tr><td>SPARTAN mensual</td><td>$5,9M licencia</td><td>$2,5M mantenimiento, opcional</td></tr>
+      <tr><td>Trueno</td><td>$3,2M/mes · 5.000 conversaciones</td><td>$3,2M/mes · 5.000 conversaciones</td></tr>
+      <tr><td>Código fuente</td><td>No</td><td>Sí, de la versión entregada en el go-live</td></tr>
+      <tr><td>Nuevas versiones</td><td>Incluidas como evolución estándar</td><td>Según contrato de mantenimiento</td></tr>
+      <tr><td>Acompañamiento en implementación</td><td>2 Forward Deployed Engineers · 2 semanas</td><td>2 Forward Deployed Engineers · 2 semanas</td></tr>
+      <tr><td>Conector MCP para Claude</td><td>Incluido (SPARTAN y Trueno)</td><td>Incluido (SPARTAN y Trueno)</td></tr>
+      <tr><td>Infraestructura</td><td>Gerenciar</td><td>Gerenciar</td></tr>
+      <tr><td>Propiedad intelectual</td><td>Intelsa</td><td>Intelsa; licencia no exclusiva, sin reventa ni sublicencia</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 08 HITOS -->
+<section>
+  <div class="section-header"><span class="section-number">09</span><h2 class="section-title">Hitos de despliegue: qué incluye cada uno</h2></div>
+  <p class="section-lead">El despliegue incluye un equipo de <strong>2 Forward Deployed Engineers</strong> de Intelsa que acompañan la implementación durante <strong>2 semanas</strong>, trabajando junto al equipo de Gerenciar para entender su operación, configurar la plataforma y resolver en el momento. Las fechas se confirman después del levantamiento técnico y dependen del alcance, los accesos, la migración, las integraciones, las pruebas y las aprobaciones de Gerenciar.</p>
+  <div class="hitos">
+    <div class="hito start">
+      <div class="hito-tag">Inicio</div>
+      <div class="hito-body">
+        <h5>Levantamiento técnico y funcional</h5>
+        <ul>
+          <li>Procesos comerciales, de cierre y de servicio de cada sociedad</li>
+          <li>Usuarios, roles y permisos por empresa</li>
+          <li>Sistemas a integrar (SINCO y otros ERP) y capacidades de cada uno</li>
+          <li>Fuentes y calidad de los datos a migrar</li>
+          <li>Infraestructura de Gerenciar</li>
+        </ul>
+        <div class="hito-deliv"><strong>Entregable:</strong> documento de alcance y cronograma por hitos.</div>
+      </div>
+    </div>
+    <div class="hito">
+      <div class="hito-tag">Hito 1</div>
+      <div class="hito-body">
+        <h5>Core productivo</h5>
+        <ul>
+          <li>Backend, base de datos y autenticación</li>
+          <li>Aislamiento multiempresa con seguridad a nivel de base de datos y pruebas de acceso entre empresas</li>
+          <li>Roles, permisos y auditoría</li>
+          <li>Empresas del grupo, usuarios y permisos configurados</li>
+          <li>Leads, clientes únicos, oportunidades, tareas y visitas</li>
+          <li>SLA, scoring y tipificaciones</li>
+        </ul>
+        <div class="hito-deliv"><strong>Entregable:</strong> CRM operando con los usuarios reales de Gerenciar.</div>
+      </div>
+    </div>
+    <div class="hito">
+      <div class="hito-tag">Hito 2</div>
+      <div class="hito-body">
+        <h5>Gestión comercial + Trueno</h5>
+        <ul>
+          <li>Journey y cadencias configurados por proyecto</li>
+          <li>Proyectos, inventario y disponibilidad</li>
+          <li>WhatsApp conectado a Trueno</li>
+          <li>Entrenamiento y setup del agente de IA</li>
+          <li>Calificación automática, paso del lead al asesor y seguimiento</li>
+        </ul>
+        <div class="hito-deliv"><strong>Entregable:</strong> leads atendidos por Trueno y registrados en SPARTAN.</div>
+      </div>
+    </div>
+    <div class="hito">
+      <div class="hito-tag">Hito 3</div>
+      <div class="hito-body">
+        <h5>Integración + cierre comercial</h5>
+        <ul>
+          <li>Integración inicial con SINCO y otros ERP, según sus capacidades</li>
+          <li>Cotizaciones versionadas desde el inventario</li>
+          <li>Separación de unidades sin doble reserva</li>
+          <li>Gestión documental y promesas de compraventa</li>
+        </ul>
+        <div class="hito-deliv"><strong>Entregable:</strong> la venta gestionada de punta a punta hasta la promesa.</div>
+      </div>
+    </div>
+    <div class="hito">
+      <div class="hito-tag">Hito 4</div>
+      <div class="hito-body">
+        <h5>Posventa</h5>
+        <ul>
+          <li>Escrituración y entregas con checklist obligatorio</li>
+          <li>Cartera, plan de pagos y estado de cuenta</li>
+          <li>PQR, garantías y SLA</li>
+          <li>Encuestas CSAT y NPS, fidelización y referidos</li>
+        </ul>
+        <div class="hito-deliv"><strong>Entregable:</strong> el recorrido completo del cliente, hasta la posventa.</div>
+      </div>
+    </div>
+    <div class="hito end">
+      <div class="hito-tag">Hito 5</div>
+      <div class="hito-body">
+        <h5>Gerencia + salida a producción</h5>
+        <ul>
+          <li>Tablero gerencial, embudo y analítica del journey</li>
+          <li>Flujo de caja, rentabilidad por empresa y reportes</li>
+          <li>Conector MCP de SPARTAN y Trueno para Claude</li>
+          <li>Migración de los datos acordados</li>
+          <li>Pruebas, UAT, capacitación y go-live</li>
+          <li>Firma del acta de salida a producción</li>
+        </ul>
+        <div class="hito-deliv"><strong>Entregable:</strong> SPARTAN en producción para todo el grupo, con acta de salida a producción firmada por ambas partes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 CONDICIONES -->
+<section>
+  <div class="section-header"><span class="section-number">10</span><h2 class="section-title">Condiciones comerciales</h2></div>
+  <ul class="conditions-list">
+    <li><strong>Impuestos:</strong> los valores están en pesos colombianos y no incluyen IVA.</li>
+    <li><strong>Facturación y pago:</strong> la implementación (o el pago único en Enterprise Source) se factura una vez firmado el contrato. Los cargos recurrentes (licencia, mantenimiento y Trueno) se facturan mensualmente. Todas las facturas se pagan a 30 días.</li>
+    <li><strong>Propiedad intelectual:</strong> en ambas modalidades Intelsa conserva la propiedad intelectual de SPARTAN y el derecho de comercializarlo, licenciarlo, modificarlo y evolucionarlo. No hay exclusividad.</li>
+    <li><strong>Enterprise Source:</strong> Gerenciar puede usar indefinidamente la versión entregada, hospedarla y modificarla para uso interno; no puede revenderla, sublicenciarla ni entregarla a otras constructoras. Nuevas versiones, módulos o integraciones futuras no se entienden incluidos.</li>
+    <li><strong>SINCO:</strong> la integración usa los endpoints disponibles y acordados. Si SINCO debe desarrollar o modificar APIs, ese desarrollo no está incluido.</li>
+    <li><strong>Trueno:</strong> el plan incluye 5.000 conversaciones al mes; cada conversación adicional se factura a $600 + IVA. Los consumos de Meta/WhatsApp, telefonía y firma se facturan aparte.</li>
+    <li><strong>Alcance:</strong> el alcance definitivo se valida en el levantamiento inicial y la migración cubre solo las fuentes acordadas.</li>
+    <li><strong>Desarrollo adicional:</strong> si se requieren desarrollos fuera del alcance acordado, Intelsa estima las horas necesarias y las costea a <strong>$180.000 + IVA por hora</strong>, previa aprobación de Gerenciar.</li>
+    <li><strong>Salida a producción:</strong> la implementación concluye con la firma de un acta de salida a producción por ambas partes.</li>
+    <li><strong>Contrato:</strong> las condiciones definitivas están sujetas a revisión jurídica de ambas partes.</li>
+    <li><strong>Validez de la propuesta:</strong> 30 días calendario a partir de la fecha de emisión.</li>
+  </ul>
+</section>
+
+<!-- CTA -->
+<div class="cta-block">
+  <div>
+    <h3>Una plataforma hecha alrededor de la operación de Gerenciar, lista para empezar.</h3>
+    <p>El siguiente paso es una sesión de aclaración para resolver dudas de alcance, usuarios y modalidad. Con la modalidad elegida arrancamos el levantamiento técnico.</p>
+    <ul class="cta-steps">
+      <li>Revisión interna de la propuesta</li>
+      <li>Sesión de aclaración con Intelsa</li>
+      <li>Elección de modalidad y levantamiento técnico</li>
+      <li>Alcance definitivo, contrato e inicio del Hito 1</li>
+    </ul>
+  </div>
+  <div class="cta-contact">
+    <div class="label">Tu contacto en Intelsa</div>
+    <div class="name">Vanessa Restrepo Sánchez</div>
+    <div class="detail">
+      <a href="mailto:vanessarestrepo@intelsa.co">vanessarestrepo@intelsa.co</a><br>
+      <a href="https://wa.me/573505757765?text=Hola%20Vanessa%2C%20quiero%20hablar%20sobre%20la%20propuesta%20de%20SPARTAN%20para%20Gerenciar" target="_blank" rel="noopener">WhatsApp 350 575 7765</a><br>
+      <a href="https://intelsa.co" target="_blank" rel="noopener">intelsa.co</a>
+    </div>
+    <a class="wa-btn" href="https://wa.me/573505757765?text=Hola%20Vanessa%2C%20quiero%20hablar%20sobre%20la%20propuesta%20de%20SPARTAN%20para%20Gerenciar" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+  </div>
+</div>
+
+<div class="footer">
+  <span>Intelsa BPO &amp; CX · Propuesta SPARTAN Flow CRM + Trueno · Confidencial</span>
+  <span>Medellín, Colombia · Noviembre 2026</span>
+</div>
+
+</div>
+
+</body>
+</html>
